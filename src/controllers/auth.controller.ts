@@ -2,6 +2,7 @@ import { Controller, Get, Next, Post, Req, Res } from '@nestjs/common';
 import type { Request, Response, NextFunction } from 'express';
 import passport from '../config/passport.config';
 import jwt from 'jsonwebtoken';
+import type { SignOptions } from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import jwksClient from 'jwks-rsa';
 import axios from 'axios';
@@ -12,6 +13,10 @@ import { getMillisecondsFromExpiry } from '../utils/helper';
 
 const TENANT_ID = process.env.MICROSOFT_TENANT_ID || 'common';
 const MSAL_MOBILE_CLIENT_ID = process.env.MSAL_MOBILE_CLIENT_ID;
+type JwtExpiry = SignOptions['expiresIn'];
+
+const resolveJwtExpiry = (value: string | undefined, fallback: JwtExpiry): JwtExpiry =>
+  (value || fallback) as JwtExpiry;
 
 const msJwks = jwksClient({
   jwksUri: 'https://login.microsoftonline.com/common/discovery/v2.0/keys',
@@ -48,8 +53,8 @@ export class AuthController {
     const roles = roleDocs.map((r: any) => r.name);
     const permissions = Array.from(new Set(roleDocs.flatMap((r: any) => r.permissions)));
 
-    const accessTTL = process.env.JWT_ACCESS_TOKEN_EXPIRES_IN || '15m';
-    const refreshTTL = process.env.JWT_REFRESH_TOKEN_EXPIRES_IN || '7d';
+    const accessTTL = resolveJwtExpiry(process.env.JWT_ACCESS_TOKEN_EXPIRES_IN, '15m');
+    const refreshTTL = resolveJwtExpiry(process.env.JWT_REFRESH_TOKEN_EXPIRES_IN, '7d');
 
     const payload = {
       id: principal._id,
@@ -89,8 +94,8 @@ export class AuthController {
     const roles = roleDocs.map((r: any) => r.name);
     const permissions = Array.from(new Set(roleDocs.flatMap((r: any) => r.permissions)));
 
-    const accessTTL = process.env.JWT_ACCESS_TOKEN_EXPIRES_IN || '15m';
-    const refreshTTL = process.env.JWT_REFRESH_TOKEN_EXPIRES_IN || '7d';
+    const accessTTL = resolveJwtExpiry(process.env.JWT_ACCESS_TOKEN_EXPIRES_IN, '15m');
+    const refreshTTL = resolveJwtExpiry(process.env.JWT_REFRESH_TOKEN_EXPIRES_IN, '7d');
 
     const payload = {
       id: principal._id,
@@ -389,8 +394,8 @@ export class AuthController {
         .select('name permissions -_id').lean();
       const roles = roleDocs.map((r: any) => r.name);
       const permissions = Array.from(new Set(roleDocs.flatMap((r: any) => r.permissions)));
-      const accessTTL = process.env.JWT_ACCESS_TOKEN_EXPIRES_IN || '15m';
-      const refreshTTL = process.env.JWT_REFRESH_TOKEN_EXPIRES_IN || '7d';
+      const accessTTL = resolveJwtExpiry(process.env.JWT_ACCESS_TOKEN_EXPIRES_IN, '15m');
+      const refreshTTL = resolveJwtExpiry(process.env.JWT_REFRESH_TOKEN_EXPIRES_IN, '7d');
 
       const payload = { id: principal._id, email: principal.email, tenantId: principal.tenantId, roles, permissions };
       const accessToken = jwt.sign(payload, process.env.JWT_SECRET as string, { expiresIn: accessTTL });
@@ -504,7 +509,7 @@ export class AuthController {
         permissions,
       };
 
-      const accessTokenExpiresIn = process.env.JWT_ACCESS_TOKEN_EXPIRES_IN || '15m';
+      const accessTokenExpiresIn = resolveJwtExpiry(process.env.JWT_ACCESS_TOKEN_EXPIRES_IN, '15m');
       const accessToken = jwt.sign(payload, process.env.JWT_SECRET as string, { expiresIn: accessTokenExpiresIn });
 
       return res.status(200).json({ accessToken, type: principalType });

@@ -1,4 +1,8 @@
-export function getMillisecondsFromExpiry(expiry: string): number {
+export function getMillisecondsFromExpiry(expiry: string | number): number {
+  if (typeof expiry === 'number') {
+    return expiry * 1000;
+  }
+
   const unit = expiry.slice(-1).toLowerCase();
   const value = parseInt(expiry.slice(0, -1), 10);
 

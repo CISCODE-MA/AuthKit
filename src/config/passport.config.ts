@@ -1,29 +1,26 @@
-const passport         = require('passport');
-const LocalStrategy    = require('passport-local').Strategy;
-const AzureStrategy    = require('passport-azure-ad-oauth2').Strategy;
-const GoogleStrategy   = require('passport-google-oauth20').Strategy;
-const FacebookStrategy = require('passport-facebook').Strategy;
-const bcrypt           = require('bcryptjs');
-const jwtDecode        = require('jsonwebtoken').decode;
-const User             = require('../models/user.model');
-const Client           = require('../models/client.model');
-require('dotenv').config();
+import passport from 'passport';
+import { Strategy as LocalStrategy } from 'passport-local';
+import { Strategy as AzureStrategy } from 'passport-azure-ad-oauth2';
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+import { Strategy as FacebookStrategy } from 'passport-facebook';
+import bcrypt from 'bcryptjs';
+import { decode as jwtDecode } from 'jsonwebtoken';
+import User from '../models/user.model';
+import Client from '../models/client.model';
+import 'dotenv/config';
 
-/* ── Lockout settings for local login ───────────────────── */
-const MAX_FAILED    = parseInt(process.env.MAX_FAILED_LOGIN_ATTEMPTS, 10) || 3;
-const LOCK_TIME_MIN = parseInt(process.env.ACCOUNT_LOCK_TIME_MINUTES, 10) || 15;
-const LOCK_TIME_MS  = LOCK_TIME_MIN * 60 * 1000;
+const MAX_FAILED = parseInt(process.env.MAX_FAILED_LOGIN_ATTEMPTS || '', 10) || 3;
+const LOCK_TIME_MIN = parseInt(process.env.ACCOUNT_LOCK_TIME_MINUTES || '', 10) || 15;
+const LOCK_TIME_MS = LOCK_TIME_MIN * 60 * 1000;
 
-/* ── Default tenant for staff created via Google/Facebook ─ */
 const DEFAULT_TENANT_ID = process.env.DEFAULT_TENANT_ID || 'social-staff';
 
-/* ── Local (email/password) for staff ───────────────────── */
 passport.use(
   new LocalStrategy(
     { usernameField: 'email', passwordField: 'password', passReqToCallback: true },
-    async (req, email, password, done) => {
+    async (req: any, email: string, password: string, done: any) => {
       try {
-        const query = { email };
+        const query: any = { email };
         if (req.body.tenantId) query.tenantId = String(req.body.tenantId).trim();
 
         const user = await User.findOne(query);
@@ -46,26 +43,27 @@ passport.use(
         await user.save();
 
         return done(null, user);
-      } catch (err) { return done(err); }
+      } catch (err) {
+        return done(err);
+      }
     }
   )
 );
 
-/* ── Microsoft (Users) ──────────────────────────────────── */
 passport.use(
   new AzureStrategy(
     {
-      clientID:     process.env.MICROSOFT_CLIENT_ID,
+      clientID: process.env.MICROSOFT_CLIENT_ID,
       clientSecret: process.env.MICROSOFT_CLIENT_SECRET,
-      callbackURL:  process.env.MICROSOFT_CALLBACK_URL, // e.g. /api/auth/microsoft/callback
+      callbackURL: process.env.MICROSOFT_CALLBACK_URL,
     },
-    async (_at, _rt, params, _profile, done) => {
+    async (_at: any, _rt: any, params: any, _profile: any, done: any) => {
       try {
-        const decoded     = jwtDecode(params.id_token);
+        const decoded: any = jwtDecode(params.id_token);
         const microsoftId = decoded.oid;
-        const email       = decoded.preferred_username;
-        const name        = decoded.name;
-        const tenantId    = decoded.tid;
+        const email = decoded.preferred_username;
+        const name = decoded.name;
+        const tenantId = decoded.tid;
 
         let user = await User.findOne({ $or: [{ microsoftId }, { email }] });
         if (!user) {
@@ -74,47 +72,48 @@ passport.use(
         } else {
           let changed = false;
           if (!user.microsoftId) { user.microsoftId = microsoftId; changed = true; }
-          if (!user.tenantId)    { user.tenantId    = tenantId;    changed = true; }
+          if (!user.tenantId) { user.tenantId = tenantId; changed = true; }
           if (changed) await user.save();
         }
         return done(null, user);
-      } catch (err) { return done(err); }
+      } catch (err) {
+        return done(err);
+      }
     }
   )
 );
 
-/* ── Microsoft (Clients) ────────────────────────────────── */
 passport.use(
   'azure_ad_oauth2_client',
   new AzureStrategy(
     {
-      clientID:     process.env.MICROSOFT_CLIENT_ID_CLIENT     || process.env.MICROSOFT_CLIENT_ID,
+      clientID: process.env.MICROSOFT_CLIENT_ID_CLIENT || process.env.MICROSOFT_CLIENT_ID,
       clientSecret: process.env.MICROSOFT_CLIENT_SECRET_CLIENT || process.env.MICROSOFT_CLIENT_SECRET,
-      callbackURL:  process.env.MICROSOFT_CALLBACK_URL_CLIENT, // e.g. /api/auth/client/microsoft/callback
+      callbackURL: process.env.MICROSOFT_CALLBACK_URL_CLIENT,
     },
-    async (_at, _rt, params, _profile, done) => {
+    async (_at: any, _rt: any, params: any, _profile: any, done: any) => {
       try {
-        const decoded     = jwtDecode(params.id_token);
+        const decoded: any = jwtDecode(params.id_token);
         const microsoftId = decoded.oid;
-        const email       = decoded.preferred_username;
-        const name        = decoded.name;
+        const email = decoded.preferred_username;
+        const name = decoded.name;
 
         let client = await Client.findOne({ $or: [{ microsoftId }, { email }] });
         if (!client) {
           client = new Client({ email, name, microsoftId, roles: [] });
-          // No password for OAuth clients by schema
           await client.save();
         } else if (!client.microsoftId) {
           client.microsoftId = microsoftId;
           await client.save();
         }
         return done(null, client);
-      } catch (err) { return done(err); }
+      } catch (err) {
+        return done(err);
+      }
     }
   )
 );
 
-/* ── Google (Users) ─────────────────────────────────────── */
 if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.env.GOOGLE_CALLBACK_URL_USER) {
   passport.use(
     'google-user',
@@ -124,7 +123,7 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
         callbackURL: process.env.GOOGLE_CALLBACK_URL_USER
       },
-      async (_at, _rt, profile, done) => {
+      async (_at: any, _rt: any, profile: any, done: any) => {
         try {
           const email = profile.emails && profile.emails[0]?.value;
           if (!email) return done(null, false);
@@ -147,13 +146,14 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.
             if (changed) await user.save();
           }
           return done(null, user);
-        } catch (err) { return done(err); }
+        } catch (err) {
+          return done(err);
+        }
       }
     )
   );
 }
 
-/* ── Google (Clients) ───────────────────────────────────── */
 if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.env.GOOGLE_CALLBACK_URL_CLIENT) {
   passport.use(
     'google-client',
@@ -163,7 +163,7 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
         callbackURL: process.env.GOOGLE_CALLBACK_URL_CLIENT
       },
-      async (_at, _rt, profile, done) => {
+      async (_at: any, _rt: any, profile: any, done: any) => {
         try {
           const email = profile.emails && profile.emails[0]?.value;
           if (!email) return done(null, false);
@@ -182,13 +182,14 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.
             await client.save();
           }
           return done(null, client);
-        } catch (err) { return done(err); }
+        } catch (err) {
+          return done(err);
+        }
       }
     )
   );
 }
 
-/* ── Facebook (Users) ───────────────────────────────────── */
 if (process.env.FB_CLIENT_ID && process.env.FB_CLIENT_SECRET && process.env.FB_CALLBACK_URL_USER) {
   passport.use(
     'facebook-user',
@@ -199,7 +200,7 @@ if (process.env.FB_CLIENT_ID && process.env.FB_CLIENT_SECRET && process.env.FB_C
         callbackURL: process.env.FB_CALLBACK_URL_USER,
         profileFields: ['id', 'displayName', 'emails']
       },
-      async (_at, _rt, profile, done) => {
+      async (_at: any, _rt: any, profile: any, done: any) => {
         try {
           const email = profile.emails && profile.emails[0]?.value;
           if (!email) return done(null, false);
@@ -218,17 +219,18 @@ if (process.env.FB_CLIENT_ID && process.env.FB_CLIENT_SECRET && process.env.FB_C
           } else {
             let changed = false;
             if (!user.facebookId) { user.facebookId = profile.id; changed = true; }
-            if (!user.tenantId)   { user.tenantId   = DEFAULT_TENANT_ID; changed = true; }
+            if (!user.tenantId) { user.tenantId = DEFAULT_TENANT_ID; changed = true; }
             if (changed) await user.save();
           }
           return done(null, user);
-        } catch (err) { return done(err); }
+        } catch (err) {
+          return done(err);
+        }
       }
     )
   );
 }
 
-/* ── Facebook (Clients) ─────────────────────────────────── */
 if (process.env.FB_CLIENT_ID && process.env.FB_CLIENT_SECRET && process.env.FB_CALLBACK_URL_CLIENT) {
   passport.use(
     'facebook-client',
@@ -239,7 +241,7 @@ if (process.env.FB_CLIENT_ID && process.env.FB_CLIENT_SECRET && process.env.FB_C
         callbackURL: process.env.FB_CALLBACK_URL_CLIENT,
         profileFields: ['id', 'displayName', 'emails']
       },
-      async (_at, _rt, profile, done) => {
+      async (_at: any, _rt: any, profile: any, done: any) => {
         try {
           const email = profile.emails && profile.emails[0]?.value;
           if (!email) return done(null, false);
@@ -258,17 +260,17 @@ if (process.env.FB_CLIENT_ID && process.env.FB_CLIENT_SECRET && process.env.FB_C
             await client.save();
           }
           return done(null, client);
-        } catch (err) { return done(err); }
+        } catch (err) {
+          return done(err);
+        }
       }
     )
   );
 }
 
-/* ── Sessions (only if you use them) ────────────────────── */
-passport.serializeUser((principal, done) => done(null, principal.id));
-passport.deserializeUser(async (id, done) => {
+passport.serializeUser((principal: any, done: any) => done(null, principal.id));
+passport.deserializeUser(async (id: string, done: any) => {
   try {
-    // Try Users, then Clients
     let principal = await User.findById(id);
     if (!principal) principal = await Client.findById(id);
     done(null, principal);
@@ -277,4 +279,4 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
-module.exports = passport;
+export default passport;

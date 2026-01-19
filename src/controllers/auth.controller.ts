@@ -11,7 +11,6 @@ import Client from '../models/client.model';
 import Role from '../models/role.model';
 import { getMillisecondsFromExpiry } from '../utils/helper';
 
-const TENANT_ID = process.env.MICROSOFT_TENANT_ID || 'common';
 const MSAL_MOBILE_CLIENT_ID = process.env.MSAL_MOBILE_CLIENT_ID;
 type JwtExpiry = SignOptions['expiresIn'];
 
@@ -59,7 +58,6 @@ export class AuthController {
     const payload = {
       id: principal._id,
       email: principal.email,
-      tenantId: principal.tenantId,
       roles,
       permissions,
     };
@@ -100,7 +98,6 @@ export class AuthController {
     const payload = {
       id: principal._id,
       email: principal.email,
-      tenantId: principal.tenantId,
       roles,
       permissions,
     };
@@ -253,11 +250,6 @@ export class AuthController {
 
       const email = ms.preferred_username || ms.email;
       const name = ms.name;
-      const tid = ms.tid;
-
-      if (TENANT_ID && TENANT_ID !== 'common' && tid && tid !== TENANT_ID) {
-        return res.status(401).json({ message: 'Tenant mismatch.' });
-      }
       if (!email) {
         return res.status(400).json({ message: 'Email claim missing in Microsoft ID token.' });
       }
@@ -269,7 +261,6 @@ export class AuthController {
         user = new User({
           email,
           name,
-          tenantId: tid || TENANT_ID,
           microsoftId,
           roles: [],
           status: 'active',
@@ -278,7 +269,6 @@ export class AuthController {
       } else {
         let changed = false;
         if (!user.microsoftId) { user.microsoftId = microsoftId; changed = true; }
-        if (!user.tenantId) { user.tenantId = tid || TENANT_ID; changed = true; }
         if (changed) await user.save();
       }
 
@@ -324,17 +314,9 @@ export class AuthController {
   @Post('google/exchange')
   async googleExchange(@Req() req: Request, @Res() res: Response) {
     try {
-      let { code, idToken, type = 'user', tenantId } = req.body || {};
+      let { code, idToken, type = 'user' } = req.body || {};
       if (!['user', 'client'].includes(type)) {
         return res.status(400).json({ message: 'invalid type; must be "user" or "client"' });
-      }
-
-      let resolvedTenantId: string | undefined;
-      if (type === 'user') {
-        resolvedTenantId = tenantId || process.env.DEFAULT_TENANT_ID;
-        if (!resolvedTenantId) {
-          return res.status(400).json({ message: 'tenantId is required for user login.' });
-        }
       }
 
       let email: string | undefined;
@@ -380,13 +362,12 @@ export class AuthController {
       if (!principal) {
         principal = new Model(
           type === 'user'
-            ? { email, name, googleId, tenantId: resolvedTenantId, roles: [], status: 'active' }
+            ? { email, name, googleId, roles: [], status: 'active' }
             : { email, name, googleId, roles: [] }
         );
         await principal.save();
       } else if (!principal.googleId) {
         principal.googleId = googleId;
-        if (type === 'user' && !principal.tenantId) principal.tenantId = resolvedTenantId;
         await principal.save();
       }
 
@@ -397,7 +378,7 @@ export class AuthController {
       const accessTTL = resolveJwtExpiry(process.env.JWT_ACCESS_TOKEN_EXPIRES_IN, '15m');
       const refreshTTL = resolveJwtExpiry(process.env.JWT_REFRESH_TOKEN_EXPIRES_IN, '7d');
 
-      const payload = { id: principal._id, email: principal.email, tenantId: principal.tenantId, roles, permissions };
+      const payload = { id: principal._id, email: principal.email, roles, permissions };
       const accessToken = jwt.sign(payload, process.env.JWT_SECRET as string, { expiresIn: accessTTL });
       const refreshToken = jwt.sign({ id: principal._id }, process.env.JWT_REFRESH_SECRET as string, { expiresIn: refreshTTL });
 
@@ -504,7 +485,6 @@ export class AuthController {
       const payload = {
         id: principal._id,
         email: principal.email,
-        tenantId: principal.tenantId,
         roles,
         permissions,
       };

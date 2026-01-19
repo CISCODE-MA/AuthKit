@@ -13,18 +13,13 @@ const MAX_FAILED = parseInt(process.env.MAX_FAILED_LOGIN_ATTEMPTS || '', 10) || 
 const LOCK_TIME_MIN = parseInt(process.env.ACCOUNT_LOCK_TIME_MINUTES || '', 10) || 15;
 const LOCK_TIME_MS = LOCK_TIME_MIN * 60 * 1000;
 
-const DEFAULT_TENANT_ID = process.env.DEFAULT_TENANT_ID || 'social-staff';
-
 passport.use(
   new LocalStrategy(
     { usernameField: 'email', passwordField: 'password', passReqToCallback: true },
     async (req: any, email: string, password: string, done: any) => {
       try {
-        const query: any = { email };
-        if (req.body.tenantId) query.tenantId = String(req.body.tenantId).trim();
-
-        const user = await User.findOne(query);
-        if (!user) return done(null, false, { message: 'Incorrect email (or tenant).' });
+        const user = await User.findOne({ email });
+        if (!user) return done(null, false, { message: 'Incorrect email.' });
 
         if (user.lockUntil && user.lockUntil > Date.now()) {
           return done(null, false, { message: `Account locked until ${new Date(user.lockUntil).toLocaleString()}.` });
@@ -63,16 +58,13 @@ passport.use(
         const microsoftId = decoded.oid;
         const email = decoded.preferred_username;
         const name = decoded.name;
-        const tenantId = decoded.tid;
-
         let user = await User.findOne({ $or: [{ microsoftId }, { email }] });
         if (!user) {
-          user = new User({ email, name, tenantId, microsoftId, roles: [], status: 'active' });
+          user = new User({ email, name, microsoftId, roles: [], status: 'active' });
           await user.save();
         } else {
           let changed = false;
           if (!user.microsoftId) { user.microsoftId = microsoftId; changed = true; }
-          if (!user.tenantId) { user.tenantId = tenantId; changed = true; }
           if (changed) await user.save();
         }
         return done(null, user);
@@ -133,7 +125,6 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.
             user = new User({
               email,
               name: profile.displayName,
-              tenantId: DEFAULT_TENANT_ID,
               googleId: profile.id,
               roles: [],
               status: 'active'
@@ -142,7 +133,6 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.
           } else {
             let changed = false;
             if (!user.googleId) { user.googleId = profile.id; changed = true; }
-            if (!user.tenantId) { user.tenantId = DEFAULT_TENANT_ID; changed = true; }
             if (changed) await user.save();
           }
           return done(null, user);
@@ -210,7 +200,6 @@ if (process.env.FB_CLIENT_ID && process.env.FB_CLIENT_SECRET && process.env.FB_C
             user = new User({
               email,
               name: profile.displayName,
-              tenantId: DEFAULT_TENANT_ID,
               facebookId: profile.id,
               roles: [],
               status: 'active'
@@ -219,7 +208,6 @@ if (process.env.FB_CLIENT_ID && process.env.FB_CLIENT_SECRET && process.env.FB_C
           } else {
             let changed = false;
             if (!user.facebookId) { user.facebookId = profile.id; changed = true; }
-            if (!user.tenantId) { user.tenantId = DEFAULT_TENANT_ID; changed = true; }
             if (changed) await user.save();
           }
           return done(null, user);

@@ -7,11 +7,11 @@ export class RolesController {
   @Post()
   async createRole(@Req() req: Request, @Res() res: Response) {
     try {
-      const { tenantId, name, description, permissions } = req.body;
-      if (!tenantId || !name) {
-        return res.status(400).json({ message: 'tenantId and role name are required.' });
+      const { name, description, permissions } = req.body;
+      if (!name) {
+        return res.status(400).json({ message: 'Role name is required.' });
       }
-      const newRole = new Role({ tenantId, name, description, permissions });
+      const newRole = new Role({ name, description, permissions });
       await newRole.save();
       return res.status(201).json(newRole);
     } catch (error: any) {
@@ -20,14 +20,10 @@ export class RolesController {
     }
   }
 
-  @Get(':tenantId')
+  @Get()
   async getRoles(@Req() req: Request, @Res() res: Response) {
     try {
-      const { tenantId } = req.params;
-      if (!tenantId) {
-        return res.status(400).json({ message: 'tenantId is required in the URL.' });
-      }
-      const roles = await (Role as any).paginate({ tenantId }, { page: 1, limit: 100 });
+      const roles = await (Role as any).paginate({}, { page: 1, limit: 100 });
       return res.status(200).json(roles);
     } catch (error: any) {
       console.error('Error retrieving roles:', error);

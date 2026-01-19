@@ -5,7 +5,8 @@ const UserSchema = new mongoose.Schema(
   {
     email: {
       type: String,
-      required: true
+      required: true,
+      unique: true
     },
     password: {
       type: String,
@@ -14,7 +15,8 @@ const UserSchema = new mongoose.Schema(
       }
     },
     name: { type: String },
-    tenantId: { type: String, required: true },
+    jobTitle: { type: String },
+    company: { type: String },
     microsoftId: { type: String, index: true },
     googleId: { type: String, index: true },
     facebookId: { type: String, index: true },
@@ -34,7 +36,6 @@ const UserSchema = new mongoose.Schema(
 );
 
 UserSchema.plugin(mongoosePaginate);
-UserSchema.index({ tenantId: 1, email: 1 }, { unique: true });
 
 const User = mongoose.models.User || mongoose.model('User', UserSchema);
 

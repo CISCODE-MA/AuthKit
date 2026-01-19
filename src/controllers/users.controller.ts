@@ -10,19 +10,16 @@ export class UsersController {
   @Post()
   async createUser(@Req() req: Request, @Res() res: Response) {
     try {
-      const { email, password, name, tenantId, microsoftId, roles } = req.body;
+      const { email, password, name, microsoftId, roles, jobTitle, company } = req.body;
 
       if (!email) {
         return res.status(400).json({ message: 'Email is required.' });
-      }
-      if (!tenantId) {
-        return res.status(400).json({ message: 'TenantId is required.' });
       }
       if (!microsoftId && !password) {
         return res.status(400).json({ message: 'Password is required for local login.' });
       }
 
-      const existingUser = await User.findOne({ email, tenantId });
+      const existingUser = await User.findOne({ email });
       if (existingUser) {
         return res.status(400).json({ message: 'User with this email already exists.' });
       }
@@ -39,9 +36,10 @@ export class UsersController {
         email,
         password: hashedPassword,
         name,
-        tenantId,
         microsoftId,
         roles,
+        jobTitle,
+        company,
         status,
         resetPasswordToken: confirmationToken,
         resetPasswordExpires: tokenExpiration
@@ -126,16 +124,13 @@ Thank you.`
   @Post('invite')
   async createUserInvitation(@Req() req: Request, @Res() res: Response) {
     try {
-      const { email, tenantId, name } = req.body;
+      const { email, name } = req.body;
 
       if (!email) {
         return res.status(400).json({ message: 'Email is required.' });
       }
-      if (!tenantId) {
-        return res.status(400).json({ message: 'TenantId is required.' });
-      }
 
-      const existingUser = await User.findOne({ email, tenantId });
+      const existingUser = await User.findOne({ email });
       if (existingUser) {
         return res.status(400).json({ message: 'User with this email already exists.' });
       }
@@ -145,7 +140,6 @@ Thank you.`
 
       const newUser = new User({
         email,
-        tenantId,
         name,
         resetPasswordToken: token,
         resetPasswordExpires: tokenExpiration
@@ -191,7 +185,6 @@ Thank you!`
   async getAllUsers(@Req() req: Request, @Res() res: Response) {
     try {
       const filter: any = {};
-      if (req.query.tenantId) filter.tenantId = req.query.tenantId;
       if (req.query.email) filter.email = req.query.email;
 
       const page = Math.max(parseInt(req.query.page as string, 10) || 1, 1);

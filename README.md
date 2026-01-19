@@ -1,14 +1,13 @@
-Auth Service (NestJS, JWT, Multi-tenant, RBAC)
+Auth Service (NestJS, JWT, RBAC)
 Internal package - private to the company.
 This package is not published on npmjs. Install it only from the company Azure Artifacts feed using a project or user-level .npmrc.
 
 Authentication and authorization module for NestJS apps.
-Provides local email/password auth with lockout, JWT access tokens and refresh, tenant scoping, RBAC, and optional OAuth (Microsoft Entra, Google, Facebook).
+Provides local email/password auth with lockout, JWT access tokens and refresh, RBAC, and optional OAuth (Microsoft Entra, Google, Facebook).
 
 Features
 Local auth (email/password) with account lockout policy.
 JWT access tokens (Bearer) and refresh endpoint (cookie or body).
-Multi-tenant scope on requests.
 RBAC (roles -> permission strings).
 Microsoft Entra (Azure AD), Google, Facebook OAuth (optional).
 MongoDB/Mongoose models.
@@ -47,7 +46,6 @@ MAX_FAILED_LOGIN_ATTEMPTS=5
 ACCOUNT_LOCK_TIME_MINUTES=15
 
 # (Optional) Microsoft Entra ID (Azure AD)
-MICROSOFT_TENANT_ID=common
 MICROSOFT_CLIENT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 MICROSOFT_CLIENT_SECRET=your-secret
 MICROSOFT_CALLBACK_URL=${BASE_URL}/api/auth/microsoft/callback
@@ -77,11 +75,11 @@ POST /api/auth/request-password-reset - Sends a reset token (e.g., by email).
 POST /api/auth/reset-password - Consumes the reset token and sets a new password.
 GET /api/auth/microsoft - GET /api/auth/microsoft/callback - Optional Microsoft Entra OAuth; issues first-party tokens.
 Users
-GET /api/users - List users (tenant-scoped, paginated).
+GET /api/users - List users (paginated).
 POST /api/users - Create a user.
 Additional CRUD endpoints as exposed by controllers.
 Roles and Permissions
-GET/POST /api/auth/roles - Manage roles (name, tenantId, permissions: string[]).
+GET/POST /api/auth/roles - Manage roles (name, permissions: string[]).
 GET /api/auth/permissions - List permission strings and metadata.
 
 Protecting your own routes (host app)
@@ -94,18 +92,16 @@ getReports() {
   return { ok: true };
 }
 
-Tenant scope comes from the JWT payload (e.g., tenantId) and is used inside controllers/guards to filter queries.
-
 Quick start (smoke tests)
 Start your host app, then create a user and log in:
 
 curl -X POST http://localhost:3000/api/users \
   -H 'Content-Type: application/json' \
-  -d '{"email":"a@b.com","password":"Secret123!","tenantId":"t-001","name":"Alice"}'
+  -d '{"email":"a@b.com","password":"Secret123!","name":"Alice"}'
 
 curl -X POST http://localhost:3000/api/auth/login \
   -H 'Content-Type: application/json' \
-  -d '{"email":"a@b.com","password":"Secret123!","tenantId":"t-001"}'
+  -d '{"email":"a@b.com","password":"Secret123!"}'
 # => { "accessToken": "...", "refreshToken": "..." }
 
 Call a protected route

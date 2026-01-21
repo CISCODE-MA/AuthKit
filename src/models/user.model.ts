@@ -40,11 +40,11 @@ export class User {
   phoneNumber?: string;
 
   @Prop({ required: true, minlength: 6, select: false })
-  password?: string;
+  password!: string;
 
-  @Prop({ required: false })
-  passwordChangedAt: Date;
-
+  @Prop({ default: Date.now })
+  passwordChangedAt!: Date;
+  
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Role' }], required: true })
   roles!: Types.ObjectId[];
 

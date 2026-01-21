@@ -74,10 +74,12 @@ POST /api/auth/refresh-token - New access token from a valid refresh token (cook
 POST /api/auth/request-password-reset - Sends a reset token (e.g., by email).
 POST /api/auth/reset-password - Consumes the reset token and sets a new password.
 GET /api/auth/microsoft - GET /api/auth/microsoft/callback - Optional Microsoft Entra OAuth; issues first-party tokens.
+Note: If the Microsoft ID token does not include an email, the response includes `profileIncomplete: true`.
 Users
 GET /api/users - List users (paginated).
 POST /api/users - Create a user.
 Additional CRUD endpoints as exposed by controllers.
+If `profileIncomplete: true`, update the user profile (e.g., set `email`) via `PUT /api/users/:id`.
 Roles and Permissions
 GET/POST /api/auth/roles - Manage roles (name, permissions: string[]).
 GET /api/auth/permissions - List permission strings and metadata.

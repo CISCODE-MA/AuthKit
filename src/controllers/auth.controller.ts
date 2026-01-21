@@ -81,7 +81,7 @@ export class AuthController {
       maxAge: getMillisecondsFromExpiry(refreshTTL),
     });
 
-    return res.status(200).json({ accessToken, refreshToken });
+    return res.status(200).json({ accessToken, refreshToken, profileIncomplete: !principal.email });
   }
 
   private async respondWebOrMobile(req: Request, res: Response, principal: any) {
@@ -126,6 +126,7 @@ export class AuthController {
       const url = new URL(mobileRedirect);
       url.searchParams.set('accessToken', accessToken);
       url.searchParams.set('refreshToken', refreshToken);
+      url.searchParams.set('profileIncomplete', (!principal.email).toString());
       return res.redirect(302, url.toString());
     }
 
@@ -138,7 +139,7 @@ export class AuthController {
       maxAge: getMillisecondsFromExpiry(refreshTTL),
     });
 
-    return res.status(200).json({ accessToken, refreshToken });
+    return res.status(200).json({ accessToken, refreshToken, profileIncomplete: !principal.email });
   }
 
   @Post('clients/register')
@@ -251,14 +252,13 @@ export class AuthController {
         return res.status(401).json({ message: 'Invalid Microsoft ID token.' });
       }
 
-      const email = ms.preferred_username || ms.email;
-      const name = ms.name;
-      if (!email) {
-        return res.status(400).json({ message: 'Email claim missing in Microsoft ID token.' });
-      }
-
       const microsoftId = ms.oid || ms.sub;
-      let user = await User.findOne({ email });
+      const email = ms.preferred_username || ms.upn || ms.email;
+      const name = ms.name;
+
+      const match: any[] = [{ microsoftId }];
+      if (email) match.push({ email });
+      let user = await User.findOne({ $or: match });
 
       if (!user) {
         user = new User({
@@ -397,7 +397,7 @@ export class AuthController {
         maxAge: getMillisecondsFromExpiry(refreshTTL),
       });
 
-      return res.status(200).json({ accessToken, refreshToken });
+      return res.status(200).json({ accessToken, refreshToken, profileIncomplete: !principal.email });
     } catch (err: any) {
       console.error('googleExchange error:', err?.response?.data || err.message || err);
       return res.status(500).json({ message: 'Server error during Google exchange.' });

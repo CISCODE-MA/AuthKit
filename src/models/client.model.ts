@@ -5,8 +5,11 @@ const ClientSchema = new mongoose.Schema(
   {
     email: {
       type: String,
-      required: true,
-      unique: true
+      required: function () {
+        return !this.microsoftId && !this.googleId && !this.facebookId;
+      },
+      unique: true,
+      sparse: true
     },
     password: {
       type: String,

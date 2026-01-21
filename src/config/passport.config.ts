@@ -55,10 +55,12 @@ passport.use(
     async (_at: any, _rt: any, params: any, _profile: any, done: any) => {
       try {
         const decoded: any = jwtDecode(params.id_token);
-        const microsoftId = decoded.oid;
-        const email = decoded.preferred_username;
+        const microsoftId = decoded.oid || decoded.sub;
+        const email = decoded.preferred_username || decoded.upn || decoded.email;
         const name = decoded.name;
-        let user = await User.findOne({ $or: [{ microsoftId }, { email }] });
+        const match: any[] = [{ microsoftId }];
+        if (email) match.push({ email });
+        let user = await User.findOne({ $or: match });
         if (!user) {
           user = new User({ email, name, microsoftId, roles: [], status: 'active' });
           await user.save();
@@ -86,11 +88,13 @@ passport.use(
     async (_at: any, _rt: any, params: any, _profile: any, done: any) => {
       try {
         const decoded: any = jwtDecode(params.id_token);
-        const microsoftId = decoded.oid;
-        const email = decoded.preferred_username;
+        const microsoftId = decoded.oid || decoded.sub;
+        const email = decoded.preferred_username || decoded.upn || decoded.email;
         const name = decoded.name;
 
-        let client = await Client.findOne({ $or: [{ microsoftId }, { email }] });
+        const match: any[] = [{ microsoftId }];
+        if (email) match.push({ email });
+        let client = await Client.findOne({ $or: match });
         if (!client) {
           client = new Client({ email, name, microsoftId, roles: [] });
           await client.save();

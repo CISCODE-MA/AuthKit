@@ -4,14 +4,13 @@ import { randomBytes } from 'node:crypto';
 import bcrypt from 'bcryptjs';
 import nodemailer from 'nodemailer';
 import User from '../models/user.model';
-import Client from '../models/client.model';
 
-const ACCOUNT_TYPES = ['user', 'client'] as const;
+const ACCOUNT_TYPES = ['user'] as const;
 type AccountType = (typeof ACCOUNT_TYPES)[number];
 
 const isAccountType = (value: unknown): value is AccountType => ACCOUNT_TYPES.includes(value as AccountType);
 
-const getModel = (type: AccountType) => (type === 'user' ? User : Client);
+const getModel = (type: AccountType) => (type === 'user' ? User : User);
 
 @Controller('api/auth')
 export class PasswordResetController {

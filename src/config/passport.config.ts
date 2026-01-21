@@ -6,7 +6,6 @@ import { Strategy as FacebookStrategy } from 'passport-facebook';
 import bcrypt from 'bcryptjs';
 import { decode as jwtDecode } from 'jsonwebtoken';
 import User from '../models/user.model';
-import Client from '../models/client.model';
 import 'dotenv/config';
 
 const MAX_FAILED = parseInt(process.env.MAX_FAILED_LOGIN_ATTEMPTS || '', 10) || 3;
@@ -90,9 +89,9 @@ passport.use(
         const email = decoded.preferred_username;
         const name = decoded.name;
 
-        let client = await Client.findOne({ $or: [{ microsoftId }, { email }] });
+        let client = await User.findOne({ $or: [{ microsoftId }, { email }] });
         if (!client) {
-          client = new Client({ email, name, microsoftId, roles: [] });
+          client = new User({ email, name, microsoftId, roles: [] });
           await client.save();
         } else if (!client.microsoftId) {
           client.microsoftId = microsoftId;
@@ -158,9 +157,9 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.
           const email = profile.emails && profile.emails[0]?.value;
           if (!email) return done(null, false);
 
-          let client = await Client.findOne({ email });
+          let client = await User.findOne({ email });
           if (!client) {
-            client = new Client({
+            client = new User({
               email,
               name: profile.displayName,
               googleId: profile.id,
@@ -234,9 +233,9 @@ if (process.env.FB_CLIENT_ID && process.env.FB_CLIENT_SECRET && process.env.FB_C
           const email = profile.emails && profile.emails[0]?.value;
           if (!email) return done(null, false);
 
-          let client = await Client.findOne({ email });
+          let client = await User.findOne({ email });
           if (!client) {
-            client = new Client({
+            client = new User({
               email,
               name: profile.displayName,
               facebookId: profile.id,
@@ -260,7 +259,7 @@ passport.serializeUser((principal: any, done: any) => done(null, principal.id));
 passport.deserializeUser(async (id: string, done: any) => {
   try {
     let principal = await User.findById(id);
-    if (!principal) principal = await Client.findById(id);
+    if (!principal) principal = await User.findById(id);
     done(null, principal);
   } catch (err) {
     done(err);

@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
+import type { SignOptions } from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import * as jwt from 'jsonwebtoken';
 import { UserRepository } from '@repos/user.repository';
 import { RegisterDto } from '@dtos/register.dto';
 import { LoginDto } from '@dtos/login.dto';
 import { MailService } from '@services/mail.service';
 
-type JwtExpiry = string | number;
+type JwtExpiry = SignOptions['expiresIn'];
 
 @Injectable()
 export class AuthService {

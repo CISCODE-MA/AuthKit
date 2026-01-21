@@ -221,7 +221,10 @@ export class AuthController {
   @Get('microsoft/callback')
   microsoftCallback(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
     passport.authenticate('azure_ad_oauth2', { session: false }, async (err: any, user: any) => {
-      if (err) return next(err);
+      if (err) {
+        console.error('Microsoft OAuth error:', err);
+        return res.status(500).json({ message: 'Microsoft auth failed', error: err?.message || err });
+      }
       if (!user) return res.status(400).json({ message: 'Microsoft authentication failed.' });
       return this.respondWebOrMobile(req, res, user);
     })(req, res, next);
@@ -443,7 +446,10 @@ export class AuthController {
   @Get('client/microsoft/callback')
   microsoftClientCallback(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
     passport.authenticate('azure_ad_oauth2_client', { session: false }, async (err: any, client: any) => {
-      if (err) return next(err);
+      if (err) {
+        console.error('Microsoft Client OAuth error:', err);
+        return res.status(500).json({ message: 'Microsoft auth failed', error: err?.message || err });
+      }
       if (!client) return res.status(400).json({ message: 'Microsoft authentication failed.' });
       return this.respondWebOrMobile(req, res, client);
     })(req, res, next);

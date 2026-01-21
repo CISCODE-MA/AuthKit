@@ -1,18 +1,15 @@
-import mongoose from 'mongoose';
-import mongoosePaginate from 'mongoose-paginate-v2';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document, Types } from 'mongoose';
 
-const RoleSchema = new mongoose.Schema(
-  {
-    name: { type: String, required: true, unique: true },
-    description: { type: String },
-    permissions: [{ type: String }]
-  },
-  { timestamps: true }
-);
+export type RoleDocument = Role & Document;
 
-RoleSchema.plugin(mongoosePaginate);
+@Schema({ timestamps: true })
+export class Role {
+  @Prop({ required: true, unique: true, trim: true })
+  name!: string;
 
-const Role = mongoose.models.Role || mongoose.model('Role', RoleSchema);
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Permission' }], default: [] })
+  permissions!: Types.ObjectId[];
+}
 
-export { RoleSchema };
-export default Role;
+export const RoleSchema = SchemaFactory.createForClass(Role);

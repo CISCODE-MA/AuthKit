@@ -1,5 +1,5 @@
 import { CanActivate, ExecutionContext, Injectable, mixin } from '@nestjs/common';
-import Role from '../models/role.model';
+import { Role } from '@models/role.model';
 
 export const hasPermission = (requiredPermission: string) => {
   @Injectable()

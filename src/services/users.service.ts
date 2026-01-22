@@ -1,11 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import bcrypt from 'bcryptjs';
 import { UserRepository } from '@repos/user.repository';
+import { RoleRepository } from '@repos/role.repository';
 import { RegisterDto } from '@dtos/auth/register.dto';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class UsersService {
-    constructor(private readonly users: UserRepository) { }
+    constructor(
+        private readonly users: UserRepository,
+        private readonly rolesRepo: RoleRepository
+    ) { }
 
     async create(dto: RegisterDto) {
         if (await this.users.findByEmail(dto.email)) throw new Error('Email already in use.');
@@ -24,7 +29,7 @@ export class UsersService {
             phoneNumber: dto.phoneNumber,
             avatar: dto.avatar,
             password: hashed,
-            roles: [], // default role can be assigned here later
+            roles: [],
             isVerified: true,
             isBanned: false,
             passwordChangedAt: new Date()
@@ -49,6 +54,14 @@ export class UsersService {
         return { ok: true };
     }
 
+    async updateRoles(id: string, roles: string[]) {
+        const existing = await this.rolesRepo.findByIds(roles);
+        if (existing.length !== roles.length) throw new Error('One or more roles not found.');
 
+        const roleIds = roles.map((r) => new Types.ObjectId(r));
+        const user = await this.users.updateById(id, { roles: roleIds });
+        if (!user) throw new Error('User not found.');
+        return { id: user._id, roles: user.roles };
+    }
 
 }

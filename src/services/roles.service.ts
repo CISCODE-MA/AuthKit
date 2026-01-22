@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { RoleRepository } from '@repos/role.repository';
 import { CreateRoleDto } from '@dtos/role/create-role.dto';
 import { UpdateRoleDto } from '@dtos/role/update-role.dto';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class RolesService {
@@ -9,7 +10,9 @@ export class RolesService {
 
     async create(dto: CreateRoleDto) {
         if (await this.roles.findByName(dto.name)) throw new Error('Role already exists.');
-        return this.roles.create({ name: dto.name, permissions: dto.permissions || [] });
+        const permIds = (dto.permissions || []).map((p) => new Types.ObjectId(p));
+        return this.roles.create({ name: dto.name, permissions: permIds });
+
     }
 
     async list() {
@@ -17,14 +20,31 @@ export class RolesService {
     }
 
     async update(id: string, dto: UpdateRoleDto) {
-        const role = await this.roles.updateById(id, dto);
+        const data: any = { ...dto };
+
+        if (dto.permissions) {
+            data.permissions = dto.permissions.map((p) => new Types.ObjectId(p));
+        }
+
+        const role = await this.roles.updateById(id, data);
         if (!role) throw new Error('Role not found.');
         return role;
     }
+
 
     async delete(id: string) {
         const role = await this.roles.deleteById(id);
         if (!role) throw new Error('Role not found.');
         return { ok: true };
     }
+
+    async setPermissions(roleId: string, permissionIds: string[]) {
+        const permIds = permissionIds.map((p) => new Types.ObjectId(p));
+        const role = await this.roles.updateById(roleId, { permissions: permIds });
+        if (!role) throw new Error('Role not found.');
+        return role;
+
+
+    }
+
 }

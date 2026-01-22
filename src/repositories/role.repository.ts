@@ -30,4 +30,9 @@ export class RoleRepository {
     deleteById(id: string | Types.ObjectId) {
         return this.roleModel.findByIdAndDelete(id);
     }
+
+    findByIds(ids: string[]) {
+        return this.roleModel.find({ _id: { $in: ids } }).lean();
+    }
+
 }

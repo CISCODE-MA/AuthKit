@@ -10,3 +10,11 @@ export class UpdateRoleDto {
     @IsString({ each: true })
     permissions?: string[];
 }
+
+
+export class UpdateRolePermissionsDto {
+  @IsArray()
+  @IsString({ each: true })
+  permissions!: string[]; // ObjectId strings
+}
+

@@ -1,9 +1,10 @@
-import { Controller, Delete, Get, Post, Put, Req, Res } from '@nestjs/common';
+import { Controller, Delete, Get, Post, Put, Req, Res, UseGuards } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import User from '../models/user.model';
 import nodemailer from 'nodemailer';
 import bcrypt from 'bcryptjs';
 import { randomBytes } from 'node:crypto';
+import { AuthenticateGuard } from '../middleware/authenticate.guard';
 
 @Controller('api/users')
 export class UsersController {
@@ -213,6 +214,27 @@ Thank you!`
       });
     } catch (error: any) {
       console.error('Error fetching users:', error);
+      return res.status(500).json({ message: 'Server error', error: error.message });
+    }
+  }
+
+  @Get('me')
+  @UseGuards(AuthenticateGuard)
+  async getMe(@Req() req: Request, @Res() res: Response) {
+    try {
+      const userId = (req.user as any)?.id;
+      if (!userId) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+
+      const user = await User.findById(userId).select('-password -resetPasswordToken -resetPasswordExpires -refreshToken -__v');
+      if (!user) {
+        return res.status(404).json({ message: 'User not found.' });
+      }
+
+      return res.status(200).json(user);
+    } catch (error: any) {
+      console.error('Error fetching current user:', error);
       return res.status(500).json({ message: 'Server error', error: error.message });
     }
   }

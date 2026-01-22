@@ -5,7 +5,7 @@ import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { Strategy as FacebookStrategy } from 'passport-facebook';
 import bcrypt from 'bcryptjs';
 import { decode as jwtDecode } from 'jsonwebtoken';
-import User from '../models/user.model';
+import { User } from '../models/user.model';
 import 'dotenv/config';
 
 const MAX_FAILED = parseInt(process.env.MAX_FAILED_LOGIN_ATTEMPTS || '', 10) || 3;

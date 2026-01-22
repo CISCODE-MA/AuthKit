@@ -13,8 +13,15 @@ import { Role, RoleSchema } from '@models/role.model';
 import { Permission, PermissionSchema } from '@models/permission.model';
 
 import { AuthService } from '@services/auth.service';
+import { UsersService } from '@services/users.service';
+import { RolesService } from '@services/roles.service';
+import { PermissionsService } from '@services/permissions.service';
 import { MailService } from '@services/mail.service';
+import { SeedService } from '@services/seed.service';
+
 import { UserRepository } from '@repos/user.repository';
+import { RoleRepository } from '@repos/role.repository';
+import { PermissionRepository } from '@repos/permission.repository';
 
 import { AuthenticateGuard } from '@middleware/authenticate.guard';
 
@@ -34,14 +41,26 @@ import { AuthenticateGuard } from '@middleware/authenticate.guard';
   ],
   providers: [
     AuthService,
+    UsersService,
+    RolesService,
+    PermissionsService,
     MailService,
+    SeedService,
     UserRepository,
+    RoleRepository,
+    PermissionRepository,
     AuthenticateGuard,
   ],
   exports: [
-    AuthenticateGuard,
     AuthService,
+    UsersService,
+    RolesService,
+    PermissionsService,
+    SeedService,
+    AuthenticateGuard,
     UserRepository,
+    RoleRepository,
+    PermissionRepository,
   ],
 })
 export class AuthKitModule implements NestModule {

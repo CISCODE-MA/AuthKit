@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { RoleRepository } from '@repos/role.repository';
 import { PermissionRepository } from '@repos/permission.repository';
-import { ObjectId, Types } from 'mongoose';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class SeedService {
@@ -26,6 +26,9 @@ export class SeedService {
 
         let user = await this.roles.findByName('user');
         if (!user) user = await this.roles.create({ name: 'user', permissions: [] });
+
+
+        console.log('[AuthKit] Seeded roles:', { adminRoleId: admin._id.toString(), userRoleId: user._id.toString() });
 
         return {
             adminRoleId: admin._id.toString(),

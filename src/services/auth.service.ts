@@ -23,23 +23,23 @@ export class AuthService {
     }
 
     private signAccessToken(payload: any) {
-        const expiresIn = this.resolveExpiry(process.env.JWT_ACCESS_TOKEN_EXPIRES_IN, '15m');
-        return jwt.sign(payload, process.env.JWT_SECRET as string, { expiresIn });
+        const expiresIn = this.resolveExpiry(this.getEnv('JWT_ACCESS_TOKEN_EXPIRES_IN'), '15m');
+        return jwt.sign(payload, this.getEnv('JWT_SECRET') as string, { expiresIn });
     }
 
     private signRefreshToken(payload: any) {
-        const expiresIn = this.resolveExpiry(process.env.JWT_REFRESH_TOKEN_EXPIRES_IN, '7d');
-        return jwt.sign(payload, process.env.JWT_REFRESH_SECRET as string, { expiresIn });
+        const expiresIn = this.resolveExpiry(this.getEnv('JWT_REFRESH_TOKEN_EXPIRES_IN'), '7d');
+        return jwt.sign(payload, this.getEnv('JWT_REFRESH_SECRET') as string, { expiresIn });
     }
 
     private signEmailToken(payload: any) {
-        const expiresIn = this.resolveExpiry(process.env.JWT_EMAIL_TOKEN_EXPIRES_IN, '1d');
-        return jwt.sign(payload, process.env.JWT_EMAIL_SECRET as string, { expiresIn });
+        const expiresIn = this.resolveExpiry(this.getEnv('JWT_EMAIL_TOKEN_EXPIRES_IN'), '1d');
+        return jwt.sign(payload, this.getEnv('JWT_EMAIL_SECRET') as string, { expiresIn });
     }
 
     private signResetToken(payload: any) {
-        const expiresIn = this.resolveExpiry(process.env.JWT_RESET_TOKEN_EXPIRES_IN, '1h');
-        return jwt.sign(payload, process.env.JWT_RESET_SECRET as string, { expiresIn });
+        const expiresIn = this.resolveExpiry(this.getEnv('JWT_RESET_TOKEN_EXPIRES_IN'), '1h');
+        return jwt.sign(payload, this.getEnv('JWT_RESET_SECRET') as string, { expiresIn });
     }
 
     private async buildTokenPayload(userId: string) {
@@ -52,6 +52,12 @@ export class AuthService {
             .filter(Boolean);
 
         return { sub: user._id.toString(), roles, permissions };
+    }
+
+    private getEnv(name: string): string {
+        const v = process.env[name];
+        if (!v) throw new Error(`${name} is not set`);
+        return v;
     }
 
     async register(dto: RegisterDto) {
@@ -88,7 +94,7 @@ export class AuthService {
     }
 
     async verifyEmail(token: string) {
-        const decoded: any = jwt.verify(token, process.env.JWT_EMAIL_SECRET as string);
+        const decoded: any = jwt.verify(token, this.getEnv('JWT_EMAIL_SECRET') as string);
         if (decoded.purpose !== 'verify') throw new Error('Invalid token purpose.');
 
         const user = await this.users.findById(decoded.sub);
@@ -126,7 +132,7 @@ export class AuthService {
     }
 
     async refresh(refreshToken: string) {
-        const decoded: any = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET as string);
+        const decoded: any = jwt.verify(refreshToken, this.getEnv('JWT_REFRESH_SECRET') as string);
         if (decoded.purpose !== 'refresh') throw new Error('Invalid token purpose.');
 
         const user = await this.users.findById(decoded.sub);
@@ -155,7 +161,7 @@ export class AuthService {
     }
 
     async resetPassword(token: string, newPassword: string) {
-        const decoded: any = jwt.verify(token, process.env.JWT_RESET_SECRET as string);
+        const decoded: any = jwt.verify(token, this.getEnv('JWT_RESET_SECRET') as string);
         if (decoded.purpose !== 'reset') throw new Error('Invalid token purpose.');
 
         const user = await this.users.findById(decoded.sub);

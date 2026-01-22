@@ -65,6 +65,8 @@ import { AdminRoleService } from '@services/admin-role.service';
     UserRepository,
     RoleRepository,
     PermissionRepository,
+    AdminGuard,
+    AdminRoleService,
   ],
 })
 export class AuthKitModule implements NestModule {

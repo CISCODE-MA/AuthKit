@@ -3,6 +3,7 @@ import type { Response } from 'express';
 import { UsersService } from '@services/users.service';
 import { RegisterDto } from '@dtos/auth/register.dto';
 import { Admin } from '@middleware/admin.decorator';
+import { UpdateUserRolesDto } from '@dtos/auth/update-user-role.dto';
 
 @Admin()
 @Controller('api/admin/users')
@@ -38,4 +39,11 @@ export class UsersController {
     const result = await this.users.delete(id);
     return res.status(200).json(result);
   }
+
+  @Patch(':id/roles')
+  async updateRoles(@Param('id') id: string, @Body() dto: UpdateUserRolesDto, @Res() res: Response) {
+    const result = await this.users.updateRoles(id, dto.roles);
+    return res.status(200).json(result);
+  }
+
 }

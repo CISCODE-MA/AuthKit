@@ -6,6 +6,7 @@ import { UserRepository } from '@repos/user.repository';
 import { RegisterDto } from '@dtos/auth/register.dto';
 import { LoginDto } from '@dtos/auth/login.dto';
 import { MailService } from '@services/mail.service';
+import { RoleRepository } from '@repos/role.repository';
 
 type JwtExpiry = SignOptions['expiresIn'];
 
@@ -13,7 +14,8 @@ type JwtExpiry = SignOptions['expiresIn'];
 export class AuthService {
     constructor(
         private readonly users: UserRepository,
-        private readonly mail: MailService
+        private readonly mail: MailService,
+        private readonly roles: RoleRepository,
     ) { }
 
     private resolveExpiry(value: string | undefined, fallback: JwtExpiry): JwtExpiry {
@@ -62,6 +64,10 @@ export class AuthService {
         const salt = await bcrypt.genSalt(10);
         const hashed = await bcrypt.hash(dto.password, salt);
 
+        const userRole = await this.roles.findByName('user');
+        if (!userRole) throw new Error('Default role not seeded.');
+
+
         const user = await this.users.create({
             fullname: dto.fullname,
             username: dto.username,
@@ -69,7 +75,7 @@ export class AuthService {
             phoneNumber: dto.phoneNumber,
             avatar: dto.avatar,
             password: hashed,
-            roles: [], // assign default role in admin setup
+            roles: [userRole._id],
             isVerified: false,
             isBanned: false,
             passwordChangedAt: new Date()

@@ -24,6 +24,8 @@ import { RoleRepository } from '@repos/role.repository';
 import { PermissionRepository } from '@repos/permission.repository';
 
 import { AuthenticateGuard } from '@middleware/authenticate.guard';
+import { AdminGuard } from '@middleware/admin.guard';
+import { AdminRoleService } from '@services/admin-role.service';
 
 @Module({
   imports: [
@@ -50,6 +52,8 @@ import { AuthenticateGuard } from '@middleware/authenticate.guard';
     RoleRepository,
     PermissionRepository,
     AuthenticateGuard,
+    AdminGuard,
+    AdminRoleService,
   ],
   exports: [
     AuthService,

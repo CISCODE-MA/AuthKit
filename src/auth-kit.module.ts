@@ -26,6 +26,8 @@ import { PermissionRepository } from '@repos/permission.repository';
 import { AuthenticateGuard } from '@middleware/authenticate.guard';
 import { AdminGuard } from '@middleware/admin.guard';
 import { AdminRoleService } from '@services/admin-role.service';
+import { OAuthService } from '@services/oauth.service';
+import passport from 'passport';
 
 @Module({
   imports: [
@@ -54,6 +56,7 @@ import { AdminRoleService } from '@services/admin-role.service';
     AuthenticateGuard,
     AdminGuard,
     AdminRoleService,
+    OAuthService,
   ],
   exports: [
     AuthService,
@@ -72,7 +75,7 @@ import { AdminRoleService } from '@services/admin-role.service';
 export class AuthKitModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(cookieParser())
+      .apply(cookieParser(), passport.initialize())
       .forRoutes({ path: '*', method: RequestMethod.ALL });
   }
 }

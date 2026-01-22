@@ -9,10 +9,11 @@ import { ResendVerificationDto } from '@dtos/auth/resend-verification.dto';
 import { ForgotPasswordDto } from '@dtos/auth/forgot-password.dto';
 import { ResetPasswordDto } from '@dtos/auth/reset-password.dto';
 import { getMillisecondsFromExpiry } from '@utils/helper';
+import { OAuthService } from '@services/oauth.service';
 
 @Controller('api/auth')
 export class AuthController {
-  constructor(private readonly auth: AuthService) { }
+  constructor(private readonly auth: AuthService, private readonly oauth: OAuthService) { }
 
   @Post('register')
   async register(@Body() dto: RegisterDto, @Res() res: Response) {
@@ -88,4 +89,25 @@ export class AuthController {
     const result = await this.auth.deleteAccount(userId);
     return res.status(200).json(result);
   }
+
+  @Post('oauth/microsoft')
+  async microsoftExchange(@Body() body: { idToken: string }, @Res() res: Response) {
+    const { accessToken, refreshToken } = await this.oauth.loginWithMicrosoft(body.idToken);
+    return res.status(200).json({ accessToken, refreshToken });
+  }
+
+  @Post('oauth/google')
+  async googleExchange(@Body() body: { idToken?: string; code?: string }, @Res() res: Response) {
+    const result = body.idToken
+      ? await this.oauth.loginWithGoogleIdToken(body.idToken)
+      : await this.oauth.loginWithGoogleCode(body.code as string);
+    return res.status(200).json(result);
+  }
+
+  @Post('oauth/facebook')
+  async facebookExchange(@Body() body: { accessToken: string }, @Res() res: Response) {
+    const result = await this.oauth.loginWithFacebook(body.accessToken);
+    return res.status(200).json(result);
+  }
+
 }

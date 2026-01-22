@@ -3,7 +3,9 @@ import type { Response } from 'express';
 import { PermissionsService } from '@services/permissions.service';
 import { CreatePermissionDto } from '@dtos/permission/create-permission.dto';
 import { UpdatePermissionDto } from '@dtos/permission/update-permission.dto';
+import { Admin } from '@middleware/admin.decorator';
 
+@Admin()
 @Controller('api/admin/permissions')
 export class PermissionsController {
   constructor(private readonly perms: PermissionsService) { }

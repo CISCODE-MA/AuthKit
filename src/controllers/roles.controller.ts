@@ -2,8 +2,10 @@ import { Body, Controller, Delete, Get, Param, Post, Put, Res } from '@nestjs/co
 import type { Response } from 'express';
 import { RolesService } from '@services/roles.service';
 import { CreateRoleDto } from '@dtos/role/create-role.dto';
-import { UpdateRoleDto } from '@dtos/role/update-role.dto';
+import { UpdateRoleDto, UpdateRolePermissionsDto } from '@dtos/role/update-role.dto';
+import { Admin } from '@middleware/admin.decorator';
 
+@Admin()
 @Controller('api/admin/roles')
 export class RolesController {
   constructor(private readonly roles: RolesService) { }
@@ -31,4 +33,11 @@ export class RolesController {
     const result = await this.roles.delete(id);
     return res.status(200).json(result);
   }
+
+  @Put(':id/permissions')
+  async setPermissions(@Param('id') id: string, @Body() dto: UpdateRolePermissionsDto, @Res() res: Response) {
+    const result = await this.roles.setPermissions(id, dto.permissions);
+    return res.status(200).json(result);
+  }
+
 }

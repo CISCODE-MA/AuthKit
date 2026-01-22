@@ -2,7 +2,9 @@ import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Res } from '@
 import type { Response } from 'express';
 import { UsersService } from '@services/users.service';
 import { RegisterDto } from '@dtos/auth/register.dto';
+import { Admin } from '@middleware/admin.decorator';
 
+@Admin()
 @Controller('api/admin/users')
 export class UsersController {
   constructor(private readonly users: UsersService) { }

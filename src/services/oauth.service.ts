@@ -111,7 +111,7 @@ export class OAuthService {
         return this.findOrCreateOAuthUser(email, me.data?.name);
     }
 
-    private async findOrCreateOAuthUser(email: string, name?: string) {
+    async findOrCreateOAuthUser(email: string, name?: string) {
         let user = await this.users.findByEmail(email);
         if (!user) {
             const [fname, ...rest] = (name || 'User OAuth').split(' ');
@@ -129,10 +129,7 @@ export class OAuthService {
             });
         }
 
-        const payload = await this.auth['buildTokenPayload'](user._id.toString());
-        const accessToken = this.auth['signAccessToken'](payload);
-        const refreshToken = this.auth['signRefreshToken']({ sub: user._id.toString(), purpose: 'refresh' });
-
+        const { accessToken, refreshToken } = await this.auth.issueTokensForUser(user._id.toString());
         return { accessToken, refreshToken };
     }
 }

@@ -28,18 +28,18 @@ export class AuthService {
     }
 
     private signRefreshToken(payload: any) {
-        const expiresIn = this.resolveExpiry(process.env.JWT_REFRESH_TOKEN_EXPIRES_IN, '15m');
+        const expiresIn = this.resolveExpiry(process.env.JWT_REFRESH_TOKEN_EXPIRES_IN, '7d');
         return jwt.sign(payload, this.getEnv('JWT_REFRESH_SECRET'), { expiresIn });
     }
 
     private signEmailToken(payload: any) {
-        const expiresIn = this.resolveExpiry(process.env.JWT_EMAIL_TOKEN_EXPIRES_IN, '15m');
+        const expiresIn = this.resolveExpiry(process.env.JWT_EMAIL_TOKEN_EXPIRES_IN, '1d');
 
         return jwt.sign(payload, this.getEnv('JWT_EMAIL_SECRET'), { expiresIn });
     }
 
     private signResetToken(payload: any) {
-        const expiresIn = this.resolveExpiry(process.env.JWT_RESET_TOKEN_EXPIRES_IN, '15m');
+        const expiresIn = this.resolveExpiry(process.env.JWT_RESET_TOKEN_EXPIRES_IN, '1h');
         return jwt.sign(payload, this.getEnv('JWT_RESET_SECRET'), { expiresIn });
     }
 
@@ -60,6 +60,14 @@ export class AuthService {
         if (!v) throw new Error(`${name} is not set`);
         return v;
     }
+
+    public async issueTokensForUser(userId: string) {
+        const payload = await this.buildTokenPayload(userId);
+        const accessToken = this.signAccessToken(payload);
+        const refreshToken = this.signRefreshToken({ sub: userId, purpose: 'refresh' });
+        return { accessToken, refreshToken };
+    }
+
 
     async register(dto: RegisterDto) {
         if (await this.users.findByEmail(dto.email)) throw new Error('Email already in use.');

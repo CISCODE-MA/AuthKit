@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import bcrypt from 'bcryptjs';
 import { UserRepository } from '@repos/user.repository';
-import { RegisterDto } from '@dtos/register.dto';
+import { RegisterDto } from '@dtos/auth/register.dto';
 
 @Injectable()
 export class UsersService {
@@ -49,6 +49,6 @@ export class UsersService {
         return { ok: true };
     }
 
-   
+
 
 }

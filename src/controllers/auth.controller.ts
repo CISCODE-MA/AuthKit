@@ -1,13 +1,13 @@
 import { Body, Controller, Delete, Post, Req, Res } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { AuthService } from '@services/auth.service';
-import { LoginDto } from '@dtos/login.dto';
-import { RegisterDto } from '@dtos/register.dto';
-import { RefreshTokenDto } from '@dtos/refresh-token.dto';
-import { VerifyEmailDto } from '@dtos/verify-email.dto';
-import { ResendVerificationDto } from '@dtos/resend-verification.dto';
-import { ForgotPasswordDto } from '@dtos/forgot-password.dto';
-import { ResetPasswordDto } from '@dtos/reset-password.dto';
+import { LoginDto } from '@dtos/auth/login.dto';
+import { RegisterDto } from '@dtos/auth/register.dto';
+import { RefreshTokenDto } from '@dtos/auth/refresh-token.dto';
+import { VerifyEmailDto } from '@dtos/auth/verify-email.dto';
+import { ResendVerificationDto } from '@dtos/auth/resend-verification.dto';
+import { ForgotPasswordDto } from '@dtos/auth/forgot-password.dto';
+import { ResetPasswordDto } from '@dtos/auth/reset-password.dto';
 import { getMillisecondsFromExpiry } from '@utils/helper';
 
 @Controller('api/auth')

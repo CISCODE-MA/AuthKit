@@ -3,8 +3,8 @@ import type { SignOptions } from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
 import { UserRepository } from '@repos/user.repository';
-import { RegisterDto } from '@dtos/register.dto';
-import { LoginDto } from '@dtos/login.dto';
+import { RegisterDto } from '@dtos/auth/register.dto';
+import { LoginDto } from '@dtos/auth/login.dto';
 import { MailService } from '@services/mail.service';
 
 type JwtExpiry = SignOptions['expiresIn'];

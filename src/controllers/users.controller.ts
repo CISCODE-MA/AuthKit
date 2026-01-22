@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Res } from '@nestjs/common';
 import type { Response } from 'express';
 import { UsersService } from '@services/users.service';
-import { RegisterDto } from '@dtos/register.dto';
+import { RegisterDto } from '@dtos/auth/register.dto';
 
 @Controller('api/admin/users')
 export class UsersController {

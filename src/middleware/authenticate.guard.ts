@@ -6,6 +6,13 @@ import { UserRepository } from '@repos/user.repository';
 export class AuthenticateGuard implements CanActivate {
   constructor(private readonly users: UserRepository) { }
 
+  private getEnv(name: string): string {
+    const v = process.env[name];
+    if (!v) throw new Error(`${name} is not set`);
+    return v;
+  }
+
+
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
     const res = context.switchToHttp().getResponse();
@@ -18,7 +25,7 @@ export class AuthenticateGuard implements CanActivate {
 
     const token = authHeader.split(' ')[1];
     try {
-      const decoded: any = jwt.verify(token, process.env.JWT_SECRET as string);
+      const decoded: any = jwt.verify(token, this.getEnv('JWT_SECRET'));
       const user = await this.users.findById(decoded.sub);
 
       if (!user) {

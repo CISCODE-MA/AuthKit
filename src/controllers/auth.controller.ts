@@ -1,5 +1,5 @@
-import { Body, Controller, Delete, Post, Req, Res } from '@nestjs/common';
-import type { Request, Response } from 'express';
+import { Body, Controller, Delete, Get, Next, Post, Req, Res } from '@nestjs/common';
+import type { NextFunction, Request, Response } from 'express';
 import { AuthService } from '@services/auth.service';
 import { LoginDto } from '@dtos/auth/login.dto';
 import { RegisterDto } from '@dtos/auth/register.dto';
@@ -10,6 +10,7 @@ import { ForgotPasswordDto } from '@dtos/auth/forgot-password.dto';
 import { ResetPasswordDto } from '@dtos/auth/reset-password.dto';
 import { getMillisecondsFromExpiry } from '@utils/helper';
 import { OAuthService } from '@services/oauth.service';
+import passport from 'passport';
 
 @Controller('api/auth')
 export class AuthController {
@@ -109,5 +110,45 @@ export class AuthController {
     const result = await this.oauth.loginWithFacebook(body.accessToken);
     return res.status(200).json(result);
   }
+
+  @Get('google')
+  googleLogin(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
+    return passport.authenticate('google', { scope: ['profile', 'email'], session: false })(req, res, next);
+  }
+
+  @Get('google/callback')
+  googleCallback(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
+    passport.authenticate('google', { session: false }, (err: any, data: any) => {
+      if (err || !data) return res.status(400).json({ message: 'Google auth failed.' });
+      return res.status(200).json(data);
+    })(req, res, next);
+  }
+
+  @Get('microsoft')
+  microsoftLogin(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
+    return passport.authenticate('azure_ad_oauth2', { session: false })(req, res, next);
+  }
+
+  @Get('microsoft/callback')
+  microsoftCallback(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
+    passport.authenticate('azure_ad_oauth2', { session: false }, (err: any, data: any) => {
+      if (err || !data) return res.status(400).json({ message: 'Microsoft auth failed.' });
+      return res.status(200).json(data);
+    })(req, res, next);
+  }
+
+  @Get('facebook')
+  facebookLogin(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
+    return passport.authenticate('facebook', { scope: ['email'], session: false })(req, res, next);
+  }
+
+  @Get('facebook/callback')
+  facebookCallback(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
+    passport.authenticate('facebook', { session: false }, (err: any, data: any) => {
+      if (err || !data) return res.status(400).json({ message: 'Facebook auth failed.' });
+      return res.status(200).json(data);
+    })(req, res, next);
+  }
+
 
 }

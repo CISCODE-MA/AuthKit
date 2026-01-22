@@ -42,4 +42,16 @@ export class UserRepository {
             select: 'name permissions'
         });
     }
+
+    list(filter: { email?: string; username?: string }) {
+        const query: any = {};
+        if (filter.email) query.email = filter.email;
+        if (filter.username) query.username = filter.username;
+
+        return this.userModel
+            .find(query)
+            .populate({ path: 'roles', select: 'name' })
+            .lean();
+    }
+
 }

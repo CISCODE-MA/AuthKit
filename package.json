@@ -17,7 +17,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && tsc-alias -p tsconfig.json",
     "start": "node dist/standalone.js",
     "test": "echo \"No tests defined\" && exit 0",
     "prepack": "npm run build",
@@ -65,6 +65,7 @@
     "@types/passport-google-oauth20": "^2.0.15",
     "@types/passport-local": "^1.0.38",
     "semantic-release": "^25.0.2",
+    "tsc-alias": "^1.8.10",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.2"
   }

@@ -3,6 +3,7 @@ import { Document, Types } from 'mongoose';
 
 export type UserDocument = User & Document;
 
+@Schema({ _id: false })
 class FullName {
   @Prop({ required: true, trim: true })
   fname!: string;
@@ -11,10 +12,11 @@ class FullName {
   lname!: string;
 }
 
+const FullNameSchema = SchemaFactory.createForClass(FullName);
 
 @Schema({ timestamps: true })
 export class User {
-  @Prop({ type: FullName, required: true })
+  @Prop({ type: FullNameSchema, required: true })
   fullname!: FullName;
 
   @Prop({ required: true, unique: true, trim: true, minlength: 3, maxlength: 30 })

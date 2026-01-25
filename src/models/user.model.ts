@@ -37,6 +37,7 @@ export class User {
   @Prop({
     unique: true,
     trim: true,
+    sparse: true,
     match: /^[0-9]{10,14}$/,
   })
   phoneNumber?: string;

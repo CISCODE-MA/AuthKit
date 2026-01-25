@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Next, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Next, Post, Req, Res, UseGuards } from '@nestjs/common';
 import type { NextFunction, Request, Response } from 'express';
 import { AuthService } from '@services/auth.service';
 import { LoginDto } from '@dtos/auth/login.dto';
@@ -11,6 +11,7 @@ import { ResetPasswordDto } from '@dtos/auth/reset-password.dto';
 import { getMillisecondsFromExpiry } from '@utils/helper';
 import { OAuthService } from '@services/oauth.service';
 import passport from 'passport';
+import { AuthenticateGuard } from '@middleware/authenticate.guard';
 
 @Controller('api/auth')
 export class AuthController {
@@ -84,6 +85,7 @@ export class AuthController {
   }
 
   @Delete('account')
+  @UseGuards(AuthenticateGuard)
   async deleteAccount(@Req() req: Request, @Res() res: Response) {
     const userId = (req as any).user?.sub;
     if (!userId) return res.status(401).json({ message: 'Unauthorized.' });

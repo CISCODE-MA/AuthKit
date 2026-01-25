@@ -1,5 +1,5 @@
 ﻿import 'dotenv/config';
-import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, OnModuleInit, RequestMethod } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import cookieParser from 'cookie-parser';
 
@@ -28,6 +28,7 @@ import { AdminGuard } from '@middleware/admin.guard';
 import { AdminRoleService } from '@services/admin-role.service';
 import { OAuthService } from '@services/oauth.service';
 import passport from 'passport';
+import { registerOAuthStrategies } from '@config/passport.config';
 
 @Module({
   imports: [
@@ -72,7 +73,13 @@ import passport from 'passport';
     AdminRoleService,
   ],
 })
-export class AuthKitModule implements NestModule {
+export class AuthKitModule implements NestModule, OnModuleInit {
+  constructor(private readonly oauth: OAuthService) { }
+
+  onModuleInit() {
+    registerOAuthStrategies(this.oauth);
+  }
+
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(cookieParser(), passport.initialize())

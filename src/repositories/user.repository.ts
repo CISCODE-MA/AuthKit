@@ -19,6 +19,10 @@ export class UserRepository {
         return this.userModel.findOne({ email });
     }
 
+    findByEmailWithPassword(email: string) {
+        return this.userModel.findOne({ email }).select('+password');
+    }
+
     findByUsername(username: string) {
         return this.userModel.findOne({ username });
     }

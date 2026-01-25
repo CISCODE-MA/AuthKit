@@ -125,7 +125,7 @@ export class AuthService {
     }
 
     async login(dto: LoginDto) {
-        const user = await this.users.findByEmail(dto.email);
+        const user = await this.users.findByEmailWithPassword(dto.email);
         if (!user) throw new Error('Invalid credentials.');
         if (user.isBanned) throw new Error('Account banned.');
         if (!user.isVerified) throw new Error('Email not verified.');

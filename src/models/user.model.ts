@@ -42,8 +42,8 @@ export class User {
   })
   phoneNumber?: string;
 
-  @Prop({ required: true, minlength: 6, select: false })
-  password!: string;
+  @Prop({ minlength: 8, select: false })
+  password?: string;
 
   @Prop({ default: Date.now })
   passwordChangedAt!: Date;

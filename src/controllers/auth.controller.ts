@@ -10,7 +10,7 @@ import { ForgotPasswordDto } from '@dtos/auth/forgot-password.dto';
 import { ResetPasswordDto } from '@dtos/auth/reset-password.dto';
 import { getMillisecondsFromExpiry } from '@utils/helper';
 import { OAuthService } from '@services/oauth.service';
-import passport from 'passport';
+import passport from '@config/passport.config';
 import { AuthenticateGuard } from '@middleware/authenticate.guard';
 
 @Controller('api/auth')
@@ -93,6 +93,7 @@ export class AuthController {
     return res.status(200).json(result);
   }
 
+  // Mobile exchange
   @Post('oauth/microsoft')
   async microsoftExchange(@Body() body: { idToken: string }, @Res() res: Response) {
     const { accessToken, refreshToken } = await this.oauth.loginWithMicrosoft(body.idToken);
@@ -113,6 +114,7 @@ export class AuthController {
     return res.status(200).json(result);
   }
 
+  // Web redirect
   @Get('google')
   googleLogin(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
     return passport.authenticate('google', { scope: ['profile', 'email'], session: false })(req, res, next);
@@ -128,15 +130,20 @@ export class AuthController {
 
   @Get('microsoft')
   microsoftLogin(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
-    return passport.authenticate('azure_ad_oauth2', { session: false })(req, res, next);
+    return passport.authenticate('azure_ad_oauth2', {
+      session: false,
+      scope: ['openid', 'profile', 'email', 'User.Read'],
+    })(req, res, next);
   }
 
   @Get('microsoft/callback')
   microsoftCallback(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
     passport.authenticate('azure_ad_oauth2', { session: false }, (err: any, data: any) => {
-      if (err || !data) return res.status(400).json({ message: 'Microsoft auth failed.' });
+      if (err) return res.status(400).json({ message: 'Microsoft auth failed', error: err?.message || err });
+      if (!data) return res.status(400).json({ message: 'Microsoft auth failed', error: 'No data returned' });
       return res.status(200).json(data);
     })(req, res, next);
+
   }
 
   @Get('facebook')
@@ -151,6 +158,4 @@ export class AuthController {
       return res.status(200).json(data);
     })(req, res, next);
   }
-
-
 }

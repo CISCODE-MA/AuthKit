@@ -11,9 +11,10 @@ export class RegisterDto {
     @Type(() => FullNameDto)
     fullname!: FullNameDto;
 
+    @IsOptional()
     @IsString()
     @MinLength(3)
-    username!: string;
+    username?: string;
 
     @IsEmail()
     email!: string;
@@ -29,4 +30,12 @@ export class RegisterDto {
     @IsOptional()
     @IsString()
     avatar?: string;
+
+    @IsOptional()
+    @IsString()
+    jobTitle?: string;
+
+    @IsOptional()
+    @IsString()
+    company?: string;
 }

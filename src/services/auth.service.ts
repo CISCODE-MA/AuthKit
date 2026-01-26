@@ -7,6 +7,7 @@ import { RegisterDto } from '@dtos/auth/register.dto';
 import { LoginDto } from '@dtos/auth/login.dto';
 import { MailService } from '@services/mail.service';
 import { RoleRepository } from '@repos/role.repository';
+import { generateUsernameFromName } from '@utils/helper';
 
 type JwtExpiry = SignOptions['expiresIn'];
 
@@ -70,6 +71,11 @@ export class AuthService {
 
 
     async register(dto: RegisterDto) {
+        // Generate username from fname-lname if not provided
+        if (!dto.username || dto.username.trim() === '') {
+            dto.username = generateUsernameFromName(dto.fullname.fname, dto.fullname.lname);
+        }
+
         if (await this.users.findByEmail(dto.email)) throw new Error('Email already in use.');
         if (await this.users.findByUsername(dto.username)) throw new Error('Username already in use.');
         if (dto.phoneNumber && (await this.users.findByPhone(dto.phoneNumber))) {
@@ -89,6 +95,8 @@ export class AuthService {
             email: dto.email,
             phoneNumber: dto.phoneNumber,
             avatar: dto.avatar,
+            jobTitle: dto.jobTitle,
+            company: dto.company,
             password: hashed,
             roles: [userRole._id],
             isVerified: false,

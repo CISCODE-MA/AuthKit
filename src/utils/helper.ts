@@ -19,3 +19,7 @@ export function getMillisecondsFromExpiry(expiry: string | number): number {
       return 0;
   }
 }
+
+export function generateUsernameFromName(fname: string, lname: string): string {
+  return `${fname.toLowerCase()}-${lname.toLowerCase()}`;
+}

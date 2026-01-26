@@ -188,13 +188,21 @@ Content-Type: application/json
     "fname": "Test",
     "lname": "User"
   },
-  "username": "Userrr",
+  "username": "custom-username",
   "email": "user@example.com",
   "password": "Pa$$word!",
   "phoneNumber": "+1234567890",
-  "avatar": "https://example.com/avatar.jpg"
+  "avatar": "https://example.com/avatar.jpg",
+  "jobTitle": "Software Engineer",
+  "company": "Ciscode"
 }
 ```
+
+**Notes:**
+
+- `username` is now **optional**. If not provided, it will be auto-generated as `fname-lname` (e.g., `test-user`)
+- `jobTitle` and `company` are **optional** profile fields
+- All other fields work as before
 
 **Response:**
 
@@ -387,10 +395,12 @@ All permissions are assigned to the `admin` role.
     fname: string,
     lname: string
   },
-  username: string (unique, 3-30 chars),
+  username: string (unique, 3-30 chars, auto-generated as fname-lname if not provided),
   email: string (unique, validated),
   phoneNumber?: string (unique, 10-14 digits),
   avatar?: string (default: 'default.jpg'),
+  jobTitle?: string,
+  company?: string,
   password: string (hashed, min 6 chars),
   roles: ObjectId[] (references Role),
   isVerified: boolean (default: false),

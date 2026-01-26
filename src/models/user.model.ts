@@ -47,7 +47,7 @@ export class User {
 
   @Prop({ default: Date.now })
   passwordChangedAt!: Date;
-  
+
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Role' }], required: true })
   roles!: Types.ObjectId[];
 
@@ -56,6 +56,12 @@ export class User {
 
   @Prop({ default: false })
   isBanned!: boolean;
+
+  @Prop({ trim: true, sparse: true })
+  jobTitle?: string;
+
+  @Prop({ trim: true, sparse: true })
+  company?: string;
 
 }
 

@@ -4,6 +4,7 @@ import { UserRepository } from '@repos/user.repository';
 import { RoleRepository } from '@repos/role.repository';
 import { RegisterDto } from '@dtos/auth/register.dto';
 import { Types } from 'mongoose';
+import { generateUsernameFromName } from '@utils/helper';
 
 @Injectable()
 export class UsersService {
@@ -13,6 +14,11 @@ export class UsersService {
     ) { }
 
     async create(dto: RegisterDto) {
+        // Generate username from fname-lname if not provided
+        if (!dto.username || dto.username.trim() === '') {
+            dto.username = generateUsernameFromName(dto.fullname.fname, dto.fullname.lname);
+        }
+
         if (await this.users.findByEmail(dto.email)) throw new Error('Email already in use.');
         if (await this.users.findByUsername(dto.username)) throw new Error('Username already in use.');
         if (dto.phoneNumber && (await this.users.findByPhone(dto.phoneNumber))) {
@@ -28,6 +34,8 @@ export class UsersService {
             email: dto.email,
             phoneNumber: dto.phoneNumber,
             avatar: dto.avatar,
+            jobTitle: dto.jobTitle,
+            company: dto.company,
             password: hashed,
             roles: [],
             isVerified: true,

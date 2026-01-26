@@ -1,15 +1,15 @@
-import mongoose from 'mongoose';
-import mongoosePaginate from 'mongoose-paginate-v2';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 
-const PermissionSchema = new mongoose.Schema({
-  name: { type: String, required: true, unique: true },
-  category: { type: String },
-  description: { type: String }
-});
+export type PermissionDocument = Permission & Document;
 
-PermissionSchema.plugin(mongoosePaginate);
+@Schema({ timestamps: true })
+export class Permission {
+  @Prop({ required: true, unique: true, trim: true })
+  name!: string;
 
-const Permission = mongoose.models.Permission || mongoose.model('Permission', PermissionSchema);
+  @Prop({ trim: true })
+  description?: string;
+}
 
-export { PermissionSchema };
-export default Permission;
+export const PermissionSchema = SchemaFactory.createForClass(Permission);

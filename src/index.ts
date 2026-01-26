@@ -2,5 +2,8 @@ import 'reflect-metadata';
 
 export { AuthKitModule } from './auth-kit.module';
 export { AuthenticateGuard } from './middleware/authenticate.guard';
-export { AuthGuard } from './middleware/auth.guard';
-export { hasPermission } from './middleware/permission.guard';
+export { hasRole } from './middleware/role.guard';
+export { Admin } from './middleware/admin.decorator';
+export { SeedService } from './services/seed.service';
+export { AdminGuard } from './middleware/admin.guard';
+export { AdminRoleService } from './services/admin-role.service';

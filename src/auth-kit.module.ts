@@ -1,34 +1,83 @@
 ﻿import 'dotenv/config';
-import { MiddlewareConsumer, Module, NestModule, OnModuleDestroy, OnModuleInit, RequestMethod } from '@nestjs/common';
-import passport from './config/passport.config';
+import { MiddlewareConsumer, Module, NestModule, OnModuleInit, RequestMethod } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
 import cookieParser from 'cookie-parser';
-import mongoose from 'mongoose';
 
-import { connectDB } from './config/db.config';
-import { AuthController } from './controllers/auth.controller';
-import { PasswordResetController } from './controllers/password-reset.controller';
-import { UsersController } from './controllers/users.controller';
-import { RolesController } from './controllers/roles.controller';
-import { PermissionsController } from './controllers/permissions.controller';
-import { AdminController } from './controllers/admin.controller';
+import { AuthController } from '@controllers/auth.controller';
+import { UsersController } from '@controllers/users.controller';
+import { RolesController } from '@controllers/roles.controller';
+import { PermissionsController } from '@controllers/permissions.controller';
+
+import { User, UserSchema } from '@models/user.model';
+import { Role, RoleSchema } from '@models/role.model';
+import { Permission, PermissionSchema } from '@models/permission.model';
+
+import { AuthService } from '@services/auth.service';
+import { UsersService } from '@services/users.service';
+import { RolesService } from '@services/roles.service';
+import { PermissionsService } from '@services/permissions.service';
+import { MailService } from '@services/mail.service';
+import { SeedService } from '@services/seed.service';
+
+import { UserRepository } from '@repos/user.repository';
+import { RoleRepository } from '@repos/role.repository';
+import { PermissionRepository } from '@repos/permission.repository';
+
+import { AuthenticateGuard } from '@middleware/authenticate.guard';
+import { AdminGuard } from '@middleware/admin.guard';
+import { AdminRoleService } from '@services/admin-role.service';
+import { OAuthService } from '@services/oauth.service';
+import passport from 'passport';
+import { registerOAuthStrategies } from '@config/passport.config';
 
 @Module({
+  imports: [
+    MongooseModule.forFeature([
+      { name: User.name, schema: UserSchema },
+      { name: Role.name, schema: RoleSchema },
+      { name: Permission.name, schema: PermissionSchema },
+    ]),
+  ],
   controllers: [
     AuthController,
-    PasswordResetController,
     UsersController,
     RolesController,
     PermissionsController,
-    AdminController,
+  ],
+  providers: [
+    AuthService,
+    UsersService,
+    RolesService,
+    PermissionsService,
+    MailService,
+    SeedService,
+    UserRepository,
+    RoleRepository,
+    PermissionRepository,
+    AuthenticateGuard,
+    AdminGuard,
+    AdminRoleService,
+    OAuthService,
+  ],
+  exports: [
+    AuthService,
+    UsersService,
+    RolesService,
+    PermissionsService,
+    SeedService,
+    AuthenticateGuard,
+    UserRepository,
+    RoleRepository,
+    PermissionRepository,
+    AdminGuard,
+    AdminRoleService,
   ],
 })
-export class AuthKitModule implements NestModule, OnModuleInit, OnModuleDestroy {
-  async onModuleInit(): Promise<void> {
-    await connectDB();
-  }
+export class AuthKitModule implements NestModule, OnModuleInit {
+  constructor(private readonly oauth: OAuthService) { }
 
-  async onModuleDestroy(): Promise<void> {
-    await mongoose.disconnect();
+  onModuleInit() {
+    registerOAuthStrategies(this.oauth);
   }
 
   configure(consumer: MiddlewareConsumer) {

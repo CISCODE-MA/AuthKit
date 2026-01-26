@@ -1,507 +1,161 @@
-import { Controller, Get, Next, Post, Req, Res } from '@nestjs/common';
-import type { Request, Response, NextFunction } from 'express';
-import passport from '../config/passport.config';
-import jwt from 'jsonwebtoken';
-import type { SignOptions } from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
-import jwksClient from 'jwks-rsa';
-import axios from 'axios';
-import User from '../models/user.model';
-import Client from '../models/client.model';
-import Role from '../models/role.model';
-import { getMillisecondsFromExpiry } from '../utils/helper';
-
-const MSAL_MOBILE_CLIENT_ID = process.env.MSAL_MOBILE_CLIENT_ID;
-type JwtExpiry = SignOptions['expiresIn'];
-
-const resolveJwtExpiry = (value: string | undefined, fallback: JwtExpiry): JwtExpiry =>
-  (value || fallback) as JwtExpiry;
-
-const msJwks = jwksClient({
-  jwksUri: 'https://login.microsoftonline.com/common/discovery/v2.0/keys',
-  cache: true,
-  rateLimit: true,
-  jwksRequestsPerMinute: 5,
-});
-
-function verifyMicrosoftIdToken(idToken: string): Promise<any> {
-  return new Promise((resolve, reject) => {
-    const getKey = (header: any, cb: (err: any, key?: string) => void) => {
-      msJwks
-        .getSigningKey(header.kid)
-        .then((k) => cb(null, k.getPublicKey()))
-        .catch(cb);
-    };
-
-    jwt.verify(
-      idToken,
-      getKey as any,
-      { algorithms: ['RS256'], audience: MSAL_MOBILE_CLIENT_ID },
-      (err, payload) => (err ? reject(err) : resolve(payload))
-    );
-  });
-}
+import { Body, Controller, Delete, Get, Next, Post, Req, Res, UseGuards } from '@nestjs/common';
+import type { NextFunction, Request, Response } from 'express';
+import { AuthService } from '@services/auth.service';
+import { LoginDto } from '@dtos/auth/login.dto';
+import { RegisterDto } from '@dtos/auth/register.dto';
+import { RefreshTokenDto } from '@dtos/auth/refresh-token.dto';
+import { VerifyEmailDto } from '@dtos/auth/verify-email.dto';
+import { ResendVerificationDto } from '@dtos/auth/resend-verification.dto';
+import { ForgotPasswordDto } from '@dtos/auth/forgot-password.dto';
+import { ResetPasswordDto } from '@dtos/auth/reset-password.dto';
+import { getMillisecondsFromExpiry } from '@utils/helper';
+import { OAuthService } from '@services/oauth.service';
+import passport from '@config/passport.config';
+import { AuthenticateGuard } from '@middleware/authenticate.guard';
 
 @Controller('api/auth')
 export class AuthController {
-  private async issueTokensAndRespond(principal: any, res: Response) {
-    const roleDocs = await Role.find({ _id: { $in: principal.roles } })
-      .select('name permissions -_id')
-      .lean();
+  constructor(private readonly auth: AuthService, private readonly oauth: OAuthService) { }
 
-    const roles = roleDocs.map((r: any) => r.name);
-    const permissions = Array.from(new Set(roleDocs.flatMap((r: any) => r.permissions)));
-
-    const accessTTL = resolveJwtExpiry(process.env.JWT_ACCESS_TOKEN_EXPIRES_IN, '15m');
-    const refreshTTL = resolveJwtExpiry(process.env.JWT_REFRESH_TOKEN_EXPIRES_IN, '7d');
-
-    const payload = {
-      id: principal._id,
-      email: principal.email,
-      roles,
-      permissions,
-    };
-
-    const accessToken = jwt.sign(payload, process.env.JWT_SECRET as string, { expiresIn: accessTTL });
-    const refreshToken = jwt.sign({ id: principal._id }, process.env.JWT_REFRESH_SECRET as string, { expiresIn: refreshTTL });
-
-    principal.refreshToken = refreshToken;
-    try {
-      await principal.save();
-    } catch (e) {
-      console.error('Error saving refreshToken:', e);
-    }
-
-    const isProd = process.env.NODE_ENV === 'production';
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: isProd,
-      sameSite: isProd ? 'none' : 'lax',
-      path: '/',
-      maxAge: getMillisecondsFromExpiry(refreshTTL),
-    });
-
-    return res.status(200).json({ accessToken, refreshToken, profileIncomplete: !principal.email });
+  @Post('register')
+  async register(@Body() dto: RegisterDto, @Res() res: Response) {
+    const result = await this.auth.register(dto);
+    return res.status(201).json(result);
   }
 
-  private async respondWebOrMobile(req: Request, res: Response, principal: any) {
-    const roleDocs = await Role.find({ _id: { $in: principal.roles } })
-      .select('name permissions -_id')
-      .lean();
-
-    const roles = roleDocs.map((r: any) => r.name);
-    const permissions = Array.from(new Set(roleDocs.flatMap((r: any) => r.permissions)));
-
-    const accessTTL = resolveJwtExpiry(process.env.JWT_ACCESS_TOKEN_EXPIRES_IN, '15m');
-    const refreshTTL = resolveJwtExpiry(process.env.JWT_REFRESH_TOKEN_EXPIRES_IN, '7d');
-
-    const payload = {
-      id: principal._id,
-      email: principal.email,
-      roles,
-      permissions,
-    };
-
-    const accessToken = jwt.sign(payload, process.env.JWT_SECRET as string, { expiresIn: accessTTL });
-    const refreshToken = jwt.sign({ id: principal._id }, process.env.JWT_REFRESH_SECRET as string, { expiresIn: refreshTTL });
-
-    principal.refreshToken = refreshToken;
-    try {
-      await principal.save();
-    } catch (e) {
-      console.error('Saving refreshToken failed:', e);
-    }
-
-    let mobileRedirect: string | undefined;
-    if (req.query.state) {
-      try {
-        const decoded = JSON.parse(Buffer.from(req.query.state as string, 'base64url').toString('utf8'));
-        mobileRedirect = decoded.redirect;
-      } catch (_) {
-        // ignore
-      }
-    }
-
-    if (mobileRedirect) {
-      const url = new URL(mobileRedirect);
-      url.searchParams.set('accessToken', accessToken);
-      url.searchParams.set('refreshToken', refreshToken);
-      url.searchParams.set('profileIncomplete', (!principal.email).toString());
-      return res.redirect(302, url.toString());
-    }
-
-    const isProd = process.env.NODE_ENV === 'production';
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: isProd,
-      sameSite: isProd ? 'none' : 'lax',
-      path: '/',
-      maxAge: getMillisecondsFromExpiry(refreshTTL),
-    });
-
-    return res.status(200).json({ accessToken, refreshToken, profileIncomplete: !principal.email });
+  @Post('verify-email')
+  async verifyEmail(@Body() dto: VerifyEmailDto, @Res() res: Response) {
+    const result = await this.auth.verifyEmail(dto.token);
+    return res.status(200).json(result);
   }
 
-  @Post('clients/register')
-  async registerClient(@Req() req: Request, @Res() res: Response) {
-    try {
-      const { email, password, name, roles = [] } = req.body;
-      if (!email || !password) {
-        return res.status(400).json({ message: 'Email and password are required.' });
-      }
-      if (await Client.findOne({ email })) {
-        return res.status(409).json({ message: 'Email already in use.' });
-      }
-      const salt = await bcrypt.genSalt(10);
-      const hashed = await bcrypt.hash(password, salt);
-      const client = new Client({ email, password: hashed, name, roles });
-      await client.save();
-      return res.status(201).json({
-        id: client._id,
-        email: client.email,
-        name: client.name,
-        roles: client.roles,
-      });
-    } catch (err) {
-      console.error('registerClient error:', err);
-      return res.status(500).json({ message: 'Server error.' });
-    }
-  }
-
-  @Post('clients/login')
-  async clientLogin(@Req() req: Request, @Res() res: Response) {
-    try {
-      const { email, password } = req.body;
-      if (!email || !password) {
-        return res.status(400).json({ message: 'Email and password are required.' });
-      }
-      const client = await Client.findOne({ email })
-        .select('+password')
-        .populate('roles', 'name permissions');
-      if (!client) {
-        return res.status(400).json({ message: 'Incorrect email.' });
-      }
-      const match = await bcrypt.compare(password, client.password);
-      if (!match) {
-        return res.status(400).json({ message: 'Incorrect password.' });
-      }
-
-      return this.issueTokensAndRespond(client, res);
-    } catch (err) {
-      console.error('clientLogin error:', err);
-      return res.status(500).json({ message: 'Server error.' });
-    }
+  @Post('resend-verification')
+  async resendVerification(@Body() dto: ResendVerificationDto, @Res() res: Response) {
+    const result = await this.auth.resendVerification(dto.email);
+    return res.status(200).json(result);
   }
 
   @Post('login')
-  localLogin(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
-    return passport.authenticate('local', { session: false }, async (err: any, user: any, info: any) => {
-      if (err) return next(err);
-      if (!user) return res.status(400).json({ message: info?.message || 'Invalid credentials.' });
+  async login(@Body() dto: LoginDto, @Res() res: Response) {
+    const { accessToken, refreshToken } = await this.auth.login(dto);
+    const refreshTTL = process.env.JWT_REFRESH_TOKEN_EXPIRES_IN || '7d';
+    const isProd = process.env.NODE_ENV === 'production';
 
-      try {
-        return this.issueTokensAndRespond(user, res);
-      } catch (e) {
-        console.error('localLogin error:', e);
-        return res.status(500).json({ message: 'Server error.' });
-      }
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? 'none' : 'lax',
+      path: '/',
+      maxAge: getMillisecondsFromExpiry(refreshTTL),
+    });
+
+    return res.status(200).json({ accessToken, refreshToken });
+  }
+
+  @Post('refresh-token')
+  async refresh(@Body() dto: RefreshTokenDto, @Req() req: Request, @Res() res: Response) {
+    const token = dto.refreshToken || (req as any).cookies?.refreshToken;
+    if (!token) return res.status(401).json({ message: 'Refresh token missing.' });
+
+    const { accessToken, refreshToken } = await this.auth.refresh(token);
+    const refreshTTL = process.env.JWT_REFRESH_TOKEN_EXPIRES_IN || '7d';
+    const isProd = process.env.NODE_ENV === 'production';
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? 'none' : 'lax',
+      path: '/',
+      maxAge: getMillisecondsFromExpiry(refreshTTL),
+    });
+
+    return res.status(200).json({ accessToken, refreshToken });
+  }
+
+  @Post('forgot-password')
+  async forgotPassword(@Body() dto: ForgotPasswordDto, @Res() res: Response) {
+    const result = await this.auth.forgotPassword(dto.email);
+    return res.status(200).json(result);
+  }
+
+  @Post('reset-password')
+  async resetPassword(@Body() dto: ResetPasswordDto, @Res() res: Response) {
+    const result = await this.auth.resetPassword(dto.token, dto.newPassword);
+    return res.status(200).json(result);
+  }
+
+  @Delete('account')
+  @UseGuards(AuthenticateGuard)
+  async deleteAccount(@Req() req: Request, @Res() res: Response) {
+    const userId = (req as any).user?.sub;
+    if (!userId) return res.status(401).json({ message: 'Unauthorized.' });
+    const result = await this.auth.deleteAccount(userId);
+    return res.status(200).json(result);
+  }
+
+  // Mobile exchange
+  @Post('oauth/microsoft')
+  async microsoftExchange(@Body() body: { idToken: string }, @Res() res: Response) {
+    const { accessToken, refreshToken } = await this.oauth.loginWithMicrosoft(body.idToken);
+    return res.status(200).json({ accessToken, refreshToken });
+  }
+
+  @Post('oauth/google')
+  async googleExchange(@Body() body: { idToken?: string; code?: string }, @Res() res: Response) {
+    const result = body.idToken
+      ? await this.oauth.loginWithGoogleIdToken(body.idToken)
+      : await this.oauth.loginWithGoogleCode(body.code as string);
+    return res.status(200).json(result);
+  }
+
+  @Post('oauth/facebook')
+  async facebookExchange(@Body() body: { accessToken: string }, @Res() res: Response) {
+    const result = await this.oauth.loginWithFacebook(body.accessToken);
+    return res.status(200).json(result);
+  }
+
+  // Web redirect
+  @Get('google')
+  googleLogin(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
+    return passport.authenticate('google', { scope: ['profile', 'email'], session: false })(req, res, next);
+  }
+
+  @Get('google/callback')
+  googleCallback(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
+    passport.authenticate('google', { session: false }, (err: any, data: any) => {
+      if (err || !data) return res.status(400).json({ message: 'Google auth failed.' });
+      return res.status(200).json(data);
     })(req, res, next);
   }
 
   @Get('microsoft')
   microsoftLogin(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
-    const redirect = req.query.redirect as string | undefined;
-    const state = redirect ? Buffer.from(JSON.stringify({ redirect }), 'utf8').toString('base64url') : undefined;
-
     return passport.authenticate('azure_ad_oauth2', {
       session: false,
-      state,
+      scope: ['openid', 'profile', 'email', 'User.Read'],
     })(req, res, next);
   }
 
   @Get('microsoft/callback')
   microsoftCallback(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
-    passport.authenticate('azure_ad_oauth2', { session: false }, async (err: any, user: any) => {
-      if (err) {
-        console.error('Microsoft OAuth error:', err);
-        return res.status(500).json({ message: 'Microsoft auth failed', error: err?.message || err });
-      }
-      if (!user) return res.status(400).json({ message: 'Microsoft authentication failed.' });
-      return this.respondWebOrMobile(req, res, user);
+    passport.authenticate('azure_ad_oauth2', { session: false }, (err: any, data: any) => {
+      if (err) return res.status(400).json({ message: 'Microsoft auth failed', error: err?.message || err });
+      if (!data) return res.status(400).json({ message: 'Microsoft auth failed', error: 'No data returned' });
+      return res.status(200).json(data);
     })(req, res, next);
-  }
 
-  @Post('microsoft/exchange')
-  async microsoftExchange(@Req() req: Request, @Res() res: Response) {
-    try {
-      if (!MSAL_MOBILE_CLIENT_ID) {
-        console.error('MSAL_MOBILE_CLIENT_ID is not set in environment.');
-        return res.status(500).json({ message: 'Server misconfiguration.' });
-      }
-
-      const { idToken } = req.body || {};
-      if (!idToken) {
-        return res.status(400).json({ message: 'idToken is required.' });
-      }
-
-      let ms: any;
-      try {
-        ms = await verifyMicrosoftIdToken(idToken);
-      } catch (e: any) {
-        console.error('ID token verify failed:', e.message || e);
-        return res.status(401).json({ message: 'Invalid Microsoft ID token.' });
-      }
-
-      const microsoftId = ms.oid || ms.sub;
-      const email = ms.preferred_username || ms.upn || ms.email;
-      const name = ms.name;
-
-      const match: any[] = [{ microsoftId }];
-      if (email) match.push({ email });
-      let user = await User.findOne({ $or: match });
-
-      if (!user) {
-        user = new User({
-          email,
-          name,
-          microsoftId,
-          roles: [],
-          status: 'active',
-        });
-        await user.save();
-      } else {
-        let changed = false;
-        if (!user.microsoftId) { user.microsoftId = microsoftId; changed = true; }
-        if (changed) await user.save();
-      }
-
-      return this.issueTokensAndRespond(user, res);
-    } catch (e) {
-      console.error('microsoftExchange error:', e);
-      return res.status(500).json({ message: 'Server error.' });
-    }
-  }
-
-  @Get('google')
-  googleUserLogin(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
-    const redirect = req.query.redirect as string | undefined;
-    const state = redirect ? Buffer.from(JSON.stringify({ redirect }), 'utf8').toString('base64url') : undefined;
-    return passport.authenticate('google-user', { session: false, scope: ['profile', 'email'], state })(req, res, next);
-  }
-
-  @Get('google/callback')
-  googleUserCallback(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
-    passport.authenticate('google-user', { session: false }, async (err: any, user: any) => {
-      if (err) return next(err);
-      if (!user) return res.status(400).json({ message: 'Google authentication failed.' });
-      return this.respondWebOrMobile(req, res, user);
-    })(req, res, next);
-  }
-
-  @Get('client/google')
-  googleClientLogin(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
-    const redirect = req.query.redirect as string | undefined;
-    const state = redirect ? Buffer.from(JSON.stringify({ redirect }), 'utf8').toString('base64url') : undefined;
-    return passport.authenticate('google-client', { session: false, scope: ['profile', 'email'], state })(req, res, next);
-  }
-
-  @Get('client/google/callback')
-  googleClientCallback(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
-    passport.authenticate('google-client', { session: false }, async (err: any, client: any) => {
-      if (err) return next(err);
-      if (!client) return res.status(400).json({ message: 'Google authentication failed.' });
-      return this.respondWebOrMobile(req, res, client);
-    })(req, res, next);
-  }
-
-  @Post('google/exchange')
-  async googleExchange(@Req() req: Request, @Res() res: Response) {
-    try {
-      let { code, idToken, type = 'user' } = req.body || {};
-      if (!['user', 'client'].includes(type)) {
-        return res.status(400).json({ message: 'invalid type; must be "user" or "client"' });
-      }
-
-      let email: string | undefined;
-      let name: string | undefined;
-      let googleId: string | undefined;
-
-      if (code) {
-        const tokenResp = await axios.post('https://oauth2.googleapis.com/token', {
-          code,
-          client_id: process.env.GOOGLE_CLIENT_ID,
-          client_secret: process.env.GOOGLE_CLIENT_SECRET,
-          redirect_uri: 'postmessage',
-          grant_type: 'authorization_code',
-        });
-
-        const { access_token } = tokenResp.data || {};
-        if (!access_token) {
-          return res.status(401).json({ message: 'Failed to exchange code with Google.' });
-        }
-
-        const profileResp = await axios.get('https://www.googleapis.com/oauth2/v2/userinfo', {
-          headers: { Authorization: `Bearer ${access_token}` },
-        });
-        email = profileResp.data?.email;
-        name = profileResp.data?.name || profileResp.data?.given_name || '';
-        googleId = profileResp.data?.id;
-      } else if (idToken) {
-        const verifyResp = await axios.get('https://oauth2.googleapis.com/tokeninfo', {
-          params: { id_token: idToken },
-        });
-        email = verifyResp.data?.email;
-        name = verifyResp.data?.name || '';
-        googleId = verifyResp.data?.sub;
-      } else {
-        return res.status(400).json({ message: 'code or idToken is required' });
-      }
-
-      if (!email) return res.status(400).json({ message: 'Google profile missing email.' });
-
-      const Model: any = type === 'user' ? User : Client;
-
-      let principal = await Model.findOne({ $or: [{ email }, { googleId }] });
-      if (!principal) {
-        principal = new Model(
-          type === 'user'
-            ? { email, name, googleId, roles: [], status: 'active' }
-            : { email, name, googleId, roles: [] }
-        );
-        await principal.save();
-      } else if (!principal.googleId) {
-        principal.googleId = googleId;
-        await principal.save();
-      }
-
-      const roleDocs = await Role.find({ _id: { $in: principal.roles } })
-        .select('name permissions -_id').lean();
-      const roles = roleDocs.map((r: any) => r.name);
-      const permissions = Array.from(new Set(roleDocs.flatMap((r: any) => r.permissions)));
-      const accessTTL = resolveJwtExpiry(process.env.JWT_ACCESS_TOKEN_EXPIRES_IN, '15m');
-      const refreshTTL = resolveJwtExpiry(process.env.JWT_REFRESH_TOKEN_EXPIRES_IN, '7d');
-
-      const payload = { id: principal._id, email: principal.email, roles, permissions };
-      const accessToken = jwt.sign(payload, process.env.JWT_SECRET as string, { expiresIn: accessTTL });
-      const refreshToken = jwt.sign({ id: principal._id }, process.env.JWT_REFRESH_SECRET as string, { expiresIn: refreshTTL });
-
-      principal.refreshToken = refreshToken;
-      try { await principal.save(); } catch (e) { console.error('Saving refreshToken failed:', e); }
-
-      const isProd = process.env.NODE_ENV === 'production';
-      res.cookie('refreshToken', refreshToken, {
-        httpOnly: true,
-        secure: isProd,
-        sameSite: isProd ? 'none' : 'lax',
-        path: '/',
-        maxAge: getMillisecondsFromExpiry(refreshTTL),
-      });
-
-      return res.status(200).json({ accessToken, refreshToken, profileIncomplete: !principal.email });
-    } catch (err: any) {
-      console.error('googleExchange error:', err?.response?.data || err.message || err);
-      return res.status(500).json({ message: 'Server error during Google exchange.' });
-    }
   }
 
   @Get('facebook')
-  facebookUserLogin(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
-    const redirect = req.query.redirect as string | undefined;
-    const state = redirect ? Buffer.from(JSON.stringify({ redirect }), 'utf8').toString('base64url') : undefined;
-    return passport.authenticate('facebook-user', { session: false, scope: ['email'], state })(req, res, next);
+  facebookLogin(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
+    return passport.authenticate('facebook', { scope: ['email'], session: false })(req, res, next);
   }
 
   @Get('facebook/callback')
-  facebookUserCallback(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
-    passport.authenticate('facebook-user', { session: false }, async (err: any, user: any) => {
-      if (err) return next(err);
-      if (!user) return res.status(400).json({ message: 'Facebook authentication failed.' });
-      return this.respondWebOrMobile(req, res, user);
+  facebookCallback(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
+    passport.authenticate('facebook', { session: false }, (err: any, data: any) => {
+      if (err || !data) return res.status(400).json({ message: 'Facebook auth failed.' });
+      return res.status(200).json(data);
     })(req, res, next);
-  }
-
-  @Get('client/facebook')
-  facebookClientLogin(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
-    const redirect = req.query.redirect as string | undefined;
-    const state = redirect ? Buffer.from(JSON.stringify({ redirect }), 'utf8').toString('base64url') : undefined;
-    return passport.authenticate('facebook-client', { session: false, scope: ['email'], state })(req, res, next);
-  }
-
-  @Get('client/facebook/callback')
-  facebookClientCallback(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
-    passport.authenticate('facebook-client', { session: false }, async (err: any, client: any) => {
-      if (err) return next(err);
-      if (!client) return res.status(400).json({ message: 'Facebook authentication failed.' });
-      return this.respondWebOrMobile(req, res, client);
-    })(req, res, next);
-  }
-
-  @Get('client/microsoft')
-  microsoftClientLogin(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
-    const redirect = req.query.redirect as string | undefined;
-    const state = redirect ? Buffer.from(JSON.stringify({ redirect }), 'utf8').toString('base64url') : undefined;
-    return passport.authenticate('azure_ad_oauth2_client', { session: false, state })(req, res, next);
-  }
-
-  @Get('client/microsoft/callback')
-  microsoftClientCallback(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
-    passport.authenticate('azure_ad_oauth2_client', { session: false }, async (err: any, client: any) => {
-      if (err) {
-        console.error('Microsoft Client OAuth error:', err);
-        return res.status(500).json({ message: 'Microsoft auth failed', error: err?.message || err });
-      }
-      if (!client) return res.status(400).json({ message: 'Microsoft authentication failed.' });
-      return this.respondWebOrMobile(req, res, client);
-    })(req, res, next);
-  }
-
-  @Post('refresh-token')
-  async refreshToken(@Req() req: Request, @Res() res: Response) {
-    try {
-      const refreshToken = (req as any).cookies?.refreshToken || req.body.refreshToken;
-      if (!refreshToken) {
-        return res.status(401).json({ message: 'Refresh token missing.' });
-      }
-
-      let decoded: any;
-      try {
-        decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET as string);
-      } catch (err: any) {
-        const msg = err.name === 'TokenExpiredError' ? 'Refresh token expired.' : 'Invalid refresh token.';
-        return res.status(401).json({ message: msg });
-      }
-
-      let principal = await User.findById(decoded.id);
-      let principalType = 'user';
-      if (!principal) {
-        principal = await Client.findById(decoded.id);
-        principalType = 'client';
-      }
-      if (!principal) return res.status(401).json({ message: 'Account not found.' });
-
-      if (principal.refreshToken !== refreshToken) {
-        return res.status(401).json({ message: 'Refresh token mismatch.' });
-      }
-
-      const roleDocs = await Role.find({ _id: { $in: principal.roles } })
-        .select('name permissions -_id').lean();
-      const roles = roleDocs.map((r: any) => r.name);
-      const permissions = Array.from(new Set(roleDocs.flatMap((r: any) => r.permissions)));
-
-      const payload = {
-        id: principal._id,
-        email: principal.email,
-        roles,
-        permissions,
-      };
-
-      const accessTokenExpiresIn = resolveJwtExpiry(process.env.JWT_ACCESS_TOKEN_EXPIRES_IN, '15m');
-      const accessToken = jwt.sign(payload, process.env.JWT_SECRET as string, { expiresIn: accessTokenExpiresIn });
-
-      return res.status(200).json({ accessToken, type: principalType });
-    } catch (error) {
-      console.error('[Refresh] Unexpected error:', error);
-      return res.status(500).json({ message: 'Server error during token refresh.' });
-    }
   }
 }

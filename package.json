@@ -1,5 +1,7 @@
 {
   "name": "@ciscode/authentication-kit",
+  "version": "1.2.0",
+  "description": "NestJS auth kit with local + OAuth, JWT, RBAC, password reset.",
   "publishConfig": {
     "access": "public"
   },
@@ -7,8 +9,6 @@
     "type": "git",
     "url": "git+https://github.com/CISCODE-MA/AuthKit.git"
   },
-  "version": "1.1.6",
-  "description": "A login library with local login, Microsoft Entra ID authentication, password reset, and roles/permissions.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -17,46 +17,52 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && tsc-alias -p tsconfig.json",
     "start": "node dist/standalone.js",
     "test": "echo \"No tests defined\" && exit 0",
     "prepack": "npm run build",
     "release": "semantic-release"
   },
   "keywords": [
-    "login",
     "authentication",
-    "microsoft-oauth",
-    "password-reset",
-    "roles",
-    "permissions",
-    "users"
+    "nest",
+    "oauth",
+    "jwt",
+    "rbac",
+    "password-reset"
   ],
   "author": "Ciscode",
   "license": "MIT",
   "dependencies": {
-    "@nestjs/common": "^10.4.0",
-    "@nestjs/core": "^10.4.0",
-    "@nestjs/platform-express": "^10.4.0",
     "axios": "^1.7.7",
     "bcryptjs": "^2.4.3",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
     "cookie-parser": "^1.4.6",
-    "dotenv": "^16.0.3",
-    "express": "^4.18.2",
-    "jsonwebtoken": "^9.0.0",
+    "dotenv": "^16.4.5",
+    "jsonwebtoken": "^9.0.2",
     "jwks-rsa": "^3.1.0",
-    "mongoose": "^7.0.0",
-    "mongoose-paginate-v2": "^1.7.1",
-    "nodemailer": "^7.0.12",
-    "passport": "^0.6.0",
+    "nodemailer": "^6.9.15",
+    "passport": "^0.7.0",
     "passport-azure-ad-oauth2": "^0.0.4",
     "passport-facebook": "^3.0.0",
     "passport-google-oauth20": "^2.0.0",
-    "passport-local": "^1.0.0",
+    "passport-local": "^1.0.0"
+  },
+  "peerDependencies": {
+    "@nestjs/common": "^10.0.0 || ^11.0.0",
+    "@nestjs/core": "^10.0.0 || ^11.0.0",
+    "@nestjs/mongoose": "^11",
+    "@nestjs/platform-express": "^10.0.0 || ^11.0.0",
+    "mongoose": "^9",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.0.0"
   },
   "devDependencies": {
+    "@nestjs/common": "^10.4.0",
+    "@nestjs/core": "^10.4.0",
+    "@nestjs/mongoose": "^10.0.2",
+    "@nestjs/platform-express": "^10.4.0",
     "@types/cookie-parser": "^1.4.6",
     "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.6",
@@ -64,8 +70,12 @@
     "@types/passport-facebook": "^3.0.4",
     "@types/passport-google-oauth20": "^2.0.15",
     "@types/passport-local": "^1.0.38",
+    "mongoose": "^7.6.4",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1",
     "semantic-release": "^25.0.2",
     "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.16",
     "typescript": "^5.6.2"
   }
 }

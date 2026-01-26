@@ -1,0 +1,20 @@
+import { IsArray, IsOptional, IsString } from 'class-validator';
+
+export class UpdateRoleDto {
+    @IsOptional()
+    @IsString()
+    name?: string;
+
+    @IsOptional()
+    @IsArray()
+    @IsString({ each: true })
+    permissions?: string[];
+}
+
+
+export class UpdateRolePermissionsDto {
+  @IsArray()
+  @IsString({ each: true })
+  permissions!: string[]; // ObjectId strings
+}
+

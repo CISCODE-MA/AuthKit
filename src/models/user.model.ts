@@ -1,46 +1,62 @@
-import mongoose from 'mongoose';
-import mongoosePaginate from 'mongoose-paginate-v2';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document, Types } from 'mongoose';
 
-const UserSchema = new mongoose.Schema(
-  {
-    email: {
-      type: String,
-      required: function () {
-        return !this.microsoftId && !this.googleId && !this.facebookId;
-      },
-      unique: true,
-      sparse: true
-    },
-    password: {
-      type: String,
-      required: function () {
-        return !this.microsoftId && !this.googleId && !this.facebookId;
-      }
-    },
-    name: { type: String },
-    jobTitle: { type: String },
-    company: { type: String },
-    microsoftId: { type: String, index: true },
-    googleId: { type: String, index: true },
-    facebookId: { type: String, index: true },
-    roles: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Role' }],
-    resetPasswordToken: { type: String },
-    resetPasswordExpires: { type: Date },
-    status: {
-      type: String,
-      enum: ['pending', 'active', 'suspended', 'deactivated'],
-      default: 'pending'
-    },
-    refreshToken: { type: String },
-    failedLoginAttempts: { type: Number, default: 0 },
-    lockUntil: { type: Date }
-  },
-  { timestamps: true }
-);
+export type UserDocument = User & Document;
 
-UserSchema.plugin(mongoosePaginate);
+@Schema({ _id: false })
+class FullName {
+  @Prop({ required: true, trim: true })
+  fname!: string;
 
-const User = mongoose.models.User || mongoose.model('User', UserSchema);
+  @Prop({ required: true, trim: true })
+  lname!: string;
+}
 
-export { UserSchema };
-export default User;
+const FullNameSchema = SchemaFactory.createForClass(FullName);
+
+@Schema({ timestamps: true })
+export class User {
+  @Prop({ type: FullNameSchema, required: true })
+  fullname!: FullName;
+
+  @Prop({ required: true, unique: true, trim: true, minlength: 3, maxlength: 30 })
+  username!: string;
+
+  @Prop({
+    required: true,
+    unique: true,
+    lowercase: true,
+    trim: true,
+    match: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+  })
+  email!: string;
+
+  @Prop({ default: 'default.jpg' })
+  avatar?: string;
+
+  @Prop({
+    unique: true,
+    trim: true,
+    sparse: true,
+    match: /^[0-9]{10,14}$/,
+  })
+  phoneNumber?: string;
+
+  @Prop({ minlength: 8, select: false })
+  password?: string;
+
+  @Prop({ default: Date.now })
+  passwordChangedAt!: Date;
+  
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Role' }], required: true })
+  roles!: Types.ObjectId[];
+
+  @Prop({ default: false })
+  isVerified!: boolean;
+
+  @Prop({ default: false })
+  isBanned!: boolean;
+
+}
+
+export const UserSchema = SchemaFactory.createForClass(User);

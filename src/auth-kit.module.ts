@@ -1,6 +1,7 @@
 ﻿import 'dotenv/config';
 import { MiddlewareConsumer, Module, NestModule, OnModuleInit, RequestMethod } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { APP_FILTER } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
 
 import { AuthController } from '@controllers/auth.controller';
@@ -18,6 +19,7 @@ import { RolesService } from '@services/roles.service';
 import { PermissionsService } from '@services/permissions.service';
 import { MailService } from '@services/mail.service';
 import { SeedService } from '@services/seed.service';
+import { LoggerService } from '@services/logger.service';
 
 import { UserRepository } from '@repos/user.repository';
 import { RoleRepository } from '@repos/role.repository';
@@ -27,6 +29,7 @@ import { AuthenticateGuard } from '@middleware/authenticate.guard';
 import { AdminGuard } from '@middleware/admin.guard';
 import { AdminRoleService } from '@services/admin-role.service';
 import { OAuthService } from '@services/oauth.service';
+import { GlobalExceptionFilter } from '@filters/http-exception.filter';
 import passport from 'passport';
 import { registerOAuthStrategies } from '@config/passport.config';
 
@@ -45,12 +48,17 @@ import { registerOAuthStrategies } from '@config/passport.config';
     PermissionsController,
   ],
   providers: [
+    {
+      provide: APP_FILTER,
+      useClass: GlobalExceptionFilter,
+    },
     AuthService,
     UsersService,
     RolesService,
     PermissionsService,
     MailService,
     SeedService,
+    LoggerService,
     UserRepository,
     RoleRepository,
     PermissionRepository,
@@ -65,6 +73,7 @@ import { registerOAuthStrategies } from '@config/passport.config';
     RolesService,
     PermissionsService,
     SeedService,
+    LoggerService,
     AuthenticateGuard,
     UserRepository,
     RoleRepository,

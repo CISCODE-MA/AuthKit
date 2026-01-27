@@ -36,6 +36,9 @@
       "@middleware/*": [
         "src/middleware/*"
       ],
+      "@filters/*": [
+        "src/filters/*"
+      ],
       "@utils/*": [
         "src/utils/*"
       ]

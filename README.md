@@ -107,17 +107,18 @@ export class AppModule implements OnModuleInit {
 
 ## API Routes
 
-### Local Auth Routes (Public)
+### Local Auth Routes
 
 ```
-POST   /api/auth/register
-POST   /api/auth/verify-email
-POST   /api/auth/resend-verification
-POST   /api/auth/login
-POST   /api/auth/refresh-token
-POST   /api/auth/forgot-password
-POST   /api/auth/reset-password
-DELETE /api/auth/account (protected)
+POST   /api/auth/register              | Register new user (public)
+POST   /api/auth/verify-email          | Verify email with token (public)
+POST   /api/auth/resend-verification   | Resend verification email (public)
+POST   /api/auth/login                 | Login with credentials (public)
+POST   /api/auth/refresh-token         | Refresh access token (public)
+POST   /api/auth/forgot-password       | Request password reset (public)
+POST   /api/auth/reset-password        | Reset password with token (public)
+GET    /api/auth/me                    | Get current user profile (protected)
+DELETE /api/auth/account               | Delete own account (protected)
 ```
 
 ### OAuth Routes - Mobile Exchange (Public)
@@ -320,6 +321,54 @@ Content-Type: application/json
   "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 }
 ```
+
+### Get Current User Profile
+
+**Request:**
+
+```json
+GET /api/auth/me
+Authorization: Bearer access-token
+```
+
+**Response:**
+
+```json
+{
+  "ok": true,
+  "data": {
+    "_id": "507f1f77bcf86cd799439011",
+    "fullname": {
+      "fname": "Test",
+      "lname": "User"
+    },
+    "username": "test-user",
+    "email": "user@example.com",
+    "avatar": "https://example.com/avatar.jpg",
+    "phoneNumber": "+1234567890",
+    "jobTitle": "Software Engineer",
+    "company": "Ciscode",
+    "isVerified": true,
+    "isBanned": false,
+    "roles": [
+      {
+        "_id": "507f1f77bcf86cd799439012",
+        "name": "user",
+        "permissions": [
+          {
+            "_id": "507f1f77bcf86cd799439013",
+            "name": "read:profile"
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-01-28T10:00:00.000Z",
+    "updatedAt": "2026-01-28T10:00:00.000Z"
+  }
+}
+```
+
+**Note:** Sensitive fields like `password` and `passwordChangedAt` are automatically excluded from the response.
 
 ### Delete Account
 

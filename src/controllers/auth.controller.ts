@@ -84,6 +84,15 @@ export class AuthController {
     return res.status(200).json(result);
   }
 
+  @Get('me')
+  @UseGuards(AuthenticateGuard)
+  async getMe(@Req() req: Request, @Res() res: Response) {
+    const userId = (req as any).user?.sub;
+    if (!userId) return res.status(401).json({ message: 'Unauthorized.' });
+    const result = await this.auth.getMe(userId);
+    return res.status(200).json(result);
+  }
+
   @Delete('account')
   @UseGuards(AuthenticateGuard)
   async deleteAccount(@Req() req: Request, @Res() res: Response) {

@@ -82,6 +82,35 @@ export class AuthService {
         return { accessToken, refreshToken };
     }
 
+    async getMe(userId: string) {
+        try {
+            const user = await this.users.findByIdWithRolesAndPermissions(userId);
+
+            if (!user) {
+                throw new NotFoundException('User not found');
+            }
+
+            if (user.isBanned) {
+                throw new ForbiddenException('Account has been banned. Please contact support');
+            }
+
+            // Return user data without sensitive information
+            const userObject = user.toObject ? user.toObject() : user;
+            const { password, passwordChangedAt, ...safeUser } = userObject as any;
+
+            return {
+                ok: true,
+                data: safeUser
+            };
+        } catch (error) {
+            if (error instanceof NotFoundException || error instanceof ForbiddenException) {
+                throw error;
+            }
+
+            this.logger.error(`Get profile failed: ${error.message}`, error.stack, 'AuthService');
+            throw new InternalServerErrorException('Failed to retrieve profile');
+        }
+    }
 
     async register(dto: RegisterDto) {
         try {

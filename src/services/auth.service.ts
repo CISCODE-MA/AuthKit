@@ -164,15 +164,25 @@ export class AuthService {
             });
 
             // Send verification email (don't let email failures crash registration)
+            let emailSent = true;
+            let emailError: string | undefined;
             try {
                 const emailToken = this.signEmailToken({ sub: user._id.toString(), purpose: 'verify' });
                 await this.mail.sendVerificationEmail(user.email, emailToken);
             } catch (error) {
+                emailSent = false;
+                emailError = error.message || 'Failed to send verification email';
                 this.logger.error(`Failed to send verification email: ${error.message}`, error.stack, 'AuthService');
                 // Continue - user is created, they can resend verification
             }
 
-            return { id: user._id, email: user.email };
+            return {
+                ok: true,
+                id: user._id,
+                email: user.email,
+                emailSent,
+                ...(emailError && { emailError, emailHint: 'User created successfully. You can resend verification email later.' })
+            };
         } catch (error) {
             // Re-throw HTTP exceptions
             if (error instanceof ConflictException || error instanceof InternalServerErrorException) {
@@ -238,13 +248,28 @@ export class AuthService {
             }
 
             const emailToken = this.signEmailToken({ sub: user._id.toString(), purpose: 'verify' });
-            await this.mail.sendVerificationEmail(user.email, emailToken);
 
-            return { ok: true, message: 'Verification email sent successfully' };
+            try {
+                await this.mail.sendVerificationEmail(user.email, emailToken);
+                return { ok: true, message: 'Verification email sent successfully', emailSent: true };
+            } catch (emailError) {
+                // Log the actual error but return generic message
+                this.logger.error(`Failed to send verification email: ${emailError.message}`, emailError.stack, 'AuthService');
+                return {
+                    ok: false,
+                    message: 'Failed to send verification email',
+                    emailSent: false,
+                    error: emailError.message || 'Email service error'
+                };
+            }
         } catch (error) {
             this.logger.error(`Resend verification failed: ${error.message}`, error.stack, 'AuthService');
-            // Return success to prevent email enumeration
-            return { ok: true, message: 'If the email exists and is unverified, a verification email has been sent' };
+            // Return error details for debugging
+            return {
+                ok: false,
+                message: 'Failed to resend verification email',
+                error: error.message
+            };
         }
     }
 
@@ -338,18 +363,38 @@ export class AuthService {
         try {
             const user = await this.users.findByEmail(email);
 
-            // Always return success to prevent email enumeration
+            // Always return success to prevent email enumeration (in production)
             if (!user) {
                 return { ok: true, message: 'If the email exists, a password reset link has been sent' };
             }
 
             const resetToken = this.signResetToken({ sub: user._id.toString(), purpose: 'reset' });
-            await this.mail.sendPasswordResetEmail(user.email, resetToken);
 
-            return { ok: true, message: 'Password reset link sent successfully' };
+            try {
+                await this.mail.sendPasswordResetEmail(user.email, resetToken);
+                return { ok: true, message: 'Password reset link sent successfully', emailSent: true };
+            } catch (emailError) {
+                // Log the actual error but return generic message for security
+                this.logger.error(`Failed to send reset email: ${emailError.message}`, emailError.stack, 'AuthService');
+
+                // In development, return error details; in production, hide for security
+                if (process.env.NODE_ENV === 'development') {
+                    return {
+                        ok: false,
+                        message: 'Failed to send password reset email',
+                        emailSent: false,
+                        error: emailError.message
+                    };
+                }
+                return { ok: true, message: 'If the email exists, a password reset link has been sent' };
+            }
         } catch (error) {
             this.logger.error(`Forgot password failed: ${error.message}`, error.stack, 'AuthService');
-            // Return success to prevent email enumeration
+
+            // In development, return error; in production, hide for security
+            if (process.env.NODE_ENV === 'development') {
+                return { ok: false, message: 'Failed to process password reset', error: error.message };
+            }
             return { ok: true, message: 'If the email exists, a password reset link has been sent' };
         }
     }

@@ -8,6 +8,7 @@ import { AuthController } from '@controllers/auth.controller';
 import { UsersController } from '@controllers/users.controller';
 import { RolesController } from '@controllers/roles.controller';
 import { PermissionsController } from '@controllers/permissions.controller';
+import { HealthController } from '@controllers/health.controller';
 
 import { User, UserSchema } from '@models/user.model';
 import { Role, RoleSchema } from '@models/role.model';
@@ -46,6 +47,7 @@ import { registerOAuthStrategies } from '@config/passport.config';
     UsersController,
     RolesController,
     PermissionsController,
+    HealthController,
   ],
   providers: [
     {

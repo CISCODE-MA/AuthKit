@@ -1,6 +1,6 @@
 {
   "name": "@ciscode/authentication-kit",
-  "version": "1.4.2",
+  "version": "1.5.0",
   "description": "NestJS auth kit with local + OAuth, JWT, RBAC, password reset.",
   "publishConfig": {
     "access": "public"

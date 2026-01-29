@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Next, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Next, Param, Post, Req, Res, UseGuards } from '@nestjs/common';
 import type { NextFunction, Request, Response } from 'express';
 import { AuthService } from '@services/auth.service';
 import { LoginDto } from '@dtos/auth/login.dto';
@@ -27,6 +27,21 @@ export class AuthController {
   async verifyEmail(@Body() dto: VerifyEmailDto, @Res() res: Response) {
     const result = await this.auth.verifyEmail(dto.token);
     return res.status(200).json(result);
+  }
+
+  @Get('verify-email/:token')
+  async verifyEmailGet(@Param('token') token: string, @Res() res: Response) {
+    try {
+      const result = await this.auth.verifyEmail(token);
+      // Redirect to frontend with success
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+      return res.redirect(`${frontendUrl}/email-verified?success=true&message=${encodeURIComponent(result.message)}`);
+    } catch (error) {
+      // Redirect to frontend with error
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+      const errorMsg = error.message || 'Email verification failed';
+      return res.redirect(`${frontendUrl}/email-verified?success=false&message=${encodeURIComponent(errorMsg)}`);
+    }
   }
 
   @Post('resend-verification')

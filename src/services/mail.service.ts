@@ -63,7 +63,13 @@ export class MailService {
         }
 
         try {
-            const url = `${process.env.FRONTEND_URL}/confirm-email?token=${token}`;
+            // Option 1: Link to frontend (frontend must call POST /api/auth/verify-email)
+            // const url = `${process.env.FRONTEND_URL}/confirm-email?token=${token}`;
+
+            // Option 2: Link directly to backend API (backend verifies and redirects)
+            const backendUrl = process.env.BACKEND_URL || process.env.FRONTEND_URL?.replace(/:\d+$/, ':3000') || 'http://localhost:3000';
+            const url = `${backendUrl}/api/auth/verify-email/${token}`;
+
             await this.transporter.sendMail({
                 from: process.env.FROM_EMAIL,
                 to: email,

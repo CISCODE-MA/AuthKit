@@ -1,9 +1,9 @@
 import { Injectable, ConflictException, NotFoundException, InternalServerErrorException } from '@nestjs/common';
-import { RoleRepository } from '@repos/role.repository';
-import { CreateRoleDto } from '@dtos/role/create-role.dto';
-import { UpdateRoleDto } from '@dtos/role/update-role.dto';
+import { RoleRepository } from '@infrastructure/role.repository';
+import { CreateRoleDto } from '@api/dto/role/create-role.dto';
+import { UpdateRoleDto } from '@api/dto/role/update-role.dto';
 import { Types } from 'mongoose';
-import { LoggerService } from '@services/logger.service';
+import { LoggerService } from '@infrastructure/logger.service';
 
 @Injectable()
 export class RolesService {

@@ -1,6 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { RoleRepository } from '@repos/role.repository';
-import { LoggerService } from '@services/logger.service';
+import { RoleRepository } from '@infrastructure/role.repository';
+import { LoggerService } from '@infrastructure/logger.service';
 
 @Injectable()
 export class AdminRoleService {

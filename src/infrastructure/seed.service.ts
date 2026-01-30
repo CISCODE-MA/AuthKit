@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { RoleRepository } from '@repos/role.repository';
-import { PermissionRepository } from '@repos/permission.repository';
+import { RoleRepository } from '@infrastructure/role.repository';
+import { PermissionRepository } from '@infrastructure/permission.repository';
 import { Types } from 'mongoose';
 
 @Injectable()

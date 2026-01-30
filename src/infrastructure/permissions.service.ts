@@ -1,8 +1,8 @@
 import { Injectable, ConflictException, NotFoundException, InternalServerErrorException } from '@nestjs/common';
-import { PermissionRepository } from '@repos/permission.repository';
-import { CreatePermissionDto } from '@dtos/permission/create-permission.dto';
-import { UpdatePermissionDto } from '@dtos/permission/update-permission.dto';
-import { LoggerService } from '@services/logger.service';
+import { PermissionRepository } from '@infrastructure/permission.repository';
+import { CreatePermissionDto } from '@api/dto/permission/create-permission.dto';
+import { UpdatePermissionDto } from '@api/dto/permission/update-permission.dto';
+import { LoggerService } from '@infrastructure/logger.service';
 
 @Injectable()
 export class PermissionsService {

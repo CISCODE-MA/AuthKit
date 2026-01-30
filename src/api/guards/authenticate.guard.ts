@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException, ForbiddenException, InternalServerErrorException } from '@nestjs/common';
 import jwt from 'jsonwebtoken';
-import { UserRepository } from '@repos/user.repository';
-import { LoggerService } from '@services/logger.service';
+import { UserRepository } from '@infrastructure/user.repository';
+import { LoggerService } from '@infrastructure/logger.service';
 
 @Injectable()
 export class AuthenticateGuard implements CanActivate {

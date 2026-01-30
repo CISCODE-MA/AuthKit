@@ -2,10 +2,10 @@ import { Injectable, UnauthorizedException, InternalServerErrorException, BadReq
 import axios, { AxiosError } from 'axios';
 import jwt from 'jsonwebtoken';
 import jwksClient from 'jwks-rsa';
-import { UserRepository } from '@repos/user.repository';
-import { RoleRepository } from '@repos/role.repository';
-import { AuthService } from '@services/auth.service';
-import { LoggerService } from '@services/logger.service';
+import { UserRepository } from '@infrastructure/user.repository';
+import { RoleRepository } from '@infrastructure/role.repository';
+import { AuthService } from '@infrastructure/auth.service';
+import { LoggerService } from '@infrastructure/logger.service';
 
 @Injectable()
 export class OAuthService {

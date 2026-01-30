@@ -1,35 +1,35 @@
-﻿import 'dotenv/config';
+import 'dotenv/config';
 import { MiddlewareConsumer, Module, NestModule, OnModuleInit, RequestMethod } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { APP_FILTER } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
 
-import { AuthController } from '@controllers/auth.controller';
-import { UsersController } from '@controllers/users.controller';
-import { RolesController } from '@controllers/roles.controller';
-import { PermissionsController } from '@controllers/permissions.controller';
-import { HealthController } from '@controllers/health.controller';
+import { AuthController } from '@api/auth.controller';
+import { UsersController } from '@api/users.controller';
+import { RolesController } from '@api/roles.controller';
+import { PermissionsController } from '@api/permissions.controller';
+import { HealthController } from '@api/health.controller';
 
-import { User, UserSchema } from '@models/user.model';
-import { Role, RoleSchema } from '@models/role.model';
-import { Permission, PermissionSchema } from '@models/permission.model';
+import { User, UserSchema } from '@domain/user.model';
+import { Role, RoleSchema } from '@domain/role.model';
+import { Permission, PermissionSchema } from '@domain/permission.model';
 
-import { AuthService } from '@services/auth.service';
-import { UsersService } from '@services/users.service';
-import { RolesService } from '@services/roles.service';
-import { PermissionsService } from '@services/permissions.service';
-import { MailService } from '@services/mail.service';
-import { SeedService } from '@services/seed.service';
-import { LoggerService } from '@services/logger.service';
+import { AuthService } from '@infrastructure/auth.service';
+import { UsersService } from '@infrastructure/users.service';
+import { RolesService } from '@infrastructure/roles.service';
+import { PermissionsService } from '@infrastructure/permissions.service';
+import { MailService } from '@infrastructure/mail.service';
+import { SeedService } from '@infrastructure/seed.service';
+import { LoggerService } from '@infrastructure/logger.service';
 
-import { UserRepository } from '@repos/user.repository';
-import { RoleRepository } from '@repos/role.repository';
-import { PermissionRepository } from '@repos/permission.repository';
+import { UserRepository } from '@infrastructure/user.repository';
+import { RoleRepository } from '@infrastructure/role.repository';
+import { PermissionRepository } from '@infrastructure/permission.repository';
 
-import { AuthenticateGuard } from '@middleware/authenticate.guard';
-import { AdminGuard } from '@middleware/admin.guard';
-import { AdminRoleService } from '@services/admin-role.service';
-import { OAuthService } from '@services/oauth.service';
+import { AuthenticateGuard } from '@api/guards/authenticate.guard';
+import { AdminGuard } from '@api/guards/admin.guard';
+import { AdminRoleService } from '@infrastructure/admin-role.service';
+import { OAuthService } from '@infrastructure/oauth.service';
 import { GlobalExceptionFilter } from '@filters/http-exception.filter';
 import passport from 'passport';
 import { registerOAuthStrategies } from '@config/passport.config';

@@ -1,9 +1,9 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Res } from '@nestjs/common';
 import type { Response } from 'express';
-import { RolesService } from '@services/roles.service';
-import { CreateRoleDto } from '@dtos/role/create-role.dto';
-import { UpdateRoleDto, UpdateRolePermissionsDto } from '@dtos/role/update-role.dto';
-import { Admin } from '@middleware/admin.decorator';
+import { RolesService } from '@infrastructure/roles.service';
+import { CreateRoleDto } from '@api/dto/role/create-role.dto';
+import { UpdateRoleDto, UpdateRolePermissionsDto } from '@api/dto/role/update-role.dto';
+import { Admin } from '@api/guards/admin.decorator';
 
 @Admin()
 @Controller('api/admin/roles')

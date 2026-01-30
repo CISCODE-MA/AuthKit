@@ -1,6 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
-import { MailService } from '@services/mail.service';
-import { LoggerService } from '@services/logger.service';
+import { MailService } from '@infrastructure/mail.service';
+import { LoggerService } from '@infrastructure/logger.service';
 
 @Controller('api/health')
 export class HealthController {

@@ -1,5 +1,5 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { AdminRoleService } from '@services/admin-role.service';
+import { AdminRoleService } from '@infrastructure/admin-role.service';
 
 @Injectable()
 export class AdminGuard implements CanActivate {

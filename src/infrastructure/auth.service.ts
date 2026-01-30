@@ -2,13 +2,13 @@ import { Injectable, ConflictException, UnauthorizedException, NotFoundException
 import type { SignOptions } from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
-import { UserRepository } from '@repos/user.repository';
-import { RegisterDto } from '@dtos/auth/register.dto';
-import { LoginDto } from '@dtos/auth/login.dto';
-import { MailService } from '@services/mail.service';
-import { RoleRepository } from '@repos/role.repository';
+import { UserRepository } from '@infrastructure/user.repository';
+import { RegisterDto } from '@api/dto/auth/register.dto';
+import { LoginDto } from '@api/dto/auth/login.dto';
+import { MailService } from '@infrastructure/mail.service';
+import { RoleRepository } from '@infrastructure/role.repository';
 import { generateUsernameFromName } from '@utils/helper';
-import { LoggerService } from '@services/logger.service';
+import { LoggerService } from '@infrastructure/logger.service';
 
 type JwtExpiry = SignOptions['expiresIn'];
 

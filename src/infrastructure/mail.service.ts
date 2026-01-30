@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { LoggerService } from '@services/logger.service';
+import { LoggerService } from '@infrastructure/logger.service';
 import type { Transporter } from 'nodemailer';
 
 @Injectable()

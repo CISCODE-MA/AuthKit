@@ -2,7 +2,7 @@ import passport from 'passport';
 import { Strategy as AzureStrategy } from 'passport-azure-ad-oauth2';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { Strategy as FacebookStrategy } from 'passport-facebook';
-import { OAuthService } from '@services/oauth.service';
+import { OAuthService } from '@infrastructure/oauth.service';
 import axios from 'axios';
 
 export const registerOAuthStrategies = (

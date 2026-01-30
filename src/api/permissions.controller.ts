@@ -1,9 +1,9 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Res } from '@nestjs/common';
 import type { Response } from 'express';
-import { PermissionsService } from '@services/permissions.service';
-import { CreatePermissionDto } from '@dtos/permission/create-permission.dto';
-import { UpdatePermissionDto } from '@dtos/permission/update-permission.dto';
-import { Admin } from '@middleware/admin.decorator';
+import { PermissionsService } from '@infrastructure/permissions.service';
+import { CreatePermissionDto } from '@api/dto/permission/create-permission.dto';
+import { UpdatePermissionDto } from '@api/dto/permission/update-permission.dto';
+import { Admin } from '@api/guards/admin.decorator';
 
 @Admin()
 @Controller('api/admin/permissions')

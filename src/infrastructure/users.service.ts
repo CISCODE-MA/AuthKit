@@ -1,11 +1,11 @@
 import { Injectable, ConflictException, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import bcrypt from 'bcryptjs';
-import { UserRepository } from '@repos/user.repository';
-import { RoleRepository } from '@repos/role.repository';
-import { RegisterDto } from '@dtos/auth/register.dto';
+import { UserRepository } from '@infrastructure/user.repository';
+import { RoleRepository } from '@infrastructure/role.repository';
+import { RegisterDto } from '@api/dto/auth/register.dto';
 import { Types } from 'mongoose';
 import { generateUsernameFromName } from '@utils/helper';
-import { LoggerService } from '@services/logger.service';
+import { LoggerService } from '@infrastructure/logger.service';
 
 @Injectable()
 export class UsersService {

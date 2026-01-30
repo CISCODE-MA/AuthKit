@@ -15,26 +15,23 @@
       "node"
     ],
     "paths": {
-      "@models/*": [
-        "src/models/*"
+      "@/*": [
+        "src/*"
       ],
-      "@dtos/*": [
-        "src/dtos/*"
+      "@api/*": [
+        "src/api/*"
       ],
-      "@repos/*": [
-        "src/repositories/*"
+      "@application/*": [
+        "src/application/*"
       ],
-      "@services/*": [
-        "src/services/*"
+      "@domain/*": [
+        "src/domain/*"
       ],
-      "@controllers/*": [
-        "src/controllers/*"
+      "@infrastructure/*": [
+        "src/infrastructure/*"
       ],
       "@config/*": [
         "src/config/*"
-      ],
-      "@middleware/*": [
-        "src/middleware/*"
       ],
       "@filters/*": [
         "src/filters/*"

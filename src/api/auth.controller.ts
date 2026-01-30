@@ -1,17 +1,17 @@
 import { Body, Controller, Delete, Get, Next, Param, Post, Req, Res, UseGuards } from '@nestjs/common';
 import type { NextFunction, Request, Response } from 'express';
-import { AuthService } from '@services/auth.service';
-import { LoginDto } from '@dtos/auth/login.dto';
-import { RegisterDto } from '@dtos/auth/register.dto';
-import { RefreshTokenDto } from '@dtos/auth/refresh-token.dto';
-import { VerifyEmailDto } from '@dtos/auth/verify-email.dto';
-import { ResendVerificationDto } from '@dtos/auth/resend-verification.dto';
-import { ForgotPasswordDto } from '@dtos/auth/forgot-password.dto';
-import { ResetPasswordDto } from '@dtos/auth/reset-password.dto';
+import { AuthService } from '@infrastructure/auth.service';
+import { LoginDto } from '@api/dto/auth/login.dto';
+import { RegisterDto } from '@api/dto/auth/register.dto';
+import { RefreshTokenDto } from '@api/dto/auth/refresh-token.dto';
+import { VerifyEmailDto } from '@api/dto/auth/verify-email.dto';
+import { ResendVerificationDto } from '@api/dto/auth/resend-verification.dto';
+import { ForgotPasswordDto } from '@api/dto/auth/forgot-password.dto';
+import { ResetPasswordDto } from '@api/dto/auth/reset-password.dto';
 import { getMillisecondsFromExpiry } from '@utils/helper';
-import { OAuthService } from '@services/oauth.service';
+import { OAuthService } from '@infrastructure/oauth.service';
 import passport from '@config/passport.config';
-import { AuthenticateGuard } from '@middleware/authenticate.guard';
+import { AuthenticateGuard } from '@api/guards/authenticate.guard';
 
 @Controller('api/auth')
 export class AuthController {

@@ -21,21 +21,66 @@
 
 ## 🏗️ Module Architecture
 
-**ALWAYS follow 4-layer Clean Architecture:**
+**ALWAYS follow 4-layer Clean Architecture (aligned with main app):**
 
 ```
 src/
   ├── api/                    # Controllers, DTOs, HTTP layer
   │   ├── auth.controller.ts
+  │   ├── guards/
+  │   │   ├── jwt-auth.guard.ts
+  │   │   └── roles.guard.ts
+  │   ├── decorators/
+  │   │   ├── current-user.decorator.ts
+  │   │   └── roles.decorator.ts
   │   └── dto/
-  ├── application/            # Use-cases, business logic
-  │   ├── ports/              # Interfaces
+  │       ├── login.dto.ts
+  │       ├── register.dto.ts
+  │       └── user.dto.ts
+  ├── application/            # Use-cases, business orchestration
+  │   ├── ports/              # Interfaces/contracts
+  │   │   └── auth.port.ts
   │   └── use-cases/
-  ├── domain/                 # Entities, value objects
-  │   └── user.entity.ts
-  └── infrastructure/         # Repositories, JWT service
+  │       ├── login.use-case.ts
+  │       ├── register.use-case.ts
+  │       └── validate-token.use-case.ts
+  ├── domain/                 # Entities, business logic
+  │   ├── user.entity.ts
+  │   ├── role.entity.ts
+  │   └── permission.entity.ts
+  └── infrastructure/         # Repositories, external services
       ├── user.repository.ts
+      ├── role.repository.ts
       └── jwt.service.ts
+```
+
+**Dependency Flow:** `api → application → domain ← infrastructure`
+
+**Guards & Decorators:**
+- **Exported guards** → `api/guards/` (used globally by apps)
+  - Example: `JwtAuthGuard`, `RolesGuard`
+  - Apps import: `import { JwtAuthGuard } from '@ciscode/authentication-kit'`
+- **Decorators** → `api/decorators/`
+  - Example: `@CurrentUser()`, `@Roles()`
+  - Exported for app use
+
+**Module Exports:**
+```typescript
+// src/index.ts - Public API
+export { AuthModule } from './auth-kit.module';
+
+// DTOs (public contracts)
+export { LoginDto, RegisterDto, UserDto } from './api/dto';
+
+// Guards & Decorators
+export { JwtAuthGuard, RolesGuard } from './api/guards';
+export { CurrentUser, Roles } from './api/decorators';
+
+// Services (if needed by apps)
+export { AuthService } from './application/auth.service';
+
+// ❌ NEVER export entities directly
+// export { User } from './domain/user.entity'; // FORBIDDEN
 ```
 
 ---
@@ -50,6 +95,25 @@ src/
 - `user.repository.ts`
 
 **Code**: Same as app standards (PascalCase classes, camelCase functions, UPPER_SNAKE_CASE constants)
+
+### Path Aliases
+
+Configured in `tsconfig.json`:
+```typescript
+"@/*"              → "src/*"
+"@api/*"           → "src/api/*"
+"@application/*"   → "src/application/*"
+"@domain/*"        → "src/domain/*"
+"@infrastructure/*"→ "src/infrastructure/*"
+```
+
+Use aliases for cleaner imports:
+```typescript
+import { LoginDto } from '@api/dto';
+import { LoginUseCase } from '@application/use-cases';
+import { User } from '@domain/user.entity';
+import { UserRepository } from '@infrastructure/user.repository';
+```
 
 ---
 
@@ -116,14 +180,62 @@ async login(email: string, password: string): Promise<AuthTokens>
 ## 🚀 Module Development Principles
 
 ### 1. Exportability
-**Export everything public:**
+**Export ONLY public API (Services + DTOs + Guards + Decorators):**
 ```typescript
-// src/index.ts
-export { AuthModule } from './auth.module';
-export { LoginDto, RegisterDto, UserDto } from './api/dto';
-export { JwtAuthGuard, RolesGuard } from './guards';
-export { CurrentUser, Roles } from './decorators';
-export { User } from './domain/user.entity';
+// src/index.ts - Public API
+export { AuthModule } from './auth-kit.module';
+
+// DTOs (public contracts - what apps consume)
+export { LoginDto, RegisterDto, UserDto, AuthTokensDto } from './api/dto';
+
+// Guards (for protecting routes in apps)
+export { JwtAuthGuard, RolesGuard, PermissionsGuard } from './api/guards';
+
+// Decorators (for extracting data in apps)
+export { CurrentUser, Roles, Permissions } from './api/decorators';
+
+// Services (if apps need direct access)
+export { AuthService } from './application/auth.service';
+
+// Types (TypeScript interfaces for configuration)
+export type { AuthModuleOptions, JwtConfig } from './types';
+```
+
+**❌ NEVER export:**
+```typescript
+// ❌ Entities - internal domain models
+export { User } from './domain/user.entity'; // FORBIDDEN
+
+// ❌ Repositories - infrastructure details
+export { UserRepository } from './infrastructure/user.repository'; // FORBIDDEN
+
+// ❌ Use-cases directly - use services instead
+export { LoginUseCase } from './application/use-cases/login.use-case'; // FORBIDDEN
+```
+
+**Rationale:**
+- DTOs = stable public contract
+- Entities = internal implementation (can change)
+- Apps work with DTOs, never entities
+- Clean separation of concerns
+
+### Path Aliases
+
+Configured in `tsconfig.json`:
+```typescript
+"@/*"              → "src/*"
+"@api/*"           → "src/api/*"
+"@application/*"   → "src/application/*"
+"@domain/*"        → "src/domain/*"
+"@infrastructure/*"→ "src/infrastructure/*"
+```
+
+Use aliases for cleaner imports:
+```typescript
+import { LoginDto } from '@api/dto';
+import { LoginUseCase } from '@application/use-cases';
+import { User } from '@domain/user.entity';
+import { UserRepository } from '@infrastructure/user.repository';
 ```
 
 ### 2. Configuration
@@ -132,7 +244,19 @@ export { User } from './domain/user.entity';
 @Module({})
 export class AuthModule {
   static forRoot(options: AuthModuleOptions): DynamicModule {
-    // Configure with app-specific options
+    return {
+      module: AuthModule,
+      providers: [
+        { provide: 'AUTH_OPTIONS', useValue: options },
+        AuthService,
+        JwtService,
+      ],
+      exports: [AuthService],
+    };
+  }
+  
+  static forRootAsync(options: AuthModuleAsyncOptions): DynamicModule {
+    // Async configuration (from ConfigService, etc.)
   }
 }
 ```
@@ -140,11 +264,73 @@ export class AuthModule {
 ### 3. Zero Business Logic Coupling
 - No hardcoded business rules specific to one app
 - Configurable behavior via options
-- Repository abstraction (no direct DB dependency)
+- Repository abstraction (database-agnostic)
+- Apps provide their own database connection
 
 ---
 
-## 🔐 Security Best Practices
+## � Workflow & Task Management
+
+### Task-Driven Development (Module Specific)
+
+**1. Branch Creation:**
+```bash
+feature/MODULE-123-add-refresh-token
+bugfix/MODULE-456-fix-jwt-validation
+refactor/MODULE-789-extract-password-service
+```
+
+**2. Task Documentation:**
+Create task file at branch start:
+```
+docs/tasks/active/MODULE-123-add-refresh-token.md
+```
+
+**Task file structure** (same as main app):
+```markdown
+# MODULE-123: Add Refresh Token Support
+
+## Description
+Add refresh token rotation for enhanced security
+
+## Implementation Details
+- What was done
+- Why (technical/security reasons)
+- Key decisions made
+
+## Files Modified
+- src/api/dto/auth-tokens.dto.ts
+- src/application/use-cases/refresh-token.use-case.ts
+
+## Breaking Changes
+- `login()` now returns `AuthTokensDto` instead of `string`
+- Apps need to update response handling
+
+## Notes
+Decision: Token rotation over sliding window for security
+```
+
+**3. On Release:**
+Move to archive:
+```
+docs/tasks/archive/by-release/v2.0.0/MODULE-123-add-refresh-token.md
+```
+
+### Development Workflow
+
+**Simple changes** (bug fix, small improvements):
+- Read context → Implement directly → Update docs → Update CHANGELOG
+
+**Complex changes** (new features, breaking changes):
+- Read context → Discuss approach → Implement step-by-step → Update docs → Update CHANGELOG → Update version
+
+**When blocked or uncertain:**
+- **DO**: Ask for clarification immediately
+- **DON'T**: Make breaking changes without approval
+
+---
+
+## �🔐 Security Best Practices
 
 **ALWAYS:**
 - ✅ Input validation on all DTOs

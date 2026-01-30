@@ -316,6 +316,44 @@ Move to archive:
 docs/tasks/archive/by-release/v2.0.0/MODULE-123-add-refresh-token.md
 ```
 
+### Git Flow - Module Specific
+
+**Branch Structure:**
+- `master` - Production releases only
+- `develop` - Active development
+- `feature/MODULE-*` - New features
+- `bugfix/MODULE-*` - Bug fixes
+
+**Workflow:**
+```bash
+# 1. Stacca da develop
+git checkout develop
+git pull origin develop
+git checkout -b feature/MODULE-123-add-refresh-token
+
+# 2. Sviluppo
+# ... implementa, testa, documenta ...
+
+# 3. Bump version e push
+npm version minor
+git push origin feature/MODULE-123-add-refresh-token --tags
+
+# 4. PR verso develop
+gh pr create --base develop
+
+# 5. Dopo merge in develop, per release:
+git checkout master
+git merge develop
+git push origin master --tags
+npm publish
+```
+
+**⚠️ IMPORTANTE:**
+- ✅ Feature branch da `develop`
+- ✅ PR verso `develop`
+- ✅ `master` solo per release
+- ❌ MAI PR dirette a `master`
+
 ### Development Workflow
 
 **Simple changes** (bug fix, small improvements):
@@ -379,6 +417,22 @@ docs/tasks/archive/by-release/v2.0.0/MODULE-123-add-refresh-token.md
 - Token expiration validation
 ```
 
+### Version Bump Command
+**ALWAYS run before pushing:**
+```bash
+npm version patch  # Bug fixes (0.0.x)
+npm version minor  # New features (0.x.0)
+npm version major  # Breaking changes (x.0.0)
+
+# This automatically:
+# - Updates package.json version
+# - Creates git commit "vX.X.X"
+# - Creates git tag
+
+# Then push:
+git push && git push --tags
+```
+
 ---
 
 ## 🚫 Restrictions - Require Approval
@@ -413,18 +467,31 @@ Before publishing:
 - [ ] Breaking changes highlighted
 - [ ] Integration tested with sample app
 
+### Pre-Publish Hook (Recommended)
+
+Aggiungi al `package.json` per bloccare pubblicazioni con errori:
+
+```json
+"scripts": {
+  "prepublishOnly": "npm run verify && npm run test:cov"
+}
+```
+
+Questo esegue automaticamente tutti i controlli prima di `npm publish` e blocca se qualcosa fallisce.
+
 ---
 
 ## 🔄 Development Workflow
 
 ### Working on Module:
 1. Clone module repo
-2. Create branch: `feature/TASK-123-description`
+2. Create branch: `feature/MODULE-123-description`
 3. Implement with tests
 4. Verify checklist
 5. Update CHANGELOG
-6. Bump version in package.json
-7. Create PR
+6. **Bump version**: `npm version patch` (or `minor`/`major`)
+7. Push: `git push && git push --tags`
+8. Create PR
 
 ### Testing in App:
 ```bash

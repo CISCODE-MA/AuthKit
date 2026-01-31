@@ -11,6 +11,7 @@
 **Purpose**: JWT-based authentication and authorization for NestJS apps
 
 ### Responsibilities:
+
 - User authentication (login, register)
 - JWT token generation and validation
 - Role-based access control (RBAC)
@@ -57,6 +58,7 @@ src/
 **Dependency Flow:** `api → application → domain ← infrastructure`
 
 **Guards & Decorators:**
+
 - **Exported guards** → `api/guards/` (used globally by apps)
   - Example: `JwtAuthGuard`, `RolesGuard`
   - Apps import: `import { JwtAuthGuard } from '@ciscode/authentication-kit'`
@@ -65,19 +67,20 @@ src/
   - Exported for app use
 
 **Module Exports:**
+
 ```typescript
 // src/index.ts - Public API
-export { AuthModule } from './auth-kit.module';
+export { AuthModule } from "./auth-kit.module";
 
 // DTOs (public contracts)
-export { LoginDto, RegisterDto, UserDto } from './api/dto';
+export { LoginDto, RegisterDto, UserDto } from "./api/dto";
 
 // Guards & Decorators
-export { JwtAuthGuard, RolesGuard } from './api/guards';
-export { CurrentUser, Roles } from './api/decorators';
+export { JwtAuthGuard, RolesGuard } from "./api/guards";
+export { CurrentUser, Roles } from "./api/decorators";
 
 // Services (if needed by apps)
-export { AuthService } from './application/auth.service';
+export { AuthService } from "./application/auth.service";
 
 // ❌ NEVER export entities directly
 // export { User } from './domain/user.entity'; // FORBIDDEN
@@ -88,6 +91,7 @@ export { AuthService } from './application/auth.service';
 ## 📝 Naming Conventions
 
 **Files**: `kebab-case` + suffix
+
 - `auth.controller.ts`
 - `login.dto.ts`
 - `user.entity.ts`
@@ -99,6 +103,7 @@ export { AuthService } from './application/auth.service';
 ### Path Aliases
 
 Configured in `tsconfig.json`:
+
 ```typescript
 "@/*"              → "src/*"
 "@api/*"           → "src/api/*"
@@ -108,11 +113,12 @@ Configured in `tsconfig.json`:
 ```
 
 Use aliases for cleaner imports:
+
 ```typescript
-import { LoginDto } from '@api/dto';
-import { LoginUseCase } from '@application/use-cases';
-import { User } from '@domain/user.entity';
-import { UserRepository } from '@infrastructure/user.repository';
+import { LoginDto } from "@api/dto";
+import { LoginUseCase } from "@application/use-cases";
+import { User } from "@domain/user.entity";
+import { UserRepository } from "@infrastructure/user.repository";
 ```
 
 ---
@@ -122,20 +128,24 @@ import { UserRepository } from '@infrastructure/user.repository';
 ### Coverage Target: 80%+
 
 **Unit Tests - MANDATORY:**
+
 - ✅ All use-cases
 - ✅ All domain logic
 - ✅ All utilities
 - ✅ Guards and decorators
 
 **Integration Tests:**
+
 - ✅ Controllers (full request/response)
 - ✅ JWT generation/validation
 - ✅ Database operations (with test DB)
 
 **E2E Tests:**
+
 - ✅ Complete auth flows (register → login → protected route)
 
 **Test file location:**
+
 ```
 src/
   └── application/
@@ -150,7 +160,7 @@ src/
 
 ### JSDoc/TSDoc - ALWAYS for:
 
-```typescript
+````typescript
 /**
  * Authenticates a user with email and password
  * @param email - User email address
@@ -163,14 +173,16 @@ src/
  * ```
  */
 async login(email: string, password: string): Promise<AuthTokens>
-```
+````
 
 **Required for:**
+
 - All exported functions/methods
 - All public classes
 - All DTOs (with property descriptions)
 
 ### API Documentation:
+
 - Swagger decorators on all controllers
 - README with usage examples
 - CHANGELOG for all releases
@@ -180,40 +192,44 @@ async login(email: string, password: string): Promise<AuthTokens>
 ## 🚀 Module Development Principles
 
 ### 1. Exportability
+
 **Export ONLY public API (Services + DTOs + Guards + Decorators):**
+
 ```typescript
 // src/index.ts - Public API
-export { AuthModule } from './auth-kit.module';
+export { AuthModule } from "./auth-kit.module";
 
 // DTOs (public contracts - what apps consume)
-export { LoginDto, RegisterDto, UserDto, AuthTokensDto } from './api/dto';
+export { LoginDto, RegisterDto, UserDto, AuthTokensDto } from "./api/dto";
 
 // Guards (for protecting routes in apps)
-export { JwtAuthGuard, RolesGuard, PermissionsGuard } from './api/guards';
+export { JwtAuthGuard, RolesGuard, PermissionsGuard } from "./api/guards";
 
 // Decorators (for extracting data in apps)
-export { CurrentUser, Roles, Permissions } from './api/decorators';
+export { CurrentUser, Roles, Permissions } from "./api/decorators";
 
 // Services (if apps need direct access)
-export { AuthService } from './application/auth.service';
+export { AuthService } from "./application/auth.service";
 
 // Types (TypeScript interfaces for configuration)
-export type { AuthModuleOptions, JwtConfig } from './types';
+export type { AuthModuleOptions, JwtConfig } from "./types";
 ```
 
 **❌ NEVER export:**
+
 ```typescript
 // ❌ Entities - internal domain models
-export { User } from './domain/user.entity'; // FORBIDDEN
+export { User } from "./domain/user.entity"; // FORBIDDEN
 
 // ❌ Repositories - infrastructure details
-export { UserRepository } from './infrastructure/user.repository'; // FORBIDDEN
+export { UserRepository } from "./infrastructure/user.repository"; // FORBIDDEN
 
 // ❌ Use-cases directly - use services instead
-export { LoginUseCase } from './application/use-cases/login.use-case'; // FORBIDDEN
+export { LoginUseCase } from "./application/use-cases/login.use-case"; // FORBIDDEN
 ```
 
 **Rationale:**
+
 - DTOs = stable public contract
 - Entities = internal implementation (can change)
 - Apps work with DTOs, never entities
@@ -222,6 +238,7 @@ export { LoginUseCase } from './application/use-cases/login.use-case'; // FORBID
 ### Path Aliases
 
 Configured in `tsconfig.json`:
+
 ```typescript
 "@/*"              → "src/*"
 "@api/*"           → "src/api/*"
@@ -231,15 +248,18 @@ Configured in `tsconfig.json`:
 ```
 
 Use aliases for cleaner imports:
+
 ```typescript
-import { LoginDto } from '@api/dto';
-import { LoginUseCase } from '@application/use-cases';
-import { User } from '@domain/user.entity';
-import { UserRepository } from '@infrastructure/user.repository';
+import { LoginDto } from "@api/dto";
+import { LoginUseCase } from "@application/use-cases";
+import { User } from "@domain/user.entity";
+import { UserRepository } from "@infrastructure/user.repository";
 ```
 
 ### 2. Configuration
+
 **Flexible module registration:**
+
 ```typescript
 @Module({})
 export class AuthModule {
@@ -247,14 +267,14 @@ export class AuthModule {
     return {
       module: AuthModule,
       providers: [
-        { provide: 'AUTH_OPTIONS', useValue: options },
+        { provide: "AUTH_OPTIONS", useValue: options },
         AuthService,
         JwtService,
       ],
       exports: [AuthService],
     };
   }
-  
+
   static forRootAsync(options: AuthModuleAsyncOptions): DynamicModule {
     // Async configuration (from ConfigService, etc.)
   }
@@ -262,6 +282,7 @@ export class AuthModule {
 ```
 
 ### 3. Zero Business Logic Coupling
+
 - No hardcoded business rules specific to one app
 - Configurable behavior via options
 - Repository abstraction (database-agnostic)
@@ -274,6 +295,7 @@ export class AuthModule {
 ### Task-Driven Development (Module Specific)
 
 **1. Branch Creation:**
+
 ```bash
 feature/MODULE-123-add-refresh-token
 bugfix/MODULE-456-fix-jwt-validation
@@ -282,36 +304,44 @@ refactor/MODULE-789-extract-password-service
 
 **2. Task Documentation:**
 Create task file at branch start:
+
 ```
 docs/tasks/active/MODULE-123-add-refresh-token.md
 ```
 
 **Task file structure** (same as main app):
+
 ```markdown
 # MODULE-123: Add Refresh Token Support
 
 ## Description
+
 Add refresh token rotation for enhanced security
 
 ## Implementation Details
+
 - What was done
 - Why (technical/security reasons)
 - Key decisions made
 
 ## Files Modified
+
 - src/api/dto/auth-tokens.dto.ts
 - src/application/use-cases/refresh-token.use-case.ts
 
 ## Breaking Changes
+
 - `login()` now returns `AuthTokensDto` instead of `string`
 - Apps need to update response handling
 
 ## Notes
+
 Decision: Token rotation over sliding window for security
 ```
 
 **3. On Release:**
 Move to archive:
+
 ```
 docs/tasks/archive/by-release/v2.0.0/MODULE-123-add-refresh-token.md
 ```
@@ -319,50 +349,56 @@ docs/tasks/archive/by-release/v2.0.0/MODULE-123-add-refresh-token.md
 ### Git Flow - Module Specific
 
 **Branch Structure:**
+
 - `master` - Production releases only
 - `develop` - Active development
 - `feature/MODULE-*` - New features
 - `bugfix/MODULE-*` - Bug fixes
 
 **Workflow:**
+
 ```bash
-# 1. Stacca da develop
+# 1. Detach from develop
 git checkout develop
 git pull origin develop
 git checkout -b feature/MODULE-123-add-refresh-token
 
-# 2. Sviluppo
-# ... implementa, testa, documenta ...
+# 2. Development
+# ... implement, test, document ...
 
-# 3. Bump version e push
+# 3. Bump version and push
 npm version minor
 git push origin feature/MODULE-123-add-refresh-token --tags
 
-# 4. PR verso develop
+# 4. PR to develop
 gh pr create --base develop
 
-# 5. Dopo merge in develop, per release:
+# 5. After merge in develop, for release:
 git checkout master
 git merge develop
 git push origin master --tags
 npm publish
 ```
 
-**⚠️ IMPORTANTE:**
-- ✅ Feature branch da `develop`
-- ✅ PR verso `develop`
-- ✅ `master` solo per release
-- ❌ MAI PR dirette a `master`
+**⚠️ IMPORTANT:**
+
+- ✅ Feature branch from `develop`
+- ✅ PR to `develop`
+- ✅ `master` only for release
+- ❌ NEVER direct PR to `master`
 
 ### Development Workflow
 
 **Simple changes** (bug fix, small improvements):
+
 - Read context → Implement directly → Update docs → Update CHANGELOG
 
 **Complex changes** (new features, breaking changes):
+
 - Read context → Discuss approach → Implement step-by-step → Update docs → Update CHANGELOG → Update version
 
 **When blocked or uncertain:**
+
 - **DO**: Ask for clarification immediately
 - **DON'T**: Make breaking changes without approval
 
@@ -371,6 +407,7 @@ npm publish
 ## �🔐 Security Best Practices
 
 **ALWAYS:**
+
 - ✅ Input validation on all DTOs
 - ✅ Password hashing (bcrypt, min 10 rounds)
 - ✅ JWT secret from env (never hardcoded)
@@ -385,40 +422,50 @@ npm publish
 ### Semantic Versioning (Strict)
 
 **MAJOR** (x.0.0) - Breaking changes:
+
 - Changed function signatures
 - Removed public methods
 - Changed DTOs structure
 - Changed module configuration
 
 **MINOR** (0.x.0) - New features:
+
 - New endpoints/methods
 - New optional parameters
 - New decorators/guards
 
 **PATCH** (0.0.x) - Bug fixes:
+
 - Internal fixes
 - Performance improvements
 - Documentation updates
 
 ### CHANGELOG Required
+
 ```markdown
 # Changelog
 
 ## [2.0.0] - 2026-01-30
+
 ### BREAKING CHANGES
+
 - `login()` now returns `AuthTokens` instead of string
 - Removed deprecated `validateUser()` method
 
 ### Added
+
 - Refresh token support
 - Role-based guards
 
 ### Fixed
+
 - Token expiration validation
 ```
 
 ### Version Bump Command
+
 **ALWAYS run before pushing:**
+
 ```bash
 npm version patch  # Bug fixes (0.0.x)
 npm version minor  # New features (0.x.0)
@@ -438,6 +485,7 @@ git push && git push --tags
 ## 🚫 Restrictions - Require Approval
 
 **NEVER without approval:**
+
 - Breaking changes to public API
 - Changing exported DTOs/interfaces
 - Removing exported functions
@@ -445,6 +493,7 @@ git push && git push --tags
 - Security-related changes
 
 **CAN do autonomously:**
+
 - Bug fixes (no breaking changes)
 - Internal refactoring
 - Adding new features (non-breaking)
@@ -456,6 +505,7 @@ git push && git push --tags
 ## ✅ Release Checklist
 
 Before publishing:
+
 - [ ] All tests passing (100% of test suite)
 - [ ] Coverage >= 80%
 - [ ] No ESLint warnings
@@ -469,7 +519,7 @@ Before publishing:
 
 ### Pre-Publish Hook (Recommended)
 
-Aggiungi al `package.json` per bloccare pubblicazioni con errori:
+Add to `package.json` to block publishing on errors:
 
 ```json
 "scripts": {
@@ -477,13 +527,14 @@ Aggiungi al `package.json` per bloccare pubblicazioni con errori:
 }
 ```
 
-Questo esegue automaticamente tutti i controlli prima di `npm publish` e blocca se qualcosa fallisce.
+This automatically runs all checks before `npm publish` and blocks if anything fails.
 
 ---
 
 ## 🔄 Development Workflow
 
 ### Working on Module:
+
 1. Clone module repo
 2. Create branch: `feature/MODULE-123-description`
 3. Implement with tests
@@ -494,6 +545,7 @@ Questo esegue automaticamente tutti i controlli prima di `npm publish` e blocca 
 8. Create PR
 
 ### Testing in App:
+
 ```bash
 # In module
 npm link
@@ -512,6 +564,7 @@ npm unlink @ciscode/authentication-kit
 ## 🎨 Code Style
 
 **Same as app:**
+
 - ESLint `--max-warnings=0`
 - Prettier formatting
 - TypeScript strict mode
@@ -523,21 +576,23 @@ npm unlink @ciscode/authentication-kit
 ## 🐛 Error Handling
 
 **Custom domain errors:**
+
 ```typescript
 export class InvalidCredentialsError extends Error {
   constructor() {
-    super('Invalid email or password');
-    this.name = 'InvalidCredentialsError';
+    super("Invalid email or password");
+    this.name = "InvalidCredentialsError";
   }
 }
 ```
 
 **Structured logging:**
+
 ```typescript
-this.logger.error('Authentication failed', {
+this.logger.error("Authentication failed", {
   email,
-  reason: 'invalid_password',
-  timestamp: new Date().toISOString()
+  reason: "invalid_password",
+  timestamp: new Date().toISOString(),
 });
 ```
 
@@ -555,6 +610,7 @@ this.logger.error('Authentication failed', {
 ## 📋 Summary
 
 **Module Principles:**
+
 1. Reusability over specificity
 2. Comprehensive testing (80%+)
 3. Complete documentation
@@ -567,5 +623,5 @@ this.logger.error('Authentication failed', {
 
 ---
 
-*Last Updated: January 30, 2026*  
-*Version: 1.0.0*
+_Last Updated: January 30, 2026_  
+_Version: 1.0.0_

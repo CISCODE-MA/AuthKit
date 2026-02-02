@@ -15,11 +15,11 @@
       "node"
     ],
     "paths": {
-      "@models/*": [
-        "src/models/*"
+      "@entities/*": [
+        "src/entities/*"
       ],
-      "@dtos/*": [
-        "src/dtos/*"
+      "@dto/*": [
+        "src/dto/*"
       ],
       "@repos/*": [
         "src/repositories/*"
@@ -30,11 +30,14 @@
       "@controllers/*": [
         "src/controllers/*"
       ],
+      "@guards/*": [
+        "src/guards/*"
+      ],
+      "@decorators/*": [
+        "src/decorators/*"
+      ],
       "@config/*": [
         "src/config/*"
-      ],
-      "@middleware/*": [
-        "src/middleware/*"
       ],
       "@filters/*": [
         "src/filters/*"

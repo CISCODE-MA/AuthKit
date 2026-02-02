@@ -1,7 +1,7 @@
 import { Injectable, ConflictException, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { RoleRepository } from '@repos/role.repository';
-import { CreateRoleDto } from '@dtos/role/create-role.dto';
-import { UpdateRoleDto } from '@dtos/role/update-role.dto';
+import { CreateRoleDto } from '@dto/role/create-role.dto';
+import { UpdateRoleDto } from '@dto/role/update-role.dto';
 import { Types } from 'mongoose';
 import { LoggerService } from '@services/logger.service';
 

@@ -1,4 +1,4 @@
-﻿import 'dotenv/config';
+import 'dotenv/config';
 import { MiddlewareConsumer, Module, NestModule, OnModuleInit, RequestMethod } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { APP_FILTER } from '@nestjs/core';
@@ -10,9 +10,9 @@ import { RolesController } from '@controllers/roles.controller';
 import { PermissionsController } from '@controllers/permissions.controller';
 import { HealthController } from '@controllers/health.controller';
 
-import { User, UserSchema } from '@models/user.model';
-import { Role, RoleSchema } from '@models/role.model';
-import { Permission, PermissionSchema } from '@models/permission.model';
+import { User, UserSchema } from '@entities/user.entity';
+import { Role, RoleSchema } from '@entities/role.entity';
+import { Permission, PermissionSchema } from '@entities/permission.entity';
 
 import { AuthService } from '@services/auth.service';
 import { UsersService } from '@services/users.service';
@@ -26,8 +26,8 @@ import { UserRepository } from '@repos/user.repository';
 import { RoleRepository } from '@repos/role.repository';
 import { PermissionRepository } from '@repos/permission.repository';
 
-import { AuthenticateGuard } from '@middleware/authenticate.guard';
-import { AdminGuard } from '@middleware/admin.guard';
+import { AuthenticateGuard } from '@guards/authenticate.guard';
+import { AdminGuard } from '@guards/admin.guard';
 import { AdminRoleService } from '@services/admin-role.service';
 import { OAuthService } from '@services/oauth.service';
 import { GlobalExceptionFilter } from '@filters/http-exception.filter';

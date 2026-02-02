@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import type { Model, Types } from 'mongoose';
-import { Permission, PermissionDocument } from '@models/permission.model';
+import { Permission, PermissionDocument } from '@entities/permission.entity';
 
 @Injectable()
 export class PermissionRepository {

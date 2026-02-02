@@ -2,7 +2,7 @@ import { Injectable, ConflictException, NotFoundException, InternalServerErrorEx
 import bcrypt from 'bcryptjs';
 import { UserRepository } from '@repos/user.repository';
 import { RoleRepository } from '@repos/role.repository';
-import { RegisterDto } from '@dtos/auth/register.dto';
+import { RegisterDto } from '@dto/auth/register.dto';
 import { Types } from 'mongoose';
 import { generateUsernameFromName } from '@utils/helper';
 import { LoggerService } from '@services/logger.service';

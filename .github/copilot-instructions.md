@@ -21,67 +21,103 @@
 
 ## 🏗️ Module Architecture
 
-**ALWAYS follow 4-layer Clean Architecture (aligned with main app):**
+**Modules use Controller-Service-Repository (CSR) pattern for simplicity and reusability.**
+
+> **WHY CSR for modules?** Reusable libraries need to be simple, well-documented, and easy to integrate. The 4-layer Clean Architecture is better suited for complex applications, not libraries.
 
 ```
 src/
-  ├── api/                    # Controllers, DTOs, HTTP layer
+  ├── index.ts                    # PUBLIC API exports
+  ├── auth-kit.module.ts          # NestJS module definition
+  │
+  ├── controllers/                # HTTP Layer
   │   ├── auth.controller.ts
-  │   ├── guards/
-  │   │   ├── jwt-auth.guard.ts
-  │   │   └── roles.guard.ts
-  │   ├── decorators/
-  │   │   ├── current-user.decorator.ts
-  │   │   └── roles.decorator.ts
-  │   └── dto/
-  │       ├── login.dto.ts
-  │       ├── register.dto.ts
-  │       └── user.dto.ts
-  ├── application/            # Use-cases, business orchestration
-  │   ├── ports/              # Interfaces/contracts
-  │   │   └── auth.port.ts
-  │   └── use-cases/
-  │       ├── login.use-case.ts
-  │       ├── register.use-case.ts
-  │       └── validate-token.use-case.ts
-  ├── domain/                 # Entities, business logic
+  │   ├── users.controller.ts
+  │   └── roles.controller.ts
+  │
+  ├── services/                   # Business Logic
+  │   ├── auth.service.ts
+  │   ├── oauth.service.ts
+  │   └── mail.service.ts
+  │
+  ├── entities/                   # Domain Models
   │   ├── user.entity.ts
   │   ├── role.entity.ts
   │   └── permission.entity.ts
-  └── infrastructure/         # Repositories, external services
-      ├── user.repository.ts
-      ├── role.repository.ts
-      └── jwt.service.ts
+  │
+  ├── repositories/               # Data Access
+  │   ├── user.repository.ts
+  │   ├── role.repository.ts
+  │   └── permission.repository.ts
+  │
+  ├── guards/                     # Auth Guards
+  │   ├── jwt-auth.guard.ts
+  │   ├── roles.guard.ts
+  │   └── admin.guard.ts
+  │
+  ├── decorators/                 # Custom Decorators
+  │   ├── current-user.decorator.ts
+  │   ├── roles.decorator.ts
+  │   └── admin.decorator.ts
+  │
+  ├── dto/                        # Data Transfer Objects
+  │   ├── auth/
+  │   │   ├── login.dto.ts
+  │   │   ├── register.dto.ts
+  │   │   └── user.dto.ts
+  │   └── role/
+  │
+  ├── filters/                    # Exception Filters
+  ├── middleware/                 # Middleware
+  ├── config/                     # Configuration
+  └── utils/                      # Utilities
 ```
 
-**Dependency Flow:** `api → application → domain ← infrastructure`
+**Responsibility Layers:**
 
-**Guards & Decorators:**
-- **Exported guards** → `api/guards/` (used globally by apps)
-  - Example: `JwtAuthGuard`, `RolesGuard`
-  - Apps import: `import { JwtAuthGuard } from '@ciscode/authentication-kit'`
-- **Decorators** → `api/decorators/`
-  - Example: `@CurrentUser()`, `@Roles()`
-  - Exported for app use
+| Layer          | Responsibility                              | Examples                          |
+|----------------|---------------------------------------------|-----------------------------------|
+| **Controllers** | HTTP handling, route definition            | `auth.controller.ts`              |
+| **Services**    | Business logic, orchestration              | `auth.service.ts`                 |
+| **Entities**    | Domain models (Mongoose schemas)           | `user.entity.ts`                  |
+| **Repositories**| Data access, database queries              | `user.repository.ts`              |
+| **Guards**      | Authentication/Authorization               | `jwt-auth.guard.ts`               |
+| **Decorators**  | Parameter extraction, metadata             | `@CurrentUser()`                  |
+| **DTOs**        | Input validation, API contracts            | `login.dto.ts`                    |
 
-**Module Exports:**
+**Module Exports (Public API):**
 ```typescript
-// src/index.ts - Public API
-export { AuthModule } from './auth-kit.module';
+// src/index.ts - Only export what apps need to consume
+export { AuthKitModule } from './auth-kit.module';
+
+// Services (main API)
+export { AuthService } from './services/auth.service';
+export { SeedService } from './services/seed.service';
 
 // DTOs (public contracts)
-export { LoginDto, RegisterDto, UserDto } from './api/dto';
+export { LoginDto, RegisterDto, UserDto } from './dto/auth';
+export { CreateRoleDto, UpdateRoleDto } from './dto/role';
 
-// Guards & Decorators
-export { JwtAuthGuard, RolesGuard } from './api/guards';
-export { CurrentUser, Roles } from './api/decorators';
+// Guards (for protecting routes)
+export { AuthenticateGuard } from './guards/jwt-auth.guard';
+export { RolesGuard } from './guards/roles.guard';
+export { AdminGuard } from './guards/admin.guard';
 
-// Services (if needed by apps)
-export { AuthService } from './application/auth.service';
+// Decorators (for DI and metadata)
+export { CurrentUser } from './decorators/current-user.decorator';
+export { Roles } from './decorators/roles.decorator';
+export { Admin } from './decorators/admin.decorator';
 
-// ❌ NEVER export entities directly
-// export { User } from './domain/user.entity'; // FORBIDDEN
+// ❌ NEVER export entities or repositories
+// export { User } from './entities/user.entity'; // FORBIDDEN
+// export { UserRepository } from './repositories/user.repository'; // FORBIDDEN
 ```
+
+**Rationale:**
+- **Entities** = internal implementation details (can change)
+- **Repositories** = internal data access (apps shouldn't depend on it)
+- **DTOs** = stable public contracts (apps depend on these)
+- **Services** = public API (apps use methods, not internals)
 
 ---
 
@@ -91,8 +127,9 @@ export { AuthService } from './application/auth.service';
 - `auth.controller.ts`
 - `login.dto.ts`
 - `user.entity.ts`
-- `validate-token.use-case.ts`
 - `user.repository.ts`
+- `jwt-auth.guard.ts`
+- `current-user.decorator.ts`
 
 **Code**: Same as app standards (PascalCase classes, camelCase functions, UPPER_SNAKE_CASE constants)
 
@@ -101,18 +138,24 @@ export { AuthService } from './application/auth.service';
 Configured in `tsconfig.json`:
 ```typescript
 "@/*"              → "src/*"
-"@api/*"           → "src/api/*"
-"@application/*"   → "src/application/*"
-"@domain/*"        → "src/domain/*"
-"@infrastructure/*"→ "src/infrastructure/*"
+"@controllers/*"   → "src/controllers/*"
+"@services/*"      → "src/services/*"
+"@entities/*"      → "src/entities/*"
+"@repos/*"         → "src/repositories/*"
+"@dtos/*"          → "src/dto/*"
+"@guards/*"        → "src/guards/*"
+"@decorators/*"    → "src/decorators/*"
+"@config/*"        → "src/config/*"
+"@utils/*"         → "src/utils/*"
 ```
 
 Use aliases for cleaner imports:
 ```typescript
-import { LoginDto } from '@api/dto';
-import { LoginUseCase } from '@application/use-cases';
-import { User } from '@domain/user.entity';
-import { UserRepository } from '@infrastructure/user.repository';
+import { LoginDto } from '@dtos/auth/login.dto';
+import { AuthService } from '@services/auth.service';
+import { User } from '@entities/user.entity';
+import { UserRepository } from '@repos/user.repository';
+import { AuthenticateGuard } from '@guards/jwt-auth.guard';
 ```
 
 ---
@@ -122,10 +165,10 @@ import { UserRepository } from '@infrastructure/user.repository';
 ### Coverage Target: 80%+
 
 **Unit Tests - MANDATORY:**
-- ✅ All use-cases
-- ✅ All domain logic
-- ✅ All utilities
+- ✅ All services (business logic)
+- ✅ All utilities and helpers
 - ✅ Guards and decorators
+- ✅ Repository methods
 
 **Integration Tests:**
 - ✅ Controllers (full request/response)
@@ -138,10 +181,9 @@ import { UserRepository } from '@infrastructure/user.repository';
 **Test file location:**
 ```
 src/
-  └── application/
-      └── use-cases/
-          ├── login.use-case.ts
-          └── login.use-case.spec.ts  ← Same directory
+  └── services/
+      ├── auth.service.ts
+      └── auth.service.spec.ts  ← Same directory
 ```
 
 ---

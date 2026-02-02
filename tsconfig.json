@@ -12,7 +12,8 @@
     "emitDecoratorMetadata": true,
     "skipLibCheck": true,
     "types": [
-      "node"
+      "node",
+      "jest"
     ],
     "paths": {
       "@entities/*": [

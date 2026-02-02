@@ -54,7 +54,12 @@ export class AuthenticateGuard implements CanActivate {
       req.user = decoded;
       return true;
     } catch (error) {
-      if (error instanceof UnauthorizedException || error instanceof ForbiddenException) {
+      // Rethrow server configuration errors and auth/authorization errors directly
+      if (
+        error instanceof UnauthorizedException ||
+        error instanceof ForbiddenException ||
+        error instanceof InternalServerErrorException
+      ) {
         throw error;
       }
 

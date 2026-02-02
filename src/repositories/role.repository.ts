@@ -2,9 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import type { Model, Types } from 'mongoose';
 import { Role, RoleDocument } from '@entities/role.entity';
+import { IRoleRepository } from './interfaces/role-repository.interface';
 
+/**
+ * Role repository implementation using Mongoose
+ */
 @Injectable()
-export class RoleRepository {
+export class RoleRepository implements IRoleRepository {
     constructor(@InjectModel(Role.name) private readonly roleModel: Model<RoleDocument>) { }
 
     create(data: Partial<Role>) {

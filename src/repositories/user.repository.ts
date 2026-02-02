@@ -2,9 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import type { Model, Types } from 'mongoose';
 import { User, UserDocument } from '@entities/user.entity';
+import { IUserRepository } from './interfaces/user-repository.interface';
 
+/**
+ * User repository implementation using Mongoose
+ */
 @Injectable()
-export class UserRepository {
+export class UserRepository implements IUserRepository {
     constructor(@InjectModel(User.name) private readonly userModel: Model<UserDocument>) { }
 
     create(data: Partial<User>) {

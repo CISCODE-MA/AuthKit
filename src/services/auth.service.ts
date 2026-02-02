@@ -1,6 +1,5 @@
 import { Injectable, ConflictException, UnauthorizedException, NotFoundException, InternalServerErrorException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import type { SignOptions } from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
 import { UserRepository } from '@repos/user.repository';
 import { RegisterDto } from '@dto/auth/register.dto';
@@ -9,9 +8,14 @@ import { MailService } from '@services/mail.service';
 import { RoleRepository } from '@repos/role.repository';
 import { generateUsernameFromName } from '@utils/helper';
 import { LoggerService } from '@services/logger.service';
+import { hashPassword, verifyPassword } from '@utils/password.util';
 
 type JwtExpiry = SignOptions['expiresIn'];
 
+/**
+ * Authentication service handling user registration, login, email verification,
+ * password reset, and token management
+ */
 @Injectable()
 export class AuthService {
     constructor(
@@ -21,31 +25,66 @@ export class AuthService {
         private readonly logger: LoggerService,
     ) { }
 
+    //#region Token Management
+
+    /**
+     * Resolves JWT expiry time from environment or uses fallback
+     * @param value - Environment variable value
+     * @param fallback - Default expiry time
+     * @returns JWT expiry time
+     */
     private resolveExpiry(value: string | undefined, fallback: JwtExpiry): JwtExpiry {
         return (value || fallback) as JwtExpiry;
     }
 
+    /**
+     * Signs an access token with user payload
+     * @param payload - Token payload containing user data
+     * @returns Signed JWT access token
+     */
     private signAccessToken(payload: any) {
         const expiresIn = this.resolveExpiry(process.env.JWT_ACCESS_TOKEN_EXPIRES_IN, '15m');
         return jwt.sign(payload, this.getEnv('JWT_SECRET'), { expiresIn });
     }
 
+    /**
+     * Signs a refresh token for token renewal
+     * @param payload - Token payload with user ID
+     * @returns Signed JWT refresh token
+     */
     private signRefreshToken(payload: any) {
         const expiresIn = this.resolveExpiry(process.env.JWT_REFRESH_TOKEN_EXPIRES_IN, '7d');
         return jwt.sign(payload, this.getEnv('JWT_REFRESH_SECRET'), { expiresIn });
     }
 
+    /**
+     * Signs an email verification token
+     * @param payload - Token payload with user data
+     * @returns Signed JWT email token
+     */
     private signEmailToken(payload: any) {
         const expiresIn = this.resolveExpiry(process.env.JWT_EMAIL_TOKEN_EXPIRES_IN, '1d');
 
         return jwt.sign(payload, this.getEnv('JWT_EMAIL_SECRET'), { expiresIn });
     }
 
+    /**
+     * Signs a password reset token
+     * @param payload - Token payload with user data
+     * @returns Signed JWT reset token
+     */
     private signResetToken(payload: any) {
         const expiresIn = this.resolveExpiry(process.env.JWT_RESET_TOKEN_EXPIRES_IN, '1h');
         return jwt.sign(payload, this.getEnv('JWT_RESET_SECRET'), { expiresIn });
     }
 
+    /**
+     * Builds JWT payload with user roles and permissions
+     * @param userId - User identifier
+     * @returns Token payload with user data
+     * @throws NotFoundException if user not found
+     * @throws InternalServerErrorException on database errors
+     */
     private async buildTokenPayload(userId: string) {
         try {
             const user = await this.users.findByIdWithRolesAndPermissions(userId);
@@ -66,6 +105,12 @@ export class AuthService {
         }
     }
 
+    /**
+     * Gets environment variable or throws error if missing
+     * @param name - Environment variable name
+     * @returns Environment variable value
+     * @throws InternalServerErrorException if variable not set
+     */
     private getEnv(name: string): string {
         const v = process.env[name];
         if (!v) {
@@ -75,6 +120,11 @@ export class AuthService {
         return v;
     }
 
+    /**
+     * Issues access and refresh tokens for authenticated user
+     * @param userId - User identifier
+     * @returns Access and refresh tokens
+     */
     public async issueTokensForUser(userId: string) {
         const payload = await this.buildTokenPayload(userId);
         const accessToken = this.signAccessToken(payload);
@@ -82,6 +132,17 @@ export class AuthService {
         return { accessToken, refreshToken };
     }
 
+    //#endregion
+
+    //#region User Profile
+
+    /**
+     * Gets authenticated user profile
+     * @param userId - User identifier from JWT
+     * @returns User profile without sensitive data
+     * @throws NotFoundException if user not found
+     * @throws ForbiddenException if account banned
+     */
     async getMe(userId: string) {
         try {
             const user = await this.users.findByIdWithRolesAndPermissions(userId);
@@ -112,6 +173,17 @@ export class AuthService {
         }
     }
 
+    //#endregion
+
+    //#region Registration
+
+    /**
+     * Registers a new user account
+     * @param dto - Registration data including email, password, name
+     * @returns Registration result with user ID and email status
+     * @throws ConflictException if email/username/phone already exists
+     * @throws InternalServerErrorException on system errors
+     */
     async register(dto: RegisterDto) {
         try {
             // Generate username from fname-lname if not provided
@@ -133,8 +205,7 @@ export class AuthService {
             // Hash password
             let hashed: string;
             try {
-                const salt = await bcrypt.genSalt(10);
-                hashed = await bcrypt.hash(dto.password, salt);
+                hashed = await hashPassword(dto.password);
             } catch (error) {
                 this.logger.error(`Password hashing failed: ${error.message}`, error.stack, 'AuthService');
                 throw new InternalServerErrorException('Registration failed');
@@ -199,6 +270,19 @@ export class AuthService {
         }
     }
 
+    //#endregion
+
+    //#region Email Verification
+
+    /**
+     * Verifies user email with token
+     * @param token - Email verification JWT token
+     * @returns Verification success message
+     * @throws BadRequestException if token is invalid
+     * @throws NotFoundException if user not found
+     * @throws UnauthorizedException if token expired or malformed
+     * @throws InternalServerErrorException on system errors
+     */
     async verifyEmail(token: string) {
         try {
             const decoded: any = jwt.verify(token, this.getEnv('JWT_EMAIL_SECRET'));
@@ -238,6 +322,12 @@ export class AuthService {
         }
     }
 
+    /**
+     * Resends email verification token to user
+     * @param email - User email address
+     * @returns Success message (always succeeds to prevent enumeration)
+     * @throws InternalServerErrorException on system errors
+     */
     async resendVerification(email: string) {
         try {
             const user = await this.users.findByEmail(email);
@@ -273,6 +363,17 @@ export class AuthService {
         }
     }
 
+    //#endregion
+
+    //#region Login & Authentication
+
+    /**
+     * Authenticates a user and issues access tokens
+     * @param dto - Login credentials (email + password)
+     * @returns Access and refresh tokens
+     * @throws UnauthorizedException if credentials are invalid or user is banned
+     * @throws InternalServerErrorException on system errors
+     */
     async login(dto: LoginDto) {
         try {
             const user = await this.users.findByEmailWithPassword(dto.email);
@@ -290,7 +391,7 @@ export class AuthService {
                 throw new ForbiddenException('Email not verified. Please check your inbox');
             }
 
-            const passwordMatch = await bcrypt.compare(dto.password, user.password as string);
+            const passwordMatch = await verifyPassword(dto.password, user.password as string);
             if (!passwordMatch) {
                 throw new UnauthorizedException('Invalid email or password');
             }
@@ -310,6 +411,18 @@ export class AuthService {
         }
     }
 
+    //#endregion
+
+    //#region Token Refresh
+
+    /**
+     * Issues new access and refresh tokens using a valid refresh token
+     * @param refreshToken - Valid refresh JWT token
+     * @returns New access and refresh token pair
+     * @throws UnauthorizedException if token is invalid, expired, or wrong type
+     * @throws ForbiddenException if user is banned
+     * @throws InternalServerErrorException on system errors
+     */
     async refresh(refreshToken: string) {
         try {
             const decoded: any = jwt.verify(refreshToken, this.getEnv('JWT_REFRESH_SECRET'));
@@ -359,6 +472,16 @@ export class AuthService {
         }
     }
 
+    //#endregion
+
+    //#region Password Reset
+
+    /**
+     * Initiates password reset process by sending reset email
+     * @param email - User email address
+     * @returns Success message (always succeeds to prevent enumeration)
+     * @throws InternalServerErrorException on critical system errors
+     */
     async forgotPassword(email: string) {
         try {
             const user = await this.users.findByEmail(email);
@@ -399,6 +522,16 @@ export class AuthService {
         }
     }
 
+    /**
+     * Resets user password using reset token
+     * @param token - Password reset JWT token
+     * @param newPassword - New password to set
+     * @returns Success confirmation
+     * @throws BadRequestException if token purpose is invalid
+     * @throws NotFoundException if user not found
+     * @throws UnauthorizedException if token expired or malformed
+     * @throws InternalServerErrorException on system errors
+     */
     async resetPassword(token: string, newPassword: string) {
         try {
             const decoded: any = jwt.verify(token, this.getEnv('JWT_RESET_SECRET'));
@@ -415,8 +548,7 @@ export class AuthService {
             // Hash new password
             let hashedPassword: string;
             try {
-                const salt = await bcrypt.genSalt(10);
-                hashedPassword = await bcrypt.hash(newPassword, salt);
+                hashedPassword = await hashPassword(newPassword);
             } catch (error) {
                 this.logger.error(`Password hashing failed: ${error.message}`, error.stack, 'AuthService');
                 throw new InternalServerErrorException('Password reset failed');
@@ -445,6 +577,17 @@ export class AuthService {
         }
     }
 
+    //#endregion
+
+    //#region Account Management
+
+    /**
+     * Permanently deletes a user account
+     * @param userId - ID of user account to delete
+     * @returns Success confirmation
+     * @throws NotFoundException if user not found
+     * @throws InternalServerErrorException on deletion errors
+     */
     async deleteAccount(userId: string) {
         try {
             const user = await this.users.deleteById(userId);
@@ -460,4 +603,6 @@ export class AuthService {
             throw new InternalServerErrorException('Account deletion failed');
         }
     }
+
+    //#endregion
 }

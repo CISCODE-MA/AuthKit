@@ -2,9 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import type { Model, Types } from 'mongoose';
 import { Permission, PermissionDocument } from '@entities/permission.entity';
+import { IPermissionRepository } from './interfaces/permission-repository.interface';
 
+/**
+ * Permission repository implementation using Mongoose
+ */
 @Injectable()
-export class PermissionRepository {
+export class PermissionRepository implements IPermissionRepository {
     constructor(@InjectModel(Permission.name) private readonly permModel: Model<PermissionDocument>) { }
 
     create(data: Partial<Permission>) {

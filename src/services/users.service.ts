@@ -1,12 +1,15 @@
 import { Injectable, ConflictException, NotFoundException, InternalServerErrorException } from '@nestjs/common';
-import bcrypt from 'bcryptjs';
 import { UserRepository } from '@repos/user.repository';
 import { RoleRepository } from '@repos/role.repository';
 import { RegisterDto } from '@dto/auth/register.dto';
 import { Types } from 'mongoose';
 import { generateUsernameFromName } from '@utils/helper';
 import { LoggerService } from '@services/logger.service';
+import { hashPassword } from '@utils/password.util';
 
+/**
+ * Users service handling user management operations
+ */
 @Injectable()
 export class UsersService {
     constructor(
@@ -15,6 +18,15 @@ export class UsersService {
         private readonly logger: LoggerService,
     ) { }
 
+    //#region User Management
+
+    /**
+     * Creates a new user account
+     * @param dto - User registration data
+     * @returns Created user object
+     * @throws ConflictException if email/username/phone already exists
+     * @throws InternalServerErrorException on creation errors
+     */
     async create(dto: RegisterDto) {
         try {
             // Generate username from fname-lname if not provided
@@ -36,8 +48,7 @@ export class UsersService {
             // Hash password
             let hashed: string;
             try {
-                const salt = await bcrypt.genSalt(10);
-                hashed = await bcrypt.hash(dto.password, salt);
+                hashed = await hashPassword(dto.password);
             } catch (error) {
                 this.logger.error(`Password hashing failed: ${error.message}`, error.stack, 'UsersService');
                 throw new InternalServerErrorException('User creation failed');
@@ -73,6 +84,16 @@ export class UsersService {
         }
     }
 
+    //#endregion
+
+    //#region Query Operations
+
+    /**
+     * Lists users based on filter criteria
+     * @param filter - Filter object with email and/or username
+     * @returns Array of users matching the filter
+     * @throws InternalServerErrorException on query errors
+     */
     async list(filter: { email?: string; username?: string }) {
         try {
             return this.users.list(filter);
@@ -82,6 +103,18 @@ export class UsersService {
         }
     }
 
+    //#endregion
+
+    //#region User Status Management
+
+    /**
+     * Sets or removes ban status for a user
+     * @param id - User ID
+     * @param banned - True to ban, false to unban
+     * @returns Updated user ID and ban status
+     * @throws NotFoundException if user not found
+     * @throws InternalServerErrorException on update errors
+     */
     async setBan(id: string, banned: boolean) {
         try {
             const user = await this.users.updateById(id, { isBanned: banned });
@@ -98,6 +131,13 @@ export class UsersService {
         }
     }
 
+    /**
+     * Deletes a user account
+     * @param id - User ID to delete
+     * @returns Success confirmation object
+     * @throws NotFoundException if user not found
+     * @throws InternalServerErrorException on deletion errors
+     */
     async delete(id: string) {
         try {
             const user = await this.users.deleteById(id);
@@ -114,6 +154,18 @@ export class UsersService {
         }
     }
 
+    //#endregion
+
+    //#region Role Management
+
+    /**
+     * Updates user role assignments
+     * @param id - User ID
+     * @param roles - Array of role IDs to assign
+     * @returns Updated user ID and roles
+     * @throws NotFoundException if user or any role not found
+     * @throws InternalServerErrorException on update errors
+     */
     async updateRoles(id: string, roles: string[]) {
         try {
             const existing = await this.rolesRepo.findByIds(roles);
@@ -136,4 +188,5 @@ export class UsersService {
         }
     }
 
+    //#endregion
 }

@@ -4,7 +4,6 @@
     "target": "ES2019",
     "declaration": true,
     "outDir": "dist",
-    "rootDir": "src",
     "strict": false,
     "baseUrl": ".",
     "esModuleInterop": true,
@@ -45,12 +44,16 @@
       ],
       "@utils/*": [
         "src/utils/*"
+      ],
+      "@test-utils/*": [
+        "src/test-utils/*"
       ]
     }
   },
   "include": [
     "src/**/*.ts",
-    "src/**/*.d.ts"
+    "src/**/*.d.ts",
+    "test/**/*.ts"
   ],
   "exclude": [
     "node_modules",

@@ -33,3 +33,21 @@ export { UpdateRoleDto } from './dto/role/update-role.dto';
 // DTOs - Permission
 export { CreatePermissionDto } from './dto/permission/create-permission.dto';
 export { UpdatePermissionDto } from './dto/permission/update-permission.dto';
+
+// Types & Interfaces (for TypeScript typing)
+export type {
+  AuthTokens,
+  RegisterResult,
+  OperationResult,
+  UserProfile,
+  IAuthService,
+} from './services/interfaces/auth-service.interface';
+
+export type {
+  ILoggerService,
+  LogLevel,
+} from './services/interfaces/logger-service.interface';
+
+export type {
+  IMailService,
+} from './services/interfaces/mail-service.interface';

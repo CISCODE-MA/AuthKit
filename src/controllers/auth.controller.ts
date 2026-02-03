@@ -148,7 +148,12 @@ export class AuthController {
   googleCallback(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
     passport.authenticate('google', { session: false }, (err: any, data: any) => {
       if (err || !data) return res.status(400).json({ message: 'Google auth failed.' });
-      return res.status(200).json(data);
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      const tokenParams = new URLSearchParams({
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+      });
+      return res.redirect(`${frontendUrl}/oauth/google/callback?${tokenParams.toString()}`);
     })(req, res, next);
   }
 
@@ -165,7 +170,12 @@ export class AuthController {
     passport.authenticate('azure_ad_oauth2', { session: false }, (err: any, data: any) => {
       if (err) return res.status(400).json({ message: 'Microsoft auth failed', error: err?.message || err });
       if (!data) return res.status(400).json({ message: 'Microsoft auth failed', error: 'No data returned' });
-      return res.status(200).json(data);
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      const tokenParams = new URLSearchParams({
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+      });
+      return res.redirect(`${frontendUrl}/oauth/microsoft/callback?${tokenParams.toString()}`);
     })(req, res, next);
 
   }
@@ -179,7 +189,12 @@ export class AuthController {
   facebookCallback(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
     passport.authenticate('facebook', { session: false }, (err: any, data: any) => {
       if (err || !data) return res.status(400).json({ message: 'Facebook auth failed.' });
-      return res.status(200).json(data);
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      const tokenParams = new URLSearchParams({
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+      });
+      return res.redirect(`${frontendUrl}/oauth/facebook/callback?${tokenParams.toString()}`);
     })(req, res, next);
   }
 }

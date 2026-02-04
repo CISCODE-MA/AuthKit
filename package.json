@@ -24,6 +24,8 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "setup": "node scripts/setup-dev.js",
+    "seed": "node scripts/seed-admin.ts && node scripts/verify-admin.js",
     "prepack": "npm run build",
     "release": "semantic-release"
   },

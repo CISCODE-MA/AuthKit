@@ -1,6 +1,17 @@
 # Copilot Instructions - Auth Kit Module
 
-> **Purpose**: Development guidelines for the Auth Kit module - a reusable authentication library for NestJS applications.
+> **Purpose**: Development guidelines for the Auth Kit module - a production-ready authentication library for NestJS applications.
+
+---
+
+## 📊 Current Status (Feb 4, 2026)
+
+**Production Ready**: ✅ YES  
+**Version**: 1.5.0  
+**Test Coverage**: 90.25% (312 tests passing)  
+**Integration**: ✅ Active in ComptAlEyes
+
+**See**: `docs/STATUS.md` for detailed metrics and `docs/NEXT_STEPS.md` for roadmap.
 
 ---
 
@@ -11,10 +22,12 @@
 **Purpose**: JWT-based authentication and authorization for NestJS apps
 
 ### Responsibilities:
-- User authentication (login, register)
-- JWT token generation and validation
+- User authentication (login, register, email verification)
+- JWT token management (access, refresh, email, reset)
+- OAuth integration (Google, Microsoft, Facebook)
 - Role-based access control (RBAC)
-- Password hashing and validation
+- Password hashing and reset
+- Admin user management
 - Auth guards and decorators
 
 ---
@@ -164,27 +177,36 @@ import { AuthenticateGuard } from '@guards/jwt-auth.guard';
 
 ### Coverage Target: 80%+
 
-**Unit Tests - MANDATORY:**
+**Current Status**: ✅ **90.25% coverage, 312 tests passing**
+
+**Test Structure:**
+```
+test/
+  ├── controllers/    # Integration tests
+  ├── services/       # Unit tests
+  ├── guards/         # Unit tests
+  ├── repositories/   # Unit tests
+  └── decorators/     # Unit tests
+```
+
+**Coverage Details:**
+- Statements: 90.25% (1065/1180)
+- Branches: 74.95% (404/539)
+- Functions: 86.09% (161/187)
+- Lines: 90.66% (981/1082)
+
+**What's Tested:**
 - ✅ All services (business logic)
-- ✅ All utilities and helpers
-- ✅ Guards and decorators
-- ✅ Repository methods
+- ✅ All controllers (HTTP layer)
+- ✅ All guards and decorators
+- ✅ All repository methods
+- ✅ Complete auth flows (E2E style)
 
-**Integration Tests:**
-- ✅ Controllers (full request/response)
-- ✅ JWT generation/validation
-- ✅ Database operations (with test DB)
-
-**E2E Tests:**
-- ✅ Complete auth flows (register → login → protected route)
-
-**Test file location:**
-```
-src/
-  └── services/
-      ├── auth.service.ts
-      └── auth.service.spec.ts  ← Same directory
-```
+**When Adding New Features:**
+- MUST write tests before merging
+- MUST maintain 80%+ coverage
+- MUST test both success and error cases
+- MUST follow existing test patterns
 
 ---
 

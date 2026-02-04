@@ -51,3 +51,7 @@ export type {
 export type {
   IMailService,
 } from './services/interfaces/mail-service.interface';
+
+// Error codes & helpers
+export { AuthErrorCode, createStructuredError, ErrorCodeToStatus } from './utils/error-codes';
+export type { StructuredError } from './utils/error-codes';

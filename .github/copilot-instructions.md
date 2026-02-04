@@ -144,6 +144,19 @@ export { Admin } from './decorators/admin.decorator';
 - `jwt-auth.guard.ts`
 - `current-user.decorator.ts`
 
+**Test Structure**: Mirror structure in `test/` directory:
+```
+test/
+├── controllers/
+│   └── auth.controller.spec.ts
+├── services/
+│   └── auth.service.spec.ts
+├── guards/
+│   └── jwt-auth.guard.spec.ts
+└── repositories/
+    └── user.repository.spec.ts
+```
+
 **Code**: Same as app standards (PascalCase classes, camelCase functions, UPPER_SNAKE_CASE constants)
 
 ### Path Aliases

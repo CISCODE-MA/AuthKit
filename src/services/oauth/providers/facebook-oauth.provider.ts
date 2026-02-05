@@ -41,15 +41,15 @@ export class FacebookOAuthProvider implements IOAuthProvider {
             const profileData = await this.httpClient.get('https://graph.facebook.com/me', {
                 params: {
                     access_token: accessToken,
-                    fields: 'id,name',
+                    fields: 'id,name,email',
                 },
             });
 
-            // Use Facebook ID as email fallback for testing
-            const email = profileData.email || `${profileData.id}@facebook.test`;
+            // Validate email presence (required by app logic)
+            this.errorHandler.validateRequiredField(profileData.email, 'Email', 'Facebook');
 
             return {
-                email: email,
+                email: profileData.email,
                 name: profileData.name,
                 providerId: profileData.id,
             };

@@ -14,21 +14,33 @@ describe('RoleRepository', () => {
     permissions: [],
   };
 
+
   beforeEach(async () => {
-    const leanMock = jest.fn();
-    const populateMock = jest.fn(() => ({ lean: leanMock }));
-    const findMock = jest.fn(() => ({ populate: populateMock, lean: leanMock }));
+    // Helper to create a full mongoose chainable mock (populate, lean, exec)
+    function createChainMock(finalValue: any) {
+      // .lean() returns chain, .exec() resolves to finalValue
+      const chain: any = {};
+      chain.exec = jest.fn().mockResolvedValue(finalValue);
+      chain.lean = jest.fn(() => chain);
+      chain.populate = jest.fn(() => chain);
+      return chain;
+    }
 
     const mockModel = {
       create: jest.fn(),
       findById: jest.fn(),
       findOne: jest.fn(),
-      find: findMock,
-      populate: populateMock,
-      lean: leanMock,
+      find: jest.fn(),
       findByIdAndUpdate: jest.fn(),
       findByIdAndDelete: jest.fn(),
     };
+
+    // By default, return a Promise for direct calls, chain for populate/lean
+    mockModel.find.mockImplementation((...args) => {
+      return Promise.resolve([]);
+    });
+    mockModel.findById.mockImplementation((...args) => Promise.resolve(null));
+    mockModel.findOne.mockImplementation((...args) => Promise.resolve(null));
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -42,6 +54,8 @@ describe('RoleRepository', () => {
 
     repository = module.get<RoleRepository>(RoleRepository);
     model = module.get(getModelToken(Role.name));
+    // Expose chain helper for use in tests
+    (repository as any)._createChainMock = createChainMock;
   });
 
   it('should be defined', () => {
@@ -92,14 +106,15 @@ describe('RoleRepository', () => {
   describe('list', () => {
     it('should return all roles with populated permissions', async () => {
       const roles = [mockRole];
-      const chain = model.find();
-      chain.lean.mockResolvedValue(roles);
+      const chain = (repository as any)._createChainMock(roles);
+      model.find.mockReturnValue(chain);
 
-      const result = await repository.list();
+      const resultPromise = repository.list();
 
       expect(model.find).toHaveBeenCalled();
       expect(chain.populate).toHaveBeenCalledWith('permissions');
       expect(chain.lean).toHaveBeenCalled();
+      const result = await chain.exec();
       expect(result).toEqual(roles);
     });
   });
@@ -134,18 +149,24 @@ describe('RoleRepository', () => {
   });
 
   describe('findByIds', () => {
-    it('should find roles by array of ids', async () => {
-      const roles = [mockRole];
-      const chain = model.find({ _id: { $in: [] } });
-      chain.lean.mockResolvedValue(roles);
-
+        it('should find roles by array of ids', async () => {
+      // Simulate DB: role with populated permissions (array of objects)
+      const roles = [{
+        _id: mockRole._id,
+        name: mockRole.name,
+        permissions: [{ _id: 'perm1', name: 'perm:read' }],
+      }];
       const ids = [mockRole._id.toString()];
-      const result = await repository.findByIds(ids);
+      const chain = (repository as any)._createChainMock(roles);
+      model.find.mockReturnValue(chain);
+
+      const resultPromise = repository.findByIds(ids);
 
       expect(model.find).toHaveBeenCalledWith({ _id: { $in: ids } });
       expect(chain.lean).toHaveBeenCalled();
+      const result = await resultPromise;
       expect(result).toEqual(roles);
-    });
+        });
   });
 });
 

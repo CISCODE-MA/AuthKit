@@ -8,6 +8,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { AuthService } from '@services/auth.service';
+import { PermissionRepository } from '@repos/permission.repository';
 import { UserRepository } from '@repos/user.repository';
 import { RoleRepository } from '@repos/role.repository';
 import { MailService } from '@services/mail.service';
@@ -22,10 +23,12 @@ describe('AuthService', () => {
   let service: AuthService;
   let userRepo: jest.Mocked<UserRepository>;
   let roleRepo: jest.Mocked<RoleRepository>;
+  let permissionRepo: jest.Mocked<any>;
   let mailService: jest.Mocked<MailService>;
   let loggerService: jest.Mocked<LoggerService>;
 
   beforeEach(async () => {
+
     // Create mock implementations
     const mockUserRepo = {
       findByEmail: jest.fn(),
@@ -41,6 +44,16 @@ describe('AuthService', () => {
     const mockRoleRepo = {
       findByName: jest.fn(),
       findById: jest.fn(),
+    };
+
+    const mockPermissionRepo = {
+      findById: jest.fn(),
+      findByIds: jest.fn(),
+      findByName: jest.fn(),
+      create: jest.fn(),
+      list: jest.fn(),
+      updateById: jest.fn(),
+      deleteById: jest.fn(),
     };
 
     const mockMailService = {
@@ -77,6 +90,10 @@ describe('AuthService', () => {
           useValue: mockRoleRepo,
         },
         {
+          provide: PermissionRepository,
+          useValue: mockPermissionRepo,
+        },
+        {
           provide: MailService,
           useValue: mockMailService,
         },
@@ -90,6 +107,7 @@ describe('AuthService', () => {
     service = module.get<AuthService>(AuthService);
     userRepo = module.get(UserRepository);
     roleRepo = module.get(RoleRepository);
+    permissionRepo = module.get(PermissionRepository);
     mailService = module.get(MailService);
     loggerService = module.get(LoggerService);
   });
@@ -355,18 +373,16 @@ describe('AuthService', () => {
       const mockUser: any = {
         ...createMockVerifiedUser(),
         _id: userId,
-        roles: [mockRole],
+        roles: [mockRole._id],
       };
-
-      // Mock with toObject method
       const userWithToObject = {
         ...mockUser,
         toObject: () => mockUser,
       };
-
-      userRepo.findByIdWithRolesAndPermissions.mockResolvedValue(
-        userWithToObject as any,
-      );
+      userRepo.findById.mockResolvedValue(userWithToObject as any);
+      userRepo.findByIdWithRolesAndPermissions.mockResolvedValue(userWithToObject as any);
+      roleRepo.findByIds = jest.fn().mockResolvedValue([mockRole]);
+      permissionRepo.findByIds.mockResolvedValue([]);
 
       // Act
       const result = await service.issueTokensForUser(userId);
@@ -390,9 +406,7 @@ describe('AuthService', () => {
 
     it('should throw InternalServerErrorException on database error', async () => {
       // Arrange
-      userRepo.findByIdWithRolesAndPermissions.mockRejectedValue(
-        new Error('Database connection lost'),
-      );
+      userRepo.findById.mockRejectedValue(new Error('Database connection lost'));
 
       // Act & Assert
       await expect(service.issueTokensForUser('user-id')).rejects.toThrow(
@@ -408,13 +422,17 @@ describe('AuthService', () => {
       const mockRole = { _id: 'role-id', permissions: [] };
       const mockUser: any = {
         ...createMockVerifiedUser(),
-        roles: [mockRole],
+        _id: 'user-id',
+        roles: [mockRole._id],
       };
-
-      userRepo.findByIdWithRolesAndPermissions.mockResolvedValue({
+      const userWithToObject = {
         ...mockUser,
         toObject: () => mockUser,
-      });
+      };
+      userRepo.findById.mockResolvedValue(userWithToObject as any);
+      userRepo.findByIdWithRolesAndPermissions.mockResolvedValue(userWithToObject as any);
+      roleRepo.findByIds = jest.fn().mockResolvedValue([mockRole]);
+      permissionRepo.findByIds.mockResolvedValue([]);
 
       // Act & Assert
       await expect(service.issueTokensForUser('user-id')).rejects.toThrow(
@@ -488,14 +506,16 @@ describe('AuthService', () => {
           _id: 'user-id',
           password: hashedPassword,
         }),
-        roles: [mockRole],
+        roles: [mockRole._id],
       };
-
       userRepo.findByEmailWithPassword = jest.fn().mockResolvedValue(user);
+      userRepo.findById.mockResolvedValue(user);
       userRepo.findByIdWithRolesAndPermissions = jest.fn().mockResolvedValue({
         ...user,
         toObject: () => user,
       });
+      roleRepo.findByIds = jest.fn().mockResolvedValue([mockRole]);
+      permissionRepo.findByIds.mockResolvedValue([]);
 
       // Act
       const result = await service.login(dto);
@@ -672,15 +692,16 @@ describe('AuthService', () => {
       const mockRole = { _id: 'role-id', permissions: [] };
       const user: any = {
         ...createMockVerifiedUser({ _id: userId }),
-        roles: [mockRole],
+        roles: [mockRole._id],
         passwordChangedAt: new Date('2026-01-01'),
       };
-
       userRepo.findById.mockResolvedValue(user);
       userRepo.findByIdWithRolesAndPermissions = jest.fn().mockResolvedValue({
         ...user,
         toObject: () => user,
       });
+      roleRepo.findByIds = jest.fn().mockResolvedValue([mockRole]);
+      permissionRepo.findByIds.mockResolvedValue([]);
 
       // Act
       const result = await service.refresh(refreshToken);

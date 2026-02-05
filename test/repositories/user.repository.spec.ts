@@ -16,25 +16,35 @@ describe('UserRepository', () => {
     roles: [],
   };
 
+
   beforeEach(async () => {
-    const leanMock = jest.fn();
-    const populateMock = jest.fn(() => ({ lean: leanMock }));
-    const selectMock = jest.fn();
-    const findByIdMock = jest.fn(() => ({ populate: populateMock }));
-    const findOneMock = jest.fn(() => ({ select: selectMock }));
-    const findMock = jest.fn(() => ({ populate: populateMock, lean: leanMock }));
+    // Helper to create a full mongoose chainable mock (populate, lean, select, exec)
+    function createChainMock(finalValue: any) {
+      // .lean() and .select() return chain, .exec() resolves to finalValue
+      const chain: any = {};
+      chain.exec = jest.fn().mockResolvedValue(finalValue);
+      chain.lean = jest.fn(() => chain);
+      chain.select = jest.fn(() => chain);
+      chain.populate = jest.fn(() => chain);
+      return chain;
+    }
 
     const mockModel = {
       create: jest.fn(),
-      findById: findByIdMock,
-      findOne: findOneMock,
-      find: findMock,
-      select: selectMock,
-      populate: populateMock,
-      lean: leanMock,
+      findById: jest.fn(),
+      findOne: jest.fn(),
+      find: jest.fn(),
       findByIdAndUpdate: jest.fn(),
       findByIdAndDelete: jest.fn(),
     };
+
+    // By default, return a Promise for direct calls, chain for populate/lean/select
+    mockModel.find.mockImplementation((...args) => {
+      // If called from a test that expects a chain, the test will override this
+      return Promise.resolve([]);
+    });
+    mockModel.findById.mockImplementation((...args) => Promise.resolve(null));
+    mockModel.findOne.mockImplementation((...args) => Promise.resolve(null));
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -48,6 +58,8 @@ describe('UserRepository', () => {
 
     repository = module.get<UserRepository>(UserRepository);
     model = module.get(getModelToken(User.name));
+    // Expose chain helper for use in tests
+    (repository as any)._createChainMock = createChainMock;
   });
 
   it('should be defined', () => {
@@ -98,13 +110,14 @@ describe('UserRepository', () => {
   describe('findByEmailWithPassword', () => {
     it('should find user by email with password field', async () => {
       const userWithPassword = { ...mockUser, password: 'hashed' };
-      const chain = model.findOne({ email: 'test@example.com' });
-      chain.select.mockResolvedValue(userWithPassword);
+      const chain = (repository as any)._createChainMock(userWithPassword);
+      model.findOne.mockReturnValue(chain);
 
-      const result = await repository.findByEmailWithPassword('test@example.com');
+      const resultPromise = repository.findByEmailWithPassword('test@example.com');
 
       expect(model.findOne).toHaveBeenCalledWith({ email: 'test@example.com' });
       expect(chain.select).toHaveBeenCalledWith('+password');
+      const result = await chain.exec();
       expect(result).toEqual(userWithPassword);
     });
   });
@@ -166,10 +179,10 @@ describe('UserRepository', () => {
         ...mockUser,
         roles: [{ name: 'admin', permissions: [{ name: 'read:users' }] }],
       };
-      const chain = model.findById(mockUser._id);
-      chain.populate.mockResolvedValue(userWithRoles);
+      const chain = (repository as any)._createChainMock(userWithRoles);
+      model.findById.mockReturnValue(chain);
 
-      const result = await repository.findByIdWithRolesAndPermissions(mockUser._id);
+      const resultPromise = repository.findByIdWithRolesAndPermissions(mockUser._id);
 
       expect(model.findById).toHaveBeenCalledWith(mockUser._id);
       expect(chain.populate).toHaveBeenCalledWith({
@@ -177,6 +190,7 @@ describe('UserRepository', () => {
         populate: { path: 'permissions', select: 'name' },
         select: 'name permissions',
       });
+      const result = await chain.exec();
       expect(result).toEqual(userWithRoles);
     });
   });
@@ -184,48 +198,52 @@ describe('UserRepository', () => {
   describe('list', () => {
     it('should list users without filters', async () => {
       const users = [mockUser];
-      const chain = model.find({});
-      chain.lean.mockResolvedValue(users);
+      const chain = (repository as any)._createChainMock(users);
+      model.find.mockReturnValue(chain);
 
-      const result = await repository.list({});
+      const resultPromise = repository.list({});
 
       expect(model.find).toHaveBeenCalledWith({});
       expect(chain.populate).toHaveBeenCalledWith({ path: 'roles', select: 'name' });
       expect(chain.lean).toHaveBeenCalled();
+      const result = await chain.exec();
       expect(result).toEqual(users);
     });
 
     it('should list users with email filter', async () => {
       const users = [mockUser];
-      const chain = model.find({ email: 'test@example.com' });
-      chain.lean.mockResolvedValue(users);
+      const chain = (repository as any)._createChainMock(users);
+      model.find.mockReturnValue(chain);
 
-      const result = await repository.list({ email: 'test@example.com' });
+      const resultPromise = repository.list({ email: 'test@example.com' });
 
       expect(model.find).toHaveBeenCalledWith({ email: 'test@example.com' });
+      expect(chain.populate).toHaveBeenCalledWith({ path: 'roles', select: 'name' });
+      expect(chain.lean).toHaveBeenCalled();
+      const result = await chain.exec();
       expect(result).toEqual(users);
     });
 
     it('should list users with username filter', async () => {
       const users = [mockUser];
-      const chain = model.find({ username: 'testuser' });
-      chain.lean.mockResolvedValue(users);
+      const chain = (repository as any)._createChainMock(users);
+      model.find.mockReturnValue(chain);
 
-      const result = await repository.list({ username: 'testuser' });
+      const resultPromise = repository.list({ username: 'testuser' });
 
       expect(model.find).toHaveBeenCalledWith({ username: 'testuser' });
+      expect(chain.populate).toHaveBeenCalledWith({ path: 'roles', select: 'name' });
+      expect(chain.lean).toHaveBeenCalled();
+      const result = await chain.exec();
       expect(result).toEqual(users);
     });
 
     it('should list users with both filters', async () => {
       const users = [mockUser];
-      const chain = model.find({
-        email: 'test@example.com',
-        username: 'testuser',
-      });
-      chain.lean.mockResolvedValue(users);
+      const chain = (repository as any)._createChainMock(users);
+      model.find.mockReturnValue(chain);
 
-      const result = await repository.list({
+      const resultPromise = repository.list({
         email: 'test@example.com',
         username: 'testuser',
       });
@@ -234,6 +252,9 @@ describe('UserRepository', () => {
         email: 'test@example.com',
         username: 'testuser',
       });
+      expect(chain.populate).toHaveBeenCalledWith({ path: 'roles', select: 'name' });
+      expect(chain.lean).toHaveBeenCalled();
+      const result = await chain.exec();
       expect(result).toEqual(users);
     });
   });

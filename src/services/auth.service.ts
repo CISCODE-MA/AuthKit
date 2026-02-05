@@ -6,6 +6,7 @@ import { RegisterDto } from '@dto/auth/register.dto';
 import { LoginDto } from '@dto/auth/login.dto';
 import { MailService } from '@services/mail.service';
 import { RoleRepository } from '@repos/role.repository';
+import { PermissionRepository } from '@repos/permission.repository';
 import { generateUsernameFromName } from '@utils/helper';
 import { LoggerService } from '@services/logger.service';
 import { hashPassword, verifyPassword } from '@utils/password.util';
@@ -22,6 +23,7 @@ export class AuthService {
         private readonly users: UserRepository,
         private readonly mail: MailService,
         private readonly roles: RoleRepository,
+        private readonly perms: PermissionRepository,
         private readonly logger: LoggerService,
     ) { }
 
@@ -87,17 +89,38 @@ export class AuthService {
      */
     private async buildTokenPayload(userId: string) {
         try {
-            const user = await this.users.findByIdWithRolesAndPermissions(userId);
+            // Get user with raw role IDs
+            const user = await this.users.findById(userId);
             if (!user) {
                 throw new NotFoundException('User not found');
             }
 
-            const roles = (user.roles || []).map((r: any) => r._id.toString());
-            const permissions = (user.roles || [])
-                .flatMap((r: any) => (r.permissions || []).map((p: any) => p.name))
-                .filter(Boolean);
+            console.log('[DEBUG] User found, querying roles...');
 
-            return { sub: user._id.toString(), roles, permissions };
+            // Manually query roles by IDs
+            const roleIds = user.roles || [];
+            const roles = await this.roles.findByIds(roleIds.map(id => id.toString()));
+            
+            console.log('[DEBUG] Roles from DB:', roles);
+
+            // Extract role names
+            const roleNames = roles.map(r => r.name).filter(Boolean);
+            
+            // Extract all permission IDs from all roles
+            const permissionIds = roles.flatMap(role => {
+                if (!role.permissions || role.permissions.length === 0) return [];
+                return role.permissions.map((p: any) => p.toString ? p.toString() : p);
+            }).filter(Boolean);
+            
+            console.log('[DEBUG] Permission IDs:', permissionIds);
+
+            // Query permissions by IDs to get names
+            const permissionObjects = await this.perms.findByIds([...new Set(permissionIds)]);
+            const permissions = permissionObjects.map(p => p.name).filter(Boolean);
+
+            console.log('[DEBUG] Final roles:', roleNames, 'permissions:', permissions);
+
+            return { sub: user._id.toString(), roles: roleNames, permissions };
         } catch (error) {
             if (error instanceof NotFoundException) throw error;
             this.logger.error(`Failed to build token payload: ${error.message}`, error.stack, 'AuthService');

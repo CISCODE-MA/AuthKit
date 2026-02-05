@@ -34,4 +34,8 @@ export class PermissionRepository implements IPermissionRepository {
     deleteById(id: string | Types.ObjectId) {
         return this.permModel.findByIdAndDelete(id);
     }
+
+    findByIds(ids: string[]) {
+        return this.permModel.find({ _id: { $in: ids } }).lean().exec();
+    }
 }

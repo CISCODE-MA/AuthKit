@@ -36,7 +36,7 @@ export class RoleRepository implements IRoleRepository {
     }
 
     findByIds(ids: string[]) {
-        return this.roleModel.find({ _id: { $in: ids } }).lean();
+        return this.roleModel.find({ _id: { $in: ids } }).populate('permissions').lean().exec();
     }
 
 }

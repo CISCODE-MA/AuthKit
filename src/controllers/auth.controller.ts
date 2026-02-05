@@ -191,7 +191,11 @@ export class AuthController {
   @ApiResponse({ status: 302, description: 'Redirects to Google OAuth consent screen.' })
   @Get('google')
   googleLogin(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
-    return passport.authenticate('google', { scope: ['profile', 'email'], session: false })(req, res, next);
+    return passport.authenticate('google', { 
+      scope: ['profile', 'email'], 
+      session: false,
+      prompt: 'select_account' // Force account selection every time
+    })(req, res, next);
   }
 
   @ApiOperation({ summary: 'Google OAuth callback (web redirect flow)' })
@@ -200,8 +204,13 @@ export class AuthController {
   @Get('google/callback')
   googleCallback(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
     passport.authenticate('google', { session: false }, (err: any, data: any) => {
-      if (err || !data) return res.status(400).json({ message: 'Google auth failed.' });
-      return res.status(200).json(data);
+      if (err || !data) {
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+        return res.redirect(`${frontendUrl}/login?error=google_auth_failed`);
+      }
+      const { accessToken, refreshToken } = data;
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      return res.redirect(`${frontendUrl}/oauth-callback?accessToken=${accessToken}&refreshToken=${refreshToken}&provider=google`);
     })(req, res, next);
   }
 
@@ -212,6 +221,7 @@ export class AuthController {
     return passport.authenticate('azure_ad_oauth2', {
       session: false,
       scope: ['openid', 'profile', 'email', 'User.Read'],
+      prompt: 'select_account' // Force account selection every time
     })(req, res, next);
   }
 
@@ -221,9 +231,13 @@ export class AuthController {
   @Get('microsoft/callback')
   microsoftCallback(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
     passport.authenticate('azure_ad_oauth2', { session: false }, (err: any, data: any) => {
-      if (err) return res.status(400).json({ message: 'Microsoft auth failed', error: err?.message || err });
-      if (!data) return res.status(400).json({ message: 'Microsoft auth failed', error: 'No data returned' });
-      return res.status(200).json(data);
+      if (err || !data) {
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+        return res.redirect(`${frontendUrl}/login?error=microsoft_auth_failed`);
+      }
+      const { accessToken, refreshToken } = data;
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      return res.redirect(`${frontendUrl}/oauth-callback?accessToken=${accessToken}&refreshToken=${refreshToken}&provider=microsoft`);
     })(req, res, next);
 
   }
@@ -232,7 +246,9 @@ export class AuthController {
   @ApiResponse({ status: 302, description: 'Redirects to Facebook OAuth consent screen.' })
   @Get('facebook')
   facebookLogin(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
-    return passport.authenticate('facebook', { scope: ['email'], session: false })(req, res, next);
+    return passport.authenticate('facebook', { 
+      session: false
+    })(req, res, next);
   }
 
   @ApiOperation({ summary: 'Facebook OAuth callback (web redirect flow)' })
@@ -241,8 +257,13 @@ export class AuthController {
   @Get('facebook/callback')
   facebookCallback(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
     passport.authenticate('facebook', { session: false }, (err: any, data: any) => {
-      if (err || !data) return res.status(400).json({ message: 'Facebook auth failed.' });
-      return res.status(200).json(data);
+      if (err || !data) {
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+        return res.redirect(`${frontendUrl}/login?error=facebook_auth_failed`);
+      }
+      const { accessToken, refreshToken } = data;
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      return res.redirect(`${frontendUrl}/oauth-callback?accessToken=${accessToken}&refreshToken=${refreshToken}&provider=facebook`);
     })(req, res, next);
   }
 }

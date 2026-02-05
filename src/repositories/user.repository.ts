@@ -44,11 +44,14 @@ export class UserRepository implements IUserRepository {
     }
 
     findByIdWithRolesAndPermissions(id: string | Types.ObjectId) {
-        return this.userModel.findById(id).populate({
-            path: 'roles',
-            populate: { path: 'permissions', select: 'name' },
-            select: 'name permissions'
-        });
+        return this.userModel.findById(id)
+            .populate({
+                path: 'roles',
+                populate: { path: 'permissions', select: 'name' },
+                select: 'name permissions'
+            })
+            .lean()
+            .exec();
     }
 
     list(filter: { email?: string; username?: string }) {

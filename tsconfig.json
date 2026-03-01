@@ -11,45 +11,19 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "skipLibCheck": true,
-    "types": [
-      "node"
-    ],
+    "types": ["node"],
     "paths": {
-      "@models/*": [
-        "src/models/*"
-      ],
-      "@dtos/*": [
-        "src/dtos/*"
-      ],
-      "@repos/*": [
-        "src/repositories/*"
-      ],
-      "@services/*": [
-        "src/services/*"
-      ],
-      "@controllers/*": [
-        "src/controllers/*"
-      ],
-      "@config/*": [
-        "src/config/*"
-      ],
-      "@middleware/*": [
-        "src/middleware/*"
-      ],
-      "@filters/*": [
-        "src/filters/*"
-      ],
-      "@utils/*": [
-        "src/utils/*"
-      ]
+      "@models/*": ["src/models/*"],
+      "@dtos/*": ["src/dtos/*"],
+      "@repos/*": ["src/repositories/*"],
+      "@services/*": ["src/services/*"],
+      "@controllers/*": ["src/controllers/*"],
+      "@config/*": ["src/config/*"],
+      "@middleware/*": ["src/middleware/*"],
+      "@filters/*": ["src/filters/*"],
+      "@utils/*": ["src/utils/*"]
     }
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.d.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  "include": ["src/**/*.ts", "src/**/*.d.ts"],
+  "exclude": ["node_modules", "dist"]
 }

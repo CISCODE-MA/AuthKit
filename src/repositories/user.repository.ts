@@ -1,61 +1,62 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import type { Model, Types } from 'mongoose';
-import { User, UserDocument } from '@models/user.model';
+import { User, UserDocument } from "@models/user.model";
+import { Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import type { Model, Types } from "mongoose";
 
 @Injectable()
 export class UserRepository {
-    constructor(@InjectModel(User.name) private readonly userModel: Model<UserDocument>) { }
+  constructor(
+    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+  ) {}
 
-    create(data: Partial<User>) {
-        return this.userModel.create(data);
-    }
+  create(data: Partial<User>) {
+    return this.userModel.create(data);
+  }
 
-    findById(id: string | Types.ObjectId) {
-        return this.userModel.findById(id);
-    }
+  findById(id: string | Types.ObjectId) {
+    return this.userModel.findById(id);
+  }
 
-    findByEmail(email: string) {
-        return this.userModel.findOne({ email });
-    }
+  findByEmail(email: string) {
+    return this.userModel.findOne({ email });
+  }
 
-    findByEmailWithPassword(email: string) {
-        return this.userModel.findOne({ email }).select('+password');
-    }
+  findByEmailWithPassword(email: string) {
+    return this.userModel.findOne({ email }).select("+password");
+  }
 
-    findByUsername(username: string) {
-        return this.userModel.findOne({ username });
-    }
+  findByUsername(username: string) {
+    return this.userModel.findOne({ username });
+  }
 
-    findByPhone(phoneNumber: string) {
-        return this.userModel.findOne({ phoneNumber });
-    }
+  findByPhone(phoneNumber: string) {
+    return this.userModel.findOne({ phoneNumber });
+  }
 
-    updateById(id: string | Types.ObjectId, data: Partial<User>) {
-        return this.userModel.findByIdAndUpdate(id, data, { new: true });
-    }
+  updateById(id: string | Types.ObjectId, data: Partial<User>) {
+    return this.userModel.findByIdAndUpdate(id, data, { new: true });
+  }
 
-    deleteById(id: string | Types.ObjectId) {
-        return this.userModel.findByIdAndDelete(id);
-    }
+  deleteById(id: string | Types.ObjectId) {
+    return this.userModel.findByIdAndDelete(id);
+  }
 
-    findByIdWithRolesAndPermissions(id: string | Types.ObjectId) {
-        return this.userModel.findById(id).populate({
-            path: 'roles',
-            populate: { path: 'permissions', select: 'name' },
-            select: 'name permissions'
-        });
-    }
+  findByIdWithRolesAndPermissions(id: string | Types.ObjectId) {
+    return this.userModel.findById(id).populate({
+      path: "roles",
+      populate: { path: "permissions", select: "name" },
+      select: "name permissions",
+    });
+  }
 
-    list(filter: { email?: string; username?: string }) {
-        const query: any = {};
-        if (filter.email) query.email = filter.email;
-        if (filter.username) query.username = filter.username;
+  list(filter: { email?: string; username?: string }) {
+    const query: any = {};
+    if (filter.email) query.email = filter.email;
+    if (filter.username) query.username = filter.username;
 
-        return this.userModel
-            .find(query)
-            .populate({ path: 'roles', select: 'name' })
-            .lean();
-    }
-
+    return this.userModel
+      .find(query)
+      .populate({ path: "roles", select: "name" })
+      .lean();
+  }
 }

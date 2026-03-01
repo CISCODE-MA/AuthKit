@@ -1,14 +1,26 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Res } from '@nestjs/common';
-import type { Response } from 'express';
-import { RolesService } from '@services/roles.service';
-import { CreateRoleDto } from '@dtos/role/create-role.dto';
-import { UpdateRoleDto, UpdateRolePermissionsDto } from '@dtos/role/update-role.dto';
-import { Admin } from '@middleware/admin.decorator';
+import { CreateRoleDto } from "@dtos/role/create-role.dto";
+import {
+  UpdateRoleDto,
+  UpdateRolePermissionsDto,
+} from "@dtos/role/update-role.dto";
+import { Admin } from "@middleware/admin.decorator";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Res,
+} from "@nestjs/common";
+import { RolesService } from "@services/roles.service";
+import type { Response } from "express";
 
 @Admin()
-@Controller('api/admin/roles')
+@Controller("api/admin/roles")
 export class RolesController {
-  constructor(private readonly roles: RolesService) { }
+  constructor(private readonly roles: RolesService) {}
 
   @Post()
   async create(@Body() dto: CreateRoleDto, @Res() res: Response) {
@@ -22,22 +34,29 @@ export class RolesController {
     return res.status(200).json(result);
   }
 
-  @Put(':id')
-  async update(@Param('id') id: string, @Body() dto: UpdateRoleDto, @Res() res: Response) {
+  @Put(":id")
+  async update(
+    @Param("id") id: string,
+    @Body() dto: UpdateRoleDto,
+    @Res() res: Response,
+  ) {
     const result = await this.roles.update(id, dto);
     return res.status(200).json(result);
   }
 
-  @Delete(':id')
-  async delete(@Param('id') id: string, @Res() res: Response) {
+  @Delete(":id")
+  async delete(@Param("id") id: string, @Res() res: Response) {
     const result = await this.roles.delete(id);
     return res.status(200).json(result);
   }
 
-  @Put(':id/permissions')
-  async setPermissions(@Param('id') id: string, @Body() dto: UpdateRolePermissionsDto, @Res() res: Response) {
+  @Put(":id/permissions")
+  async setPermissions(
+    @Param("id") id: string,
+    @Body() dto: UpdateRolePermissionsDto,
+    @Res() res: Response,
+  ) {
     const result = await this.roles.setPermissions(id, dto.permissions);
     return res.status(200).json(result);
   }
-
 }

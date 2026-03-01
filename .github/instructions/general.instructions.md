@@ -30,15 +30,15 @@
 
 ### Key Characteristics
 
-| Characteristic | Description |
-|---------------|-------------|
-| **Architecture** | Repository pattern, dependency injection, layered structure |
-| **Database** | MongoDB via Mongoose (host app connection) |
-| **Token Strategy** | JWT (stateless) with automatic invalidation on password change |
-| **OAuth Flow** | Mobile token exchange + Web redirect (Passport) |
-| **Security** | bcrypt password hashing (12 rounds), JWT secrets, HTTPS cookies |
-| **Extensibility** | Configurable via env vars, exportable guards/services/decorators |
-| **Testing** | Currently minimal - requires expansion (target: 80%+ coverage) |
+| Characteristic     | Description                                                      |
+| ------------------ | ---------------------------------------------------------------- |
+| **Architecture**   | Repository pattern, dependency injection, layered structure      |
+| **Database**       | MongoDB via Mongoose (host app connection)                       |
+| **Token Strategy** | JWT (stateless) with automatic invalidation on password change   |
+| **OAuth Flow**     | Mobile token exchange + Web redirect (Passport)                  |
+| **Security**       | bcrypt password hashing (12 rounds), JWT secrets, HTTPS cookies  |
+| **Extensibility**  | Configurable via env vars, exportable guards/services/decorators |
+| **Testing**        | Currently minimal - requires expansion (target: 80%+ coverage)   |
 
 ---
 
@@ -250,47 +250,47 @@ AuthKit/
 
 ### Files
 
-| Type | Pattern | Examples |
-|------|---------|----------|
-| **Controllers** | `*.controller.ts` | `auth.controller.ts`, `users.controller.ts` |
-| **Services** | `*.service.ts` | `auth.service.ts`, `mail.service.ts` |
-| **Repositories** | `*.repository.ts` | `user.repository.ts`, `role.repository.ts` |
-| **Models** | `*.model.ts` | `user.model.ts`, `role.model.ts` |
-| **DTOs** | `*.dto.ts` | `login.dto.ts`, `create-role.dto.ts` |
-| **Guards** | `*.guard.ts` | `authenticate.guard.ts`, `admin.guard.ts` |
-| **Decorators** | `*.decorator.ts` | `admin.decorator.ts` |
-| **Config** | `*.config.ts` | `passport.config.ts` |
-| **Utils** | `*.ts` (in utils/) | `helper.ts` |
+| Type             | Pattern            | Examples                                    |
+| ---------------- | ------------------ | ------------------------------------------- |
+| **Controllers**  | `*.controller.ts`  | `auth.controller.ts`, `users.controller.ts` |
+| **Services**     | `*.service.ts`     | `auth.service.ts`, `mail.service.ts`        |
+| **Repositories** | `*.repository.ts`  | `user.repository.ts`, `role.repository.ts`  |
+| **Models**       | `*.model.ts`       | `user.model.ts`, `role.model.ts`            |
+| **DTOs**         | `*.dto.ts`         | `login.dto.ts`, `create-role.dto.ts`        |
+| **Guards**       | `*.guard.ts`       | `authenticate.guard.ts`, `admin.guard.ts`   |
+| **Decorators**   | `*.decorator.ts`   | `admin.decorator.ts`                        |
+| **Config**       | `*.config.ts`      | `passport.config.ts`                        |
+| **Utils**        | `*.ts` (in utils/) | `helper.ts`                                 |
 
 **Rule**: Always use `kebab-case` for file names with descriptive suffixes.
 
 ### Classes & Interfaces
 
-| Type | Pattern | Examples |
-|------|---------|----------|
-| **Controllers** | `PascalCase` + `Controller` | `AuthController`, `UsersController` |
-| **Services** | `PascalCase` + `Service` | `AuthService`, `MailService` |
-| **Repositories** | `PascalCase` + `Repository` | `UserRepository`, `RoleRepository` |
-| **Models** | `PascalCase` | `User`, `Role`, `Permission` |
-| **DTOs** | `PascalCase` + `Dto` | `LoginDto`, `RegisterDto` |
-| **Guards** | `PascalCase` + `Guard` | `AuthenticateGuard`, `AdminGuard` |
-| **Interfaces** | `PascalCase` (or `I` prefix) | `UserDocument`, `ITokenPayload` |
+| Type             | Pattern                      | Examples                            |
+| ---------------- | ---------------------------- | ----------------------------------- |
+| **Controllers**  | `PascalCase` + `Controller`  | `AuthController`, `UsersController` |
+| **Services**     | `PascalCase` + `Service`     | `AuthService`, `MailService`        |
+| **Repositories** | `PascalCase` + `Repository`  | `UserRepository`, `RoleRepository`  |
+| **Models**       | `PascalCase`                 | `User`, `Role`, `Permission`        |
+| **DTOs**         | `PascalCase` + `Dto`         | `LoginDto`, `RegisterDto`           |
+| **Guards**       | `PascalCase` + `Guard`       | `AuthenticateGuard`, `AdminGuard`   |
+| **Interfaces**   | `PascalCase` (or `I` prefix) | `UserDocument`, `ITokenPayload`     |
 
 ### Functions & Methods
 
-| Type | Pattern | Examples |
-|------|---------|----------|
-| **Public methods** | `camelCase` | `login()`, `register()`, `verifyEmail()` |
-| **Private methods** | `camelCase` | `signAccessToken()`, `buildTokenPayload()` |
-| **Repository methods** | `camelCase` (CRUD verbs) | `findById()`, `create()`, `updateById()`, `deleteById()` |
-| **Utility functions** | `camelCase` | `getMillisecondsFromExpiry()`, `generateUsernameFromName()` |
+| Type                   | Pattern                  | Examples                                                    |
+| ---------------------- | ------------------------ | ----------------------------------------------------------- |
+| **Public methods**     | `camelCase`              | `login()`, `register()`, `verifyEmail()`                    |
+| **Private methods**    | `camelCase`              | `signAccessToken()`, `buildTokenPayload()`                  |
+| **Repository methods** | `camelCase` (CRUD verbs) | `findById()`, `create()`, `updateById()`, `deleteById()`    |
+| **Utility functions**  | `camelCase`              | `getMillisecondsFromExpiry()`, `generateUsernameFromName()` |
 
 ### Variables & Constants
 
-| Type | Pattern | Examples |
-|------|---------|----------|
-| **Variables** | `camelCase` | `accessToken`, `refreshToken`, `user` |
-| **Constants (immutable)** | `UPPER_SNAKE_CASE` | `JWT_SECRET`, `TOKEN_EXPIRY` |
+| Type                          | Pattern            | Examples                               |
+| ----------------------------- | ------------------ | -------------------------------------- |
+| **Variables**                 | `camelCase`        | `accessToken`, `refreshToken`, `user`  |
+| **Constants (immutable)**     | `UPPER_SNAKE_CASE` | `JWT_SECRET`, `TOKEN_EXPIRY`           |
 | **Env vars (in process.env)** | `UPPER_SNAKE_CASE` | `MONGO_URI`, `JWT_SECRET`, `SMTP_HOST` |
 
 ### Path Aliases
@@ -313,13 +313,13 @@ Configured in `tsconfig.json`:
 
 ```typescript
 // ✅ Correct
-import { UserRepository } from '@repos/user.repository';
-import { LoginDto } from '@dtos/auth/login.dto';
-import { AuthService } from '@services/auth.service';
+import { UserRepository } from "@repos/user.repository";
+import { LoginDto } from "@dtos/auth/login.dto";
+import { AuthService } from "@services/auth.service";
 
 // ❌ Wrong
-import { UserRepository } from '../../repositories/user.repository';
-import { LoginDto } from '../dtos/auth/login.dto';
+import { UserRepository } from "../../repositories/user.repository";
+import { LoginDto } from "../dtos/auth/login.dto";
 ```
 
 ---
@@ -331,10 +331,10 @@ import { LoginDto } from '../dtos/auth/login.dto';
 **✅ Correct Pattern:**
 
 ```typescript
-import { Injectable } from '@nestjs/common';
-import { UserRepository } from '@repos/user.repository';
-import { MailService } from '@services/mail.service';
-import { LoggerService } from '@services/logger.service';
+import { Injectable } from "@nestjs/common";
+import { UserRepository } from "@repos/user.repository";
+import { MailService } from "@services/mail.service";
+import { LoggerService } from "@services/logger.service";
 
 @Injectable()
 export class AuthService {
@@ -356,7 +356,7 @@ export class AuthService {
 
 ```typescript
 // DON'T import services directly or instantiate manually
-import { UserRepository } from '@repos/user.repository';
+import { UserRepository } from "@repos/user.repository";
 const userRepo = new UserRepository(); // ❌ Breaks DI container
 ```
 
@@ -370,22 +370,22 @@ import { NotFoundException, UnauthorizedException, InternalServerErrorException 
 async findUserById(id: string) {
   try {
     const user = await this.users.findById(id);
-    
+
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    
+
     if (user.isBanned) {
       throw new ForbiddenException('Account has been banned. Please contact support');
     }
-    
+
     return user;
   } catch (error) {
     // Re-throw known NestJS exceptions
     if (error instanceof NotFoundException || error instanceof ForbiddenException) {
       throw error;
     }
-    
+
     // Log unexpected errors and throw generic error
     this.logger.error(`Failed to find user: ${error.message}`, error.stack, 'AuthService');
     throw new InternalServerErrorException('Failed to retrieve user');
@@ -411,14 +411,16 @@ async findUserById(id: string) {
 **✅ Correct Repository:**
 
 ```typescript
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
-import { User, UserDocument } from '@models/user.model';
+import { Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model, Types } from "mongoose";
+import { User, UserDocument } from "@models/user.model";
 
 @Injectable()
 export class UserRepository {
-  constructor(@InjectModel(User.name) private readonly userModel: Model<UserDocument>) {}
+  constructor(
+    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+  ) {}
 
   async findById(id: string | Types.ObjectId) {
     return this.userModel.findById(id);
@@ -438,9 +440,9 @@ export class UserRepository {
 
   async findByIdWithRolesAndPermissions(id: string | Types.ObjectId) {
     return this.userModel.findById(id).populate({
-      path: 'roles',
-      populate: { path: 'permissions', select: 'name' },
-      select: 'name permissions'
+      path: "roles",
+      populate: { path: "permissions", select: "name" },
+      select: "name permissions",
     });
   }
 }
@@ -485,8 +487,13 @@ private async buildTokenPayload(userId: string) {
 
 ```typescript
 // In AuthenticateGuard
-if (user.passwordChangedAt && decoded.iat * 1000 < user.passwordChangedAt.getTime()) {
-  throw new UnauthorizedException('Token expired due to password change. Please login again');
+if (
+  user.passwordChangedAt &&
+  decoded.iat * 1000 < user.passwordChangedAt.getTime()
+) {
+  throw new UnauthorizedException(
+    "Token expired due to password change. Please login again",
+  );
 }
 ```
 
@@ -520,8 +527,14 @@ const secret = process.env.JWT_SECRET; // ❌ Might be undefined
 **✅ Using class-validator:**
 
 ```typescript
-import { IsEmail, IsString, MinLength, ValidateNested, IsOptional } from 'class-validator';
-import { Type } from 'class-transformer';
+import {
+  IsEmail,
+  IsString,
+  MinLength,
+  ValidateNested,
+  IsOptional,
+} from "class-validator";
+import { Type } from "class-transformer";
 
 class FullNameDto {
   @IsString()
@@ -572,9 +585,16 @@ async comparePassword(plain: string, hashed: string): Promise<boolean> {
 **✅ Structured logging:**
 
 ```typescript
-this.logger.log('User registered successfully', 'AuthService');
-this.logger.warn('SMTP not configured - email functionality disabled', 'MailService');
-this.logger.error(`Authentication failed: ${error.message}`, error.stack, 'AuthenticateGuard');
+this.logger.log("User registered successfully", "AuthService");
+this.logger.warn(
+  "SMTP not configured - email functionality disabled",
+  "MailService",
+);
+this.logger.error(
+  `Authentication failed: ${error.message}`,
+  error.stack,
+  "AuthenticateGuard",
+);
 ```
 
 ---
@@ -585,9 +605,9 @@ this.logger.error(`Authentication failed: ${error.message}`, error.stack, 'Authe
 
 ```typescript
 // ❌ BAD
-@Controller('api/auth')
+@Controller("api/auth")
 export class AuthController {
-  @Post('login')
+  @Post("login")
   async login(@Body() dto: LoginDto) {
     const user = await this.users.findByEmail(dto.email);
     const valid = await bcrypt.compare(dto.password, user.password);
@@ -598,11 +618,11 @@ export class AuthController {
 }
 
 // ✅ GOOD - Delegate to service
-@Controller('api/auth')
+@Controller("api/auth")
 export class AuthController {
   constructor(private readonly auth: AuthService) {}
 
-  @Post('login')
+  @Post("login")
   async login(@Body() dto: LoginDto, @Res() res: Response) {
     const { accessToken, refreshToken } = await this.auth.login(dto);
     // Handle cookie setting and response formatting here only
@@ -639,11 +659,11 @@ export class AuthService {
 
 ```typescript
 // ❌ BAD
-const token = jwt.sign(payload, 'my-secret-key', { expiresIn: '15m' });
+const token = jwt.sign(payload, "my-secret-key", { expiresIn: "15m" });
 
 // ✅ GOOD
-const token = jwt.sign(payload, this.getEnv('JWT_SECRET'), {
-  expiresIn: this.resolveExpiry(process.env.JWT_ACCESS_TOKEN_EXPIRES_IN, '15m')
+const token = jwt.sign(payload, this.getEnv("JWT_SECRET"), {
+  expiresIn: this.resolveExpiry(process.env.JWT_ACCESS_TOKEN_EXPIRES_IN, "15m"),
 });
 ```
 
@@ -659,7 +679,7 @@ async getUser(id: string) {
 async getUser(id: string) {
   const user = await this.users.findById(id);
   if (!user) throw new NotFoundException('User not found');
-  
+
   const userObject = user.toObject ? user.toObject() : user;
   const { password, passwordChangedAt, ...safeUser } = userObject as any;
   return safeUser;
@@ -679,12 +699,16 @@ try {
 // ✅ GOOD
 try {
   const user = await this.users.findById(id);
-  if (!user) throw new NotFoundException('User not found');
+  if (!user) throw new NotFoundException("User not found");
   return user;
 } catch (error) {
   if (error instanceof NotFoundException) throw error;
-  this.logger.error(`Failed to find user: ${error.message}`, error.stack, 'AuthService');
-  throw new InternalServerErrorException('Failed to retrieve user');
+  this.logger.error(
+    `Failed to find user: ${error.message}`,
+    error.stack,
+    "AuthService",
+  );
+  throw new InternalServerErrorException("Failed to retrieve user");
 }
 ```
 
@@ -698,22 +722,22 @@ try {
 
 ```typescript
 // Module
-export { AuthKitModule } from './auth-kit.module';
+export { AuthKitModule } from "./auth-kit.module";
 
 // Guards (used by host apps)
-export { AuthenticateGuard } from './middleware/authenticate.guard';
-export { AdminGuard } from './middleware/admin.guard';
-export { hasRole } from './middleware/role.guard';
+export { AuthenticateGuard } from "./middleware/authenticate.guard";
+export { AdminGuard } from "./middleware/admin.guard";
+export { hasRole } from "./middleware/role.guard";
 
 // Decorators
-export { Admin } from './middleware/admin.decorator';
+export { Admin } from "./middleware/admin.decorator";
 
 // Services (if host apps need direct access)
-export { AuthService } from './services/auth.service';
-export { UsersService } from './services/users.service';
-export { RolesService } from './services/roles.service';
-export { SeedService } from './services/seed.service';
-export { AdminRoleService } from './services/admin-role.service';
+export { AuthService } from "./services/auth.service";
+export { UsersService } from "./services/users.service";
+export { RolesService } from "./services/roles.service";
+export { SeedService } from "./services/seed.service";
+export { AdminRoleService } from "./services/admin-role.service";
 ```
 
 ### What MUST NOT be exported:
@@ -722,16 +746,16 @@ export { AdminRoleService } from './services/admin-role.service';
 
 ```typescript
 // ❌ NEVER export models/schemas
-export { User, UserSchema } from './models/user.model'; // FORBIDDEN
+export { User, UserSchema } from "./models/user.model"; // FORBIDDEN
 
 // ❌ NEVER export repositories directly (exported via module if needed)
-export { UserRepository } from './repositories/user.repository'; // Consider carefully
+export { UserRepository } from "./repositories/user.repository"; // Consider carefully
 
 // ❌ NEVER export DTOs (host apps don't need them - they use the API)
-export { LoginDto, RegisterDto } from './dtos/auth/login.dto'; // FORBIDDEN
+export { LoginDto, RegisterDto } from "./dtos/auth/login.dto"; // FORBIDDEN
 
 // ❌ NEVER export internal utilities
-export { generateUsernameFromName } from './utils/helper'; // FORBIDDEN
+export { generateUsernameFromName } from "./utils/helper"; // FORBIDDEN
 ```
 
 **Rationale:**
@@ -766,7 +790,7 @@ export class AuthKitModule { }
 
 ```typescript
 // In host app
-import { AuthService } from '@ciscode/authentication-kit';
+import { AuthService } from "@ciscode/authentication-kit";
 
 @Injectable()
 export class MyService {
@@ -816,13 +840,13 @@ if (user.passwordChangedAt && decoded.iat * 1000 < user.passwordChangedAt.getTim
 ### 3. Cookie Security
 
 ```typescript
-const isProd = process.env.NODE_ENV === 'production';
+const isProd = process.env.NODE_ENV === "production";
 
-res.cookie('refreshToken', refreshToken, {
-  httpOnly: true,           // ✅ Prevent JS access
-  secure: isProd,           // ✅ HTTPS only in production
-  sameSite: isProd ? 'none' : 'lax',  // ✅ CSRF protection
-  path: '/',
+res.cookie("refreshToken", refreshToken, {
+  httpOnly: true, // ✅ Prevent JS access
+  secure: isProd, // ✅ HTTPS only in production
+  sameSite: isProd ? "none" : "lax", // ✅ CSRF protection
+  path: "/",
   maxAge: getMillisecondsFromExpiry(refreshTTL),
 });
 ```
@@ -873,11 +897,11 @@ password!: string;
 
 ```typescript
 // ✅ Generic error for login failures (prevent user enumeration)
-throw new UnauthorizedException('Invalid credentials');
+throw new UnauthorizedException("Invalid credentials");
 
 // ❌ DON'T reveal specific info
-throw new UnauthorizedException('User not found'); // Reveals email exists
-throw new UnauthorizedException('Wrong password'); // Reveals email exists
+throw new UnauthorizedException("User not found"); // Reveals email exists
+throw new UnauthorizedException("Wrong password"); // Reveals email exists
 ```
 
 ---
@@ -888,11 +912,11 @@ throw new UnauthorizedException('Wrong password'); // Reveals email exists
 
 **Format**: `MAJOR.MINOR.PATCH` (e.g., `1.5.1`)
 
-| Version Type | When to Bump | Examples |
-|-------------|--------------|----------|
-| **MAJOR** (x.0.0) | Breaking changes | Changed exported function signatures, removed public methods, changed DTO structure, renamed guards |
-| **MINOR** (0.x.0) | New features (backwards-compatible) | Added new endpoints, new optional parameters, new guards/decorators |
-| **PATCH** (0.0.x) | Bug fixes, internal changes | Fixed token validation bug, improved error messages, documentation updates |
+| Version Type      | When to Bump                        | Examples                                                                                            |
+| ----------------- | ----------------------------------- | --------------------------------------------------------------------------------------------------- |
+| **MAJOR** (x.0.0) | Breaking changes                    | Changed exported function signatures, removed public methods, changed DTO structure, renamed guards |
+| **MINOR** (0.x.0) | New features (backwards-compatible) | Added new endpoints, new optional parameters, new guards/decorators                                 |
+| **PATCH** (0.0.x) | Bug fixes, internal changes         | Fixed token validation bug, improved error messages, documentation updates                          |
 
 ### Breaking Changes Examples
 
@@ -901,14 +925,17 @@ throw new UnauthorizedException('Wrong password'); // Reveals email exists
 ```typescript
 // v1.x.x - OLD
 export class AuthService {
-  async login(dto: LoginDto): Promise<string> { // Returns token string
+  async login(dto: LoginDto): Promise<string> {
+    // Returns token string
     return accessToken;
   }
 }
 
 // v2.0.0 - NEW (BREAKING)
 export class AuthService {
-  async login(dto: LoginDto): Promise<{ accessToken: string; refreshToken: string }> {
+  async login(
+    dto: LoginDto,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
     return { accessToken, refreshToken };
   }
 }
@@ -919,7 +946,8 @@ export class AuthService {
 ```typescript
 // v1.5.x - Add new optional parameter
 export class AuthService {
-  async register(dto: RegisterDto, skipEmailVerification = false) { // ✅ Non-breaking
+  async register(dto: RegisterDto, skipEmailVerification = false) {
+    // ✅ Non-breaking
     // ...
   }
 }
@@ -955,20 +983,24 @@ git push && git push --tags
 ## [2.0.0] - 2026-02-15
 
 ### BREAKING CHANGES
+
 - `login()` now returns `{ accessToken, refreshToken }` instead of string
 - Removed deprecated `validateUser()` method
 
 ### Added
+
 - Refresh token rotation support
 - `hasRole(roleId)` guard factory for dynamic role checking
 
 ### Fixed
+
 - Token expiration validation now correctly handles timezone differences
 - Email verification links now work correctly in production
 
 ## [1.5.1] - 2026-01-30
 
 ### Fixed
+
 - Fixed SMTP connection error handling
 ```
 
@@ -1014,15 +1046,15 @@ npm publish
 
 ## 🛠️ Development Commands
 
-| Command | Purpose |
-|---------|---------|
-| `npm run build` | Compile TypeScript → `dist/` (uses `tsc-alias` for path resolution) |
-| `npm start` | Run standalone server (testing/demo mode) |
-| `npm test` | Run test suite (currently minimal - expand later) |
-| `npm run prepack` | Auto-runs before `npm pack` or `npm publish` |
-| `npm link` | Link package locally for testing in host apps |
-| `npm version [patch\|minor\|major]` | Bump version, commit, and tag |
-| `npm publish` | Publish to NPM registry |
+| Command                             | Purpose                                                             |
+| ----------------------------------- | ------------------------------------------------------------------- |
+| `npm run build`                     | Compile TypeScript → `dist/` (uses `tsc-alias` for path resolution) |
+| `npm start`                         | Run standalone server (testing/demo mode)                           |
+| `npm test`                          | Run test suite (currently minimal - expand later)                   |
+| `npm run prepack`                   | Auto-runs before `npm pack` or `npm publish`                        |
+| `npm link`                          | Link package locally for testing in host apps                       |
+| `npm version [patch\|minor\|major]` | Bump version, commit, and tag                                       |
+| `npm publish`                       | Publish to NPM registry                                             |
 
 ### Testing in Host App
 

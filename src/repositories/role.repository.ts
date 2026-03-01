@@ -1,38 +1,39 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import type { Model, Types } from 'mongoose';
-import { Role, RoleDocument } from '@models/role.model';
+import { Role, RoleDocument } from "@models/role.model";
+import { Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import type { Model, Types } from "mongoose";
 
 @Injectable()
 export class RoleRepository {
-    constructor(@InjectModel(Role.name) private readonly roleModel: Model<RoleDocument>) { }
+  constructor(
+    @InjectModel(Role.name) private readonly roleModel: Model<RoleDocument>,
+  ) {}
 
-    create(data: Partial<Role>) {
-        return this.roleModel.create(data);
-    }
+  create(data: Partial<Role>) {
+    return this.roleModel.create(data);
+  }
 
-    findById(id: string | Types.ObjectId) {
-        return this.roleModel.findById(id);
-    }
+  findById(id: string | Types.ObjectId) {
+    return this.roleModel.findById(id);
+  }
 
-    findByName(name: string) {
-        return this.roleModel.findOne({ name });
-    }
+  findByName(name: string) {
+    return this.roleModel.findOne({ name });
+  }
 
-    list() {
-        return this.roleModel.find().populate('permissions').lean();
-    }
+  list() {
+    return this.roleModel.find().populate("permissions").lean();
+  }
 
-    updateById(id: string | Types.ObjectId, data: Partial<Role>) {
-        return this.roleModel.findByIdAndUpdate(id, data, { new: true });
-    }
+  updateById(id: string | Types.ObjectId, data: Partial<Role>) {
+    return this.roleModel.findByIdAndUpdate(id, data, { new: true });
+  }
 
-    deleteById(id: string | Types.ObjectId) {
-        return this.roleModel.findByIdAndDelete(id);
-    }
+  deleteById(id: string | Types.ObjectId) {
+    return this.roleModel.findByIdAndDelete(id);
+  }
 
-    findByIds(ids: string[]) {
-        return this.roleModel.find({ _id: { $in: ids } }).lean();
-    }
-
+  findByIds(ids: string[]) {
+    return this.roleModel.find({ _id: { $in: ids } }).lean();
+  }
 }

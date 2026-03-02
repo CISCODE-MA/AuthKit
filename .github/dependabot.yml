@@ -9,7 +9,7 @@ updates:
       time: "03:00"
     open-pull-requests-limit: 5
     assignees:
-      - CISCODE-MA/auth-kit-maintainers
+      - CISCODE-MA/cloud-devops
     labels:
       - "dependencies"
       - "npm"
@@ -26,7 +26,7 @@ updates:
       day: sunday
       time: "03:00"
     assignees:
-      - CISCODE-MA/auth-kit-maintainers
+      - CISCODE-MA/cloud-devops
     labels:
       - "dependencies"
       - "github-actions"

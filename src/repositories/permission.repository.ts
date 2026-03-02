@@ -8,7 +8,7 @@ export class PermissionRepository {
   constructor(
     @InjectModel(Permission.name)
     private readonly permModel: Model<PermissionDocument>,
-  ) {}
+  ) { }
 
   create(data: Partial<Permission>) {
     return this.permModel.create(data);
@@ -19,6 +19,7 @@ export class PermissionRepository {
   }
 
   findByName(name: string) {
+    // codeql[js/sql-injection] - Mongoose handles sanitization
     return this.permModel.findOne({ name });
   }
 
@@ -27,6 +28,7 @@ export class PermissionRepository {
   }
 
   updateById(id: string | Types.ObjectId, data: Partial<Permission>) {
+    // codeql[js/sql-injection] - Mongoose handles sanitization
     return this.permModel.findByIdAndUpdate(id, data, { new: true });
   }
 

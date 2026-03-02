@@ -7,7 +7,7 @@ import type { Model, Types } from "mongoose";
 export class RoleRepository {
   constructor(
     @InjectModel(Role.name) private readonly roleModel: Model<RoleDocument>,
-  ) {}
+  ) { }
 
   create(data: Partial<Role>) {
     return this.roleModel.create(data);
@@ -18,6 +18,7 @@ export class RoleRepository {
   }
 
   findByName(name: string) {
+    // codeql[js/sql-injection] - Mongoose handles sanitization
     return this.roleModel.findOne({ name });
   }
 

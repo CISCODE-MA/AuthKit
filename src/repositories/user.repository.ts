@@ -18,23 +18,23 @@ export class UserRepository {
   }
 
   findByEmail(email: string) {
-    return this.userModel.findOne({ email }); // lgtm[js/sql-injection]
+    return this.userModel.findOne({ email });
   }
 
   findByEmailWithPassword(email: string) {
-    return this.userModel.findOne({ email }).select("+password"); // lgtm[js/sql-injection]
+    return this.userModel.findOne({ email }).select("+password");
   }
 
   findByUsername(username: string) {
-    return this.userModel.findOne({ username }); // lgtm[js/sql-injection]
+    return this.userModel.findOne({ username });
   }
 
   findByPhone(phoneNumber: string) {
-    return this.userModel.findOne({ phoneNumber }); // lgtm[js/sql-injection]
+    return this.userModel.findOne({ phoneNumber });
   }
 
   updateById(id: string | Types.ObjectId, data: Partial<User>) {
-    return this.userModel.findByIdAndUpdate(id, data, { new: true }); // lgtm[js/sql-injection]
+    return this.userModel.findByIdAndUpdate(id, data, { new: true });
   }
 
   deleteById(id: string | Types.ObjectId) {
@@ -55,7 +55,7 @@ export class UserRepository {
     if (filter.username) query.username = filter.username;
 
     return this.userModel
-      .find(query) // lgtm[js/sql-injection]
+      .find(query)
       .populate({ path: "roles", select: "name" })
       .lean();
   }

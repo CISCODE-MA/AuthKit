@@ -18,7 +18,7 @@ export class RoleRepository {
   }
 
   findByName(name: string) {
-    return this.roleModel.findOne({ name }); // lgtm[js/sql-injection]
+    return this.roleModel.findOne({ name });
   }
 
   list() {
@@ -26,7 +26,7 @@ export class RoleRepository {
   }
 
   updateById(id: string | Types.ObjectId, data: Partial<Role>) {
-    return this.roleModel.findByIdAndUpdate(id, data, { new: true }); // lgtm[js/sql-injection]
+    return this.roleModel.findByIdAndUpdate(id, data, { new: true });
   }
 
   deleteById(id: string | Types.ObjectId) {

@@ -19,7 +19,7 @@ export class PermissionRepository {
   }
 
   findByName(name: string) {
-    return this.permModel.findOne({ name }); // lgtm[js/sql-injection]
+    return this.permModel.findOne({ name });
   }
 
   list() {
@@ -27,7 +27,7 @@ export class PermissionRepository {
   }
 
   updateById(id: string | Types.ObjectId, data: Partial<Permission>) {
-    return this.permModel.findByIdAndUpdate(id, data, { new: true }); // lgtm[js/sql-injection]
+    return this.permModel.findByIdAndUpdate(id, data, { new: true });
   }
 
   deleteById(id: string | Types.ObjectId) {

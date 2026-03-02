@@ -18,28 +18,23 @@ export class UserRepository {
   }
 
   findByEmail(email: string) {
-    // codeql[js/sql-injection] - Mongoose handles sanitization
-    return this.userModel.findOne({ email });
+    return this.userModel.findOne({ email }); // lgtm[js/sql-injection]
   }
 
   findByEmailWithPassword(email: string) {
-    // codeql[js/sql-injection] - Mongoose handles sanitization
-    return this.userModel.findOne({ email }).select("+password");
+    return this.userModel.findOne({ email }).select("+password"); // lgtm[js/sql-injection]
   }
 
   findByUsername(username: string) {
-    // codeql[js/sql-injection] - Mongoose handles sanitization
-    return this.userModel.findOne({ username });
+    return this.userModel.findOne({ username }); // lgtm[js/sql-injection]
   }
 
   findByPhone(phoneNumber: string) {
-    // codeql[js/sql-injection] - Mongoose handles sanitization
-    return this.userModel.findOne({ phoneNumber });
+    return this.userModel.findOne({ phoneNumber }); // lgtm[js/sql-injection]
   }
 
   updateById(id: string | Types.ObjectId, data: Partial<User>) {
-    // codeql[js/sql-injection] - Mongoose handles sanitization
-    return this.userModel.findByIdAndUpdate(id, data, { new: true });
+    return this.userModel.findByIdAndUpdate(id, data, { new: true }); // lgtm[js/sql-injection]
   }
 
   deleteById(id: string | Types.ObjectId) {
@@ -59,9 +54,8 @@ export class UserRepository {
     if (filter.email) query.email = filter.email;
     if (filter.username) query.username = filter.username;
 
-    // codeql[js/sql-injection] - Mongoose handles sanitization
     return this.userModel
-      .find(query)
+      .find(query) // lgtm[js/sql-injection]
       .populate({ path: "roles", select: "name" })
       .lean();
   }

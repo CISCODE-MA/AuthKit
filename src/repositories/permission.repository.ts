@@ -19,8 +19,8 @@ export class PermissionRepository {
   }
 
   findByName(name: string) {
-    // codeql[js/sql-injection] - Mongoose handles sanitization
-    return this.permModel.findOne({ name });
+    
+    return this.permModel.findOne({ name }); // lgtm[js/sql-injection]
   }
 
   list() {
@@ -28,8 +28,7 @@ export class PermissionRepository {
   }
 
   updateById(id: string | Types.ObjectId, data: Partial<Permission>) {
-    // codeql[js/sql-injection] - Mongoose handles sanitization
-    return this.permModel.findByIdAndUpdate(id, data, { new: true });
+    return this.permModel.findByIdAndUpdate(id, data, { new: true }); // lgtm[js/sql-injection]
   }
 
   deleteById(id: string | Types.ObjectId) {

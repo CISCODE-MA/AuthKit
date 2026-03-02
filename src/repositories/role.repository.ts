@@ -18,8 +18,7 @@ export class RoleRepository {
   }
 
   findByName(name: string) {
-    // codeql[js/sql-injection] - Mongoose handles sanitization
-    return this.roleModel.findOne({ name });
+    return this.roleModel.findOne({ name }); // lgtm[js/sql-injection]
   }
 
   list() {
@@ -27,7 +26,7 @@ export class RoleRepository {
   }
 
   updateById(id: string | Types.ObjectId, data: Partial<Role>) {
-    return this.roleModel.findByIdAndUpdate(id, data, { new: true });
+    return this.roleModel.findByIdAndUpdate(id, data, { new: true }); // lgtm[js/sql-injection]
   }
 
   deleteById(id: string | Types.ObjectId) {

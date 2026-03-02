@@ -7,7 +7,7 @@ import type { Model, Types } from "mongoose";
 export class RoleRepository {
   constructor(
     @InjectModel(Role.name) private readonly roleModel: Model<RoleDocument>,
-  ) { }
+  ) {}
 
   create(data: Partial<Role>) {
     return this.roleModel.create(data);

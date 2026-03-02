@@ -7,7 +7,7 @@ import type { Model, Types } from "mongoose";
 export class UserRepository {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
-  ) { }
+  ) {}
 
   create(data: Partial<User>) {
     return this.userModel.create(data);

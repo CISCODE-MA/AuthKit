@@ -8,7 +8,7 @@ export class PermissionRepository {
   constructor(
     @InjectModel(Permission.name)
     private readonly permModel: Model<PermissionDocument>,
-  ) { }
+  ) {}
 
   create(data: Partial<Permission>) {
     return this.permModel.create(data);
@@ -19,7 +19,6 @@ export class PermissionRepository {
   }
 
   findByName(name: string) {
-    
     return this.permModel.findOne({ name }); // lgtm[js/sql-injection]
   }
 

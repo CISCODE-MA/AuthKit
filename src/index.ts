@@ -1,9 +1,9 @@
-import 'reflect-metadata';
+import "reflect-metadata";
 
-export { AuthKitModule } from './auth-kit.module';
-export { AuthenticateGuard } from './middleware/authenticate.guard';
-export { hasRole } from './middleware/role.guard';
-export { Admin } from './middleware/admin.decorator';
-export { SeedService } from './services/seed.service';
-export { AdminGuard } from './middleware/admin.guard';
-export { AdminRoleService } from './services/admin-role.service';
+export { AuthKitModule } from "./auth-kit.module";
+export { AuthenticateGuard } from "./middleware/authenticate.guard";
+export { hasRole } from "./middleware/role.guard";
+export { Admin } from "./middleware/admin.decorator";
+export { SeedService } from "./services/seed.service";
+export { AdminGuard } from "./middleware/admin.guard";
+export { AdminRoleService } from "./services/admin-role.service";

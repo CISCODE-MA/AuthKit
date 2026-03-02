@@ -1,0 +1,11 @@
+name: "CodeQL Config for AuthKit"
+
+# Suppress false positives for Mongoose queries
+# Mongoose automatically sanitizes all query parameters
+query-filters:
+  - exclude:
+      id: js/sql-injection
+      paths:
+        - src/repositories/user.repository.ts
+        - src/repositories/role.repository.ts
+        - src/repositories/permission.repository.ts

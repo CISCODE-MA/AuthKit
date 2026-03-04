@@ -1,9 +1,9 @@
-import type { TestingModule } from '@nestjs/testing';
-import { Test } from '@nestjs/testing';
-import { Logger as NestLogger } from '@nestjs/common';
-import { LoggerService } from '@services/logger.service';
+import type { TestingModule } from "@nestjs/testing";
+import { Test } from "@nestjs/testing";
+import { Logger as NestLogger } from "@nestjs/common";
+import { LoggerService } from "@services/logger.service";
 
-describe('LoggerService', () => {
+describe("LoggerService", () => {
   let service: LoggerService;
   let nestLoggerSpy: jest.SpyInstance;
 
@@ -15,33 +15,35 @@ describe('LoggerService', () => {
     service = module.get<LoggerService>(LoggerService);
 
     // Spy on NestJS Logger methods
-    nestLoggerSpy = jest.spyOn(NestLogger.prototype, 'log').mockImplementation();
-    jest.spyOn(NestLogger.prototype, 'error').mockImplementation();
-    jest.spyOn(NestLogger.prototype, 'warn').mockImplementation();
-    jest.spyOn(NestLogger.prototype, 'debug').mockImplementation();
-    jest.spyOn(NestLogger.prototype, 'verbose').mockImplementation();
+    nestLoggerSpy = jest
+      .spyOn(NestLogger.prototype, "log")
+      .mockImplementation();
+    jest.spyOn(NestLogger.prototype, "error").mockImplementation();
+    jest.spyOn(NestLogger.prototype, "warn").mockImplementation();
+    jest.spyOn(NestLogger.prototype, "debug").mockImplementation();
+    jest.spyOn(NestLogger.prototype, "verbose").mockImplementation();
   });
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  it('should be defined', () => {
+  it("should be defined", () => {
     expect(service).toBeDefined();
   });
 
-  describe('log', () => {
-    it('should call NestJS logger.log with message', () => {
-      const message = 'Test log message';
+  describe("log", () => {
+    it("should call NestJS logger.log with message", () => {
+      const message = "Test log message";
 
       service.log(message);
 
       expect(NestLogger.prototype.log).toHaveBeenCalledWith(message, undefined);
     });
 
-    it('should call NestJS logger.log with message and context', () => {
-      const message = 'Test log message';
-      const context = 'TestContext';
+    it("should call NestJS logger.log with message and context", () => {
+      const message = "Test log message";
+      const context = "TestContext";
 
       service.log(message, context);
 
@@ -49,9 +51,9 @@ describe('LoggerService', () => {
     });
   });
 
-  describe('error', () => {
-    it('should call NestJS logger.error with message only', () => {
-      const message = 'Test error message';
+  describe("error", () => {
+    it("should call NestJS logger.error with message only", () => {
+      const message = "Test error message";
 
       service.error(message);
 
@@ -62,9 +64,9 @@ describe('LoggerService', () => {
       );
     });
 
-    it('should call NestJS logger.error with message and trace', () => {
-      const message = 'Test error message';
-      const trace = 'Error stack trace';
+    it("should call NestJS logger.error with message and trace", () => {
+      const message = "Test error message";
+      const trace = "Error stack trace";
 
       service.error(message, trace);
 
@@ -75,10 +77,10 @@ describe('LoggerService', () => {
       );
     });
 
-    it('should call NestJS logger.error with message, trace, and context', () => {
-      const message = 'Test error message';
-      const trace = 'Error stack trace';
-      const context = 'TestContext';
+    it("should call NestJS logger.error with message, trace, and context", () => {
+      const message = "Test error message";
+      const trace = "Error stack trace";
+      const context = "TestContext";
 
       service.error(message, trace, context);
 
@@ -90,9 +92,9 @@ describe('LoggerService', () => {
     });
   });
 
-  describe('warn', () => {
-    it('should call NestJS logger.warn with message', () => {
-      const message = 'Test warning message';
+  describe("warn", () => {
+    it("should call NestJS logger.warn with message", () => {
+      const message = "Test warning message";
 
       service.warn(message);
 
@@ -102,9 +104,9 @@ describe('LoggerService', () => {
       );
     });
 
-    it('should call NestJS logger.warn with message and context', () => {
-      const message = 'Test warning message';
-      const context = 'TestContext';
+    it("should call NestJS logger.warn with message and context", () => {
+      const message = "Test warning message";
+      const context = "TestContext";
 
       service.warn(message, context);
 
@@ -112,10 +114,10 @@ describe('LoggerService', () => {
     });
   });
 
-  describe('debug', () => {
-    it('should call NestJS logger.debug in development mode', () => {
-      process.env.NODE_ENV = 'development';
-      const message = 'Test debug message';
+  describe("debug", () => {
+    it("should call NestJS logger.debug in development mode", () => {
+      process.env.NODE_ENV = "development";
+      const message = "Test debug message";
 
       service.debug(message);
 
@@ -125,22 +127,19 @@ describe('LoggerService', () => {
       );
     });
 
-    it('should call NestJS logger.debug with context in development mode', () => {
-      process.env.NODE_ENV = 'development';
-      const message = 'Test debug message';
-      const context = 'TestContext';
+    it("should call NestJS logger.debug with context in development mode", () => {
+      process.env.NODE_ENV = "development";
+      const message = "Test debug message";
+      const context = "TestContext";
 
       service.debug(message, context);
 
-      expect(NestLogger.prototype.debug).toHaveBeenCalledWith(
-        message,
-        context,
-      );
+      expect(NestLogger.prototype.debug).toHaveBeenCalledWith(message, context);
     });
 
-    it('should NOT call NestJS logger.debug in production mode', () => {
-      process.env.NODE_ENV = 'production';
-      const message = 'Test debug message';
+    it("should NOT call NestJS logger.debug in production mode", () => {
+      process.env.NODE_ENV = "production";
+      const message = "Test debug message";
 
       service.debug(message);
 
@@ -148,10 +147,10 @@ describe('LoggerService', () => {
     });
   });
 
-  describe('verbose', () => {
-    it('should call NestJS logger.verbose in development mode', () => {
-      process.env.NODE_ENV = 'development';
-      const message = 'Test verbose message';
+  describe("verbose", () => {
+    it("should call NestJS logger.verbose in development mode", () => {
+      process.env.NODE_ENV = "development";
+      const message = "Test verbose message";
 
       service.verbose(message);
 
@@ -161,10 +160,10 @@ describe('LoggerService', () => {
       );
     });
 
-    it('should call NestJS logger.verbose with context in development mode', () => {
-      process.env.NODE_ENV = 'development';
-      const message = 'Test verbose message';
-      const context = 'TestContext';
+    it("should call NestJS logger.verbose with context in development mode", () => {
+      process.env.NODE_ENV = "development";
+      const message = "Test verbose message";
+      const context = "TestContext";
 
       service.verbose(message, context);
 
@@ -174,9 +173,9 @@ describe('LoggerService', () => {
       );
     });
 
-    it('should NOT call NestJS logger.verbose in production mode', () => {
-      process.env.NODE_ENV = 'production';
-      const message = 'Test verbose message';
+    it("should NOT call NestJS logger.verbose in production mode", () => {
+      process.env.NODE_ENV = "production";
+      const message = "Test verbose message";
 
       service.verbose(message);
 
@@ -184,5 +183,3 @@ describe('LoggerService', () => {
     });
   });
 });
-
-

@@ -1,11 +1,11 @@
-import type { TestingModule } from '@nestjs/testing';
-import { Test } from '@nestjs/testing';
-import { SeedService } from '@services/seed.service';
-import { RoleRepository } from '@repos/role.repository';
-import { PermissionRepository } from '@repos/permission.repository';
-import { Types } from 'mongoose';
+import type { TestingModule } from "@nestjs/testing";
+import { Test } from "@nestjs/testing";
+import { SeedService } from "@services/seed.service";
+import { RoleRepository } from "@repos/role.repository";
+import { PermissionRepository } from "@repos/permission.repository";
+import { Types } from "mongoose";
 
-describe('SeedService', () => {
+describe("SeedService", () => {
   let service: SeedService;
   let mockRoleRepository: any;
   let mockPermissionRepository: any;
@@ -38,7 +38,7 @@ describe('SeedService', () => {
     service = module.get<SeedService>(SeedService);
 
     // Mock console.log to keep test output clean
-    jest.spyOn(console, 'log').mockImplementation();
+    jest.spyOn(console, "log").mockImplementation();
   });
 
   afterEach(() => {
@@ -46,12 +46,12 @@ describe('SeedService', () => {
     jest.restoreAllMocks();
   });
 
-  it('should be defined', () => {
+  it("should be defined", () => {
     expect(service).toBeDefined();
   });
 
-  describe('seedDefaults', () => {
-    it('should create all default permissions when none exist', async () => {
+  describe("seedDefaults", () => {
+    it("should create all default permissions when none exist", async () => {
       // Arrange
       mockPermissionRepository.findByName.mockResolvedValue(null);
       mockPermissionRepository.create.mockImplementation((dto) => ({
@@ -72,27 +72,27 @@ describe('SeedService', () => {
       // Assert
       expect(mockPermissionRepository.create).toHaveBeenCalledTimes(3);
       expect(mockPermissionRepository.create).toHaveBeenCalledWith({
-        name: 'users:manage',
+        name: "users:manage",
       });
       expect(mockPermissionRepository.create).toHaveBeenCalledWith({
-        name: 'roles:manage',
+        name: "roles:manage",
       });
       expect(mockPermissionRepository.create).toHaveBeenCalledWith({
-        name: 'permissions:manage',
+        name: "permissions:manage",
       });
 
-      expect(result).toHaveProperty('adminRoleId');
-      expect(result).toHaveProperty('userRoleId');
-      expect(typeof result.adminRoleId).toBe('string');
-      expect(typeof result.userRoleId).toBe('string');
+      expect(result).toHaveProperty("adminRoleId");
+      expect(result).toHaveProperty("userRoleId");
+      expect(typeof result.adminRoleId).toBe("string");
+      expect(typeof result.userRoleId).toBe("string");
     });
 
-    it('should use existing permissions instead of creating new ones', async () => {
+    it("should use existing permissions instead of creating new ones", async () => {
       // Arrange
       const existingPermissions = [
-        { _id: new Types.ObjectId(), name: 'users:manage' },
-        { _id: new Types.ObjectId(), name: 'roles:manage' },
-        { _id: new Types.ObjectId(), name: 'permissions:manage' },
+        { _id: new Types.ObjectId(), name: "users:manage" },
+        { _id: new Types.ObjectId(), name: "roles:manage" },
+        { _id: new Types.ObjectId(), name: "permissions:manage" },
       ];
 
       mockPermissionRepository.findByName.mockImplementation((name) => {
@@ -114,7 +114,7 @@ describe('SeedService', () => {
       expect(mockPermissionRepository.create).not.toHaveBeenCalled();
     });
 
-    it('should create admin role with all permissions when not exists', async () => {
+    it("should create admin role with all permissions when not exists", async () => {
       // Arrange
       const permissionIds = [
         new Types.ObjectId(),
@@ -137,16 +137,16 @@ describe('SeedService', () => {
       const userRoleId = new Types.ObjectId();
 
       mockRoleRepository.create.mockImplementation((dto) => {
-        if (dto.name === 'admin') {
+        if (dto.name === "admin") {
           return {
             _id: adminRoleId,
-            name: 'admin',
+            name: "admin",
             permissions: dto.permissions,
           };
         }
         return {
           _id: userRoleId,
-          name: 'user',
+          name: "user",
           permissions: dto.permissions,
         };
       });
@@ -157,19 +157,19 @@ describe('SeedService', () => {
       // Assert
       expect(mockRoleRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          name: 'admin',
+          name: "admin",
           permissions: expect.any(Array),
         }),
       );
 
       // Verify admin role has permissions
       const adminCall = mockRoleRepository.create.mock.calls.find(
-        (call) => call[0].name === 'admin',
+        (call) => call[0].name === "admin",
       );
       expect(adminCall[0].permissions).toHaveLength(3);
     });
 
-    it('should create user role with no permissions when not exists', async () => {
+    it("should create user role with no permissions when not exists", async () => {
       // Arrange
       mockPermissionRepository.findByName.mockResolvedValue(null);
       mockPermissionRepository.create.mockImplementation((dto) => ({
@@ -190,17 +190,17 @@ describe('SeedService', () => {
       // Assert
       expect(mockRoleRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          name: 'user',
+          name: "user",
           permissions: [],
         }),
       );
     });
 
-    it('should use existing admin role if already exists', async () => {
+    it("should use existing admin role if already exists", async () => {
       // Arrange
       const existingAdminRole = {
         _id: new Types.ObjectId(),
-        name: 'admin',
+        name: "admin",
         permissions: [],
       };
 
@@ -211,7 +211,7 @@ describe('SeedService', () => {
       }));
 
       mockRoleRepository.findByName.mockImplementation((name) => {
-        if (name === 'admin') return existingAdminRole;
+        if (name === "admin") return existingAdminRole;
         return null;
       });
 
@@ -229,15 +229,15 @@ describe('SeedService', () => {
       // Admin role already exists, so create should only be called once for user role
       expect(mockRoleRepository.create).toHaveBeenCalledTimes(1);
       expect(mockRoleRepository.create).toHaveBeenCalledWith(
-        expect.objectContaining({ name: 'user' }),
+        expect.objectContaining({ name: "user" }),
       );
     });
 
-    it('should use existing user role if already exists', async () => {
+    it("should use existing user role if already exists", async () => {
       // Arrange
       const existingUserRole = {
         _id: new Types.ObjectId(),
-        name: 'user',
+        name: "user",
         permissions: [],
       };
 
@@ -248,7 +248,7 @@ describe('SeedService', () => {
       }));
 
       mockRoleRepository.findByName.mockImplementation((name) => {
-        if (name === 'user') return existingUserRole;
+        if (name === "user") return existingUserRole;
         return null;
       });
 
@@ -265,7 +265,7 @@ describe('SeedService', () => {
       expect(result.userRoleId).toBe(existingUserRole._id.toString());
     });
 
-    it('should return both role IDs after successful seeding', async () => {
+    it("should return both role IDs after successful seeding", async () => {
       // Arrange
       const adminRoleId = new Types.ObjectId();
       const userRoleId = new Types.ObjectId();
@@ -278,10 +278,10 @@ describe('SeedService', () => {
 
       mockRoleRepository.findByName.mockResolvedValue(null);
       mockRoleRepository.create.mockImplementation((dto) => {
-        if (dto.name === 'admin') {
-          return { _id: adminRoleId, name: 'admin', permissions: [] };
+        if (dto.name === "admin") {
+          return { _id: adminRoleId, name: "admin", permissions: [] };
         }
-        return { _id: userRoleId, name: 'user', permissions: [] };
+        return { _id: userRoleId, name: "user", permissions: [] };
       });
 
       // Act
@@ -294,7 +294,7 @@ describe('SeedService', () => {
       });
     });
 
-    it('should log the seeded role IDs to console', async () => {
+    it("should log the seeded role IDs to console", async () => {
       // Arrange
       const adminRoleId = new Types.ObjectId();
       const userRoleId = new Types.ObjectId();
@@ -307,10 +307,10 @@ describe('SeedService', () => {
 
       mockRoleRepository.findByName.mockResolvedValue(null);
       mockRoleRepository.create.mockImplementation((dto) => {
-        if (dto.name === 'admin') {
-          return { _id: adminRoleId, name: 'admin', permissions: [] };
+        if (dto.name === "admin") {
+          return { _id: adminRoleId, name: "admin", permissions: [] };
         }
-        return { _id: userRoleId, name: 'user', permissions: [] };
+        return { _id: userRoleId, name: "user", permissions: [] };
       });
 
       // Act
@@ -318,7 +318,7 @@ describe('SeedService', () => {
 
       // Assert
       expect(console.log).toHaveBeenCalledWith(
-        '[AuthKit] Seeded roles:',
+        "[AuthKit] Seeded roles:",
         expect.objectContaining({
           adminRoleId: adminRoleId.toString(),
           userRoleId: userRoleId.toString(),
@@ -327,5 +327,3 @@ describe('SeedService', () => {
     });
   });
 });
-
-

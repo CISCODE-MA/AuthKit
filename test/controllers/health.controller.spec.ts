@@ -1,10 +1,10 @@
-import type { TestingModule } from '@nestjs/testing';
-import { Test } from '@nestjs/testing';
-import { HealthController } from '@controllers/health.controller';
-import { MailService } from '@services/mail.service';
-import { LoggerService } from '@services/logger.service';
+import type { TestingModule } from "@nestjs/testing";
+import { Test } from "@nestjs/testing";
+import { HealthController } from "@controllers/health.controller";
+import { MailService } from "@services/mail.service";
+import { LoggerService } from "@services/logger.service";
 
-describe('HealthController', () => {
+describe("HealthController", () => {
   let controller: HealthController;
   let mockMailService: jest.Mocked<MailService>;
   let mockLoggerService: jest.Mocked<LoggerService>;
@@ -34,8 +34,8 @@ describe('HealthController', () => {
     jest.clearAllMocks();
   });
 
-  describe('checkSmtp', () => {
-    it('should return connected status when SMTP is working', async () => {
+  describe("checkSmtp", () => {
+    it("should return connected status when SMTP is working", async () => {
       mockMailService.verifyConnection.mockResolvedValue({
         connected: true,
       });
@@ -43,84 +43,82 @@ describe('HealthController', () => {
       const result = await controller.checkSmtp();
 
       expect(result).toMatchObject({
-        service: 'smtp',
-        status: 'connected',
+        service: "smtp",
+        status: "connected",
       });
       expect((result as any).config).toBeDefined();
       expect(mockMailService.verifyConnection).toHaveBeenCalled();
     });
 
-    it('should return disconnected status when SMTP fails', async () => {
+    it("should return disconnected status when SMTP fails", async () => {
       mockMailService.verifyConnection.mockResolvedValue({
         connected: false,
-        error: 'Connection timeout',
+        error: "Connection timeout",
       });
 
       const result = await controller.checkSmtp();
 
       expect(result).toMatchObject({
-        service: 'smtp',
-        status: 'disconnected',
-        error: 'Connection timeout',
+        service: "smtp",
+        status: "disconnected",
+        error: "Connection timeout",
       });
       expect(mockMailService.verifyConnection).toHaveBeenCalled();
     });
 
-    it('should handle exceptions and log errors', async () => {
-      const error = new Error('SMTP crashed');
+    it("should handle exceptions and log errors", async () => {
+      const error = new Error("SMTP crashed");
       mockMailService.verifyConnection.mockRejectedValue(error);
 
       const result = await controller.checkSmtp();
 
       expect(result).toMatchObject({
-        service: 'smtp',
-        status: 'error',
+        service: "smtp",
+        status: "error",
       });
       expect(mockLoggerService.error).toHaveBeenCalledWith(
-        expect.stringContaining('SMTP health check failed'),
+        expect.stringContaining("SMTP health check failed"),
         error.stack,
-        'HealthController',
+        "HealthController",
       );
     });
 
-    it('should mask sensitive config values', async () => {
-      process.env.SMTP_USER = 'testuser@example.com';
+    it("should mask sensitive config values", async () => {
+      process.env.SMTP_USER = "testuser@example.com";
       mockMailService.verifyConnection.mockResolvedValue({ connected: true });
 
       const result = await controller.checkSmtp();
 
       expect((result as any).config.user).toMatch(/^\*\*\*/);
-      expect((result as any).config.user).not.toContain('testuser');
+      expect((result as any).config.user).not.toContain("testuser");
     });
   });
 
-  describe('checkAll', () => {
-    it('should return overall health status', async () => {
+  describe("checkAll", () => {
+    it("should return overall health status", async () => {
       mockMailService.verifyConnection.mockResolvedValue({ connected: true });
 
       const result = await controller.checkAll();
 
       expect(result).toMatchObject({
-        status: 'healthy',
+        status: "healthy",
         checks: {
-          smtp: expect.objectContaining({ service: 'smtp' }),
+          smtp: expect.objectContaining({ service: "smtp" }),
         },
         environment: expect.any(Object),
       });
     });
 
-    it('should return degraded status when SMTP fails', async () => {
+    it("should return degraded status when SMTP fails", async () => {
       mockMailService.verifyConnection.mockResolvedValue({
         connected: false,
-        error: 'Connection failed',
+        error: "Connection failed",
       });
 
       const result = await controller.checkAll();
 
-      expect(result.status).toBe('degraded');
-      expect(result.checks.smtp.status).toBe('disconnected');
+      expect(result.status).toBe("degraded");
+      expect(result.checks.smtp.status).toBe("disconnected");
     });
   });
 });
-
-

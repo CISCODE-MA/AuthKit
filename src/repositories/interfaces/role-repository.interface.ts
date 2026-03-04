@@ -1,11 +1,14 @@
-import type { Types } from 'mongoose';
-import type { IRepository } from './repository.interface';
-import type { Role } from '@entities/role.entity';
+import type { Types } from "mongoose";
+import type { IRepository } from "./repository.interface";
+import type { Role } from "@entities/role.entity";
 
 /**
  * Role repository interface
  */
-export interface IRoleRepository extends IRepository<Role, string | Types.ObjectId> {
+export interface IRoleRepository extends IRepository<
+  Role,
+  string | Types.ObjectId
+> {
   /**
    * Find role by name
    * @param name - Role name

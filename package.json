@@ -2,6 +2,7 @@
   "name": "@ciscode/authentication-kit",
   "version": "1.5.0",
   "description": "NestJS auth kit with local + OAuth, JWT, RBAC, password reset.",
+  "type": "module",
   "publishConfig": {
     "access": "public"
   },
@@ -24,6 +25,11 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "lint": "eslint . --max-warnings=0",
+    "lint:fix": "eslint . --fix",
+    "format:write": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "format": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\"",
+    "typecheck": "tsc --noEmit",
     "prepack": "npm run build",
     "release": "semantic-release"
   },

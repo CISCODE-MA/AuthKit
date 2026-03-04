@@ -1,15 +1,23 @@
-import type { TestingModule } from '@nestjs/testing';
-import { Test } from '@nestjs/testing';
-import type { INestApplication} from '@nestjs/common';
-import { ExecutionContext, ValidationPipe, ConflictException, UnauthorizedException, ForbiddenException, NotFoundException, BadRequestException } from '@nestjs/common';
-import request from 'supertest';
-import cookieParser from 'cookie-parser';
-import { AuthController } from '@controllers/auth.controller';
-import { AuthService } from '@services/auth.service';
-import { OAuthService } from '@services/oauth.service';
-import { AuthenticateGuard } from '@guards/authenticate.guard';
+import type { TestingModule } from "@nestjs/testing";
+import { Test } from "@nestjs/testing";
+import type { INestApplication } from "@nestjs/common";
+import {
+  ExecutionContext,
+  ValidationPipe,
+  ConflictException,
+  UnauthorizedException,
+  ForbiddenException,
+  NotFoundException,
+  BadRequestException,
+} from "@nestjs/common";
+import request from "supertest";
+import cookieParser from "cookie-parser";
+import { AuthController } from "@controllers/auth.controller";
+import { AuthService } from "@services/auth.service";
+import { OAuthService } from "@services/oauth.service";
+import { AuthenticateGuard } from "@guards/authenticate.guard";
 
-describe('AuthController (Integration)', () => {
+describe("AuthController (Integration)", () => {
   let app: INestApplication;
   let authService: jest.Mocked<AuthService>;
   let oauthService: jest.Mocked<OAuthService>;
@@ -51,10 +59,10 @@ describe('AuthController (Integration)', () => {
       .compile();
 
     app = moduleFixture.createNestApplication();
-    
+
     // Add cookie-parser middleware for handling cookies
     app.use(cookieParser());
-    
+
     // Add global validation pipe for DTO validation
     app.useGlobalPipes(
       new ValidationPipe({
@@ -63,7 +71,7 @@ describe('AuthController (Integration)', () => {
         transform: true,
       }),
     );
-    
+
     await app.init();
 
     authService = moduleFixture.get(AuthService);
@@ -75,18 +83,18 @@ describe('AuthController (Integration)', () => {
     jest.clearAllMocks();
   });
 
-  describe('POST /api/auth/register', () => {
-    it('should return 201 and user data on successful registration', async () => {
+  describe("POST /api/auth/register", () => {
+    it("should return 201 and user data on successful registration", async () => {
       // Arrange
       const dto = {
-        email: 'test@example.com',
-        fullname: { fname: 'Test', lname: 'User' },
-        password: 'password123',
+        email: "test@example.com",
+        fullname: { fname: "Test", lname: "User" },
+        password: "password123",
       };
 
       const expectedResult: any = {
         ok: true,
-        id: 'new-user-id',
+        id: "new-user-id",
         email: dto.email,
         emailSent: true,
       };
@@ -95,7 +103,7 @@ describe('AuthController (Integration)', () => {
 
       // Act & Assert
       const response = await request(app.getHttpServer())
-        .post('/api/auth/register')
+        .post("/api/auth/register")
         .send(dto)
         .expect(201);
 
@@ -103,142 +111,148 @@ describe('AuthController (Integration)', () => {
       expect(authService.register).toHaveBeenCalledWith(dto);
     });
 
-    it('should return 400 for invalid input data', async () => {
+    it("should return 400 for invalid input data", async () => {
       // Arrange
       const invalidDto = {
-        email: 'invalid-email',
+        email: "invalid-email",
         // Missing fullname and password
       };
 
       // Act & Assert
       await request(app.getHttpServer())
-        .post('/api/auth/register')
+        .post("/api/auth/register")
         .send(invalidDto)
         .expect(400);
     });
 
-    it('should return 409 if email already exists', async () => {
+    it("should return 409 if email already exists", async () => {
       // Arrange
       const dto = {
-        email: 'existing@example.com',
-        fullname: { fname: 'Test', lname: 'User' },
-        password: 'password123',
+        email: "existing@example.com",
+        fullname: { fname: "Test", lname: "User" },
+        password: "password123",
       };
 
-      authService.register.mockRejectedValue(new ConflictException('Email already exists'));
+      authService.register.mockRejectedValue(
+        new ConflictException("Email already exists"),
+      );
 
       // Act & Assert
       await request(app.getHttpServer())
-        .post('/api/auth/register')
+        .post("/api/auth/register")
         .send(dto)
         .expect(409);
     });
   });
 
-  describe('POST /api/auth/login', () => {
-    it('should return 200 with tokens on successful login', async () => {
+  describe("POST /api/auth/login", () => {
+    it("should return 200 with tokens on successful login", async () => {
       // Arrange
       const dto = {
-        email: 'test@example.com',
-        password: 'password123',
+        email: "test@example.com",
+        password: "password123",
       };
 
       const expectedTokens = {
-        accessToken: 'mock-access-token',
-        refreshToken: 'mock-refresh-token',
+        accessToken: "mock-access-token",
+        refreshToken: "mock-refresh-token",
       };
 
       authService.login.mockResolvedValue(expectedTokens);
 
       // Act & Assert
       const response = await request(app.getHttpServer())
-        .post('/api/auth/login')
+        .post("/api/auth/login")
         .send(dto)
         .expect(200);
 
-      expect(response.body).toHaveProperty('accessToken');
-      expect(response.body).toHaveProperty('refreshToken');
-      expect(response.headers['set-cookie']).toBeDefined();
+      expect(response.body).toHaveProperty("accessToken");
+      expect(response.body).toHaveProperty("refreshToken");
+      expect(response.headers["set-cookie"]).toBeDefined();
       expect(authService.login).toHaveBeenCalledWith(dto);
     });
 
-    it('should return 401 for invalid credentials', async () => {
+    it("should return 401 for invalid credentials", async () => {
       // Arrange
       const dto = {
-        email: 'test@example.com',
-        password: 'wrongpassword',
+        email: "test@example.com",
+        password: "wrongpassword",
       };
 
-      authService.login.mockRejectedValue(new UnauthorizedException('Invalid credentials'));
+      authService.login.mockRejectedValue(
+        new UnauthorizedException("Invalid credentials"),
+      );
 
       // Act & Assert
       await request(app.getHttpServer())
-        .post('/api/auth/login')
+        .post("/api/auth/login")
         .send(dto)
         .expect(401);
     });
 
-    it('should return 403 if email not verified', async () => {
+    it("should return 403 if email not verified", async () => {
       // Arrange
       const dto = {
-        email: 'unverified@example.com',
-        password: 'password123',
+        email: "unverified@example.com",
+        password: "password123",
       };
 
-      authService.login.mockRejectedValue(new ForbiddenException('Email not verified'));
+      authService.login.mockRejectedValue(
+        new ForbiddenException("Email not verified"),
+      );
 
       // Act & Assert
       await request(app.getHttpServer())
-        .post('/api/auth/login')
+        .post("/api/auth/login")
         .send(dto)
         .expect(403);
     });
 
-    it('should set httpOnly cookie with refresh token', async () => {
+    it("should set httpOnly cookie with refresh token", async () => {
       // Arrange
       const dto = {
-        email: 'test@example.com',
-        password: 'password123',
+        email: "test@example.com",
+        password: "password123",
       };
 
       const expectedTokens = {
-        accessToken: 'mock-access-token',
-        refreshToken: 'mock-refresh-token',
+        accessToken: "mock-access-token",
+        refreshToken: "mock-refresh-token",
       };
 
       authService.login.mockResolvedValue(expectedTokens);
 
       // Act
       const response = await request(app.getHttpServer())
-        .post('/api/auth/login')
+        .post("/api/auth/login")
         .send(dto)
         .expect(200);
 
       // Assert
-      const cookies = response.headers['set-cookie'];
+      const cookies = response.headers["set-cookie"];
       expect(cookies).toBeDefined();
-      expect(cookies[0]).toContain('refreshToken=');
-      expect(cookies[0]).toContain('HttpOnly');
+      expect(cookies[0]).toContain("refreshToken=");
+      expect(cookies[0]).toContain("HttpOnly");
     });
   });
 
-  describe('POST /api/auth/verify-email', () => {
-    it('should return 200 on successful email verification', async () => {
+  describe("POST /api/auth/verify-email", () => {
+    it("should return 200 on successful email verification", async () => {
       // Arrange
       const dto = {
-        token: 'valid-verification-token',
+        token: "valid-verification-token",
       };
 
       const expectedResult = {
         ok: true,
-        message: 'Email verified successfully',
+        message: "Email verified successfully",
       };
 
       authService.verifyEmail.mockResolvedValue(expectedResult);
 
       // Act & Assert
       const response = await request(app.getHttpServer())
-        .post('/api/auth/verify-email')
+        .post("/api/auth/verify-email")
         .send(dto)
         .expect(200);
 
@@ -246,87 +260,91 @@ describe('AuthController (Integration)', () => {
       expect(authService.verifyEmail).toHaveBeenCalledWith(dto.token);
     });
 
-    it('should return 401 for invalid token', async () => {
+    it("should return 401 for invalid token", async () => {
       // Arrange
       const dto = {
-        token: 'invalid-token',
+        token: "invalid-token",
       };
 
-      authService.verifyEmail.mockRejectedValue(new UnauthorizedException('Invalid verification token'));
+      authService.verifyEmail.mockRejectedValue(
+        new UnauthorizedException("Invalid verification token"),
+      );
 
       // Act & Assert
       await request(app.getHttpServer())
-        .post('/api/auth/verify-email')
+        .post("/api/auth/verify-email")
         .send(dto)
         .expect(401);
     });
 
-    it('should return 401 for expired token', async () => {
+    it("should return 401 for expired token", async () => {
       // Arrange
       const dto = {
-        token: 'expired-token',
+        token: "expired-token",
       };
 
-      authService.verifyEmail.mockRejectedValue(new UnauthorizedException('Token expired'));
+      authService.verifyEmail.mockRejectedValue(
+        new UnauthorizedException("Token expired"),
+      );
 
       // Act & Assert
       await request(app.getHttpServer())
-        .post('/api/auth/verify-email')
+        .post("/api/auth/verify-email")
         .send(dto)
         .expect(401);
     });
   });
 
-  describe('GET /api/auth/verify-email/:token', () => {
-    it('should redirect to frontend with success on valid token', async () => {
+  describe("GET /api/auth/verify-email/:token", () => {
+    it("should redirect to frontend with success on valid token", async () => {
       // Arrange
-      const token = 'valid-verification-token';
+      const token = "valid-verification-token";
       const expectedResult = {
         ok: true,
-        message: 'Email verified successfully',
+        message: "Email verified successfully",
       };
 
       authService.verifyEmail.mockResolvedValue(expectedResult);
-      process.env.FRONTEND_URL = 'http://localhost:3000';
+      process.env.FRONTEND_URL = "http://localhost:3000";
 
       // Act & Assert
       const response = await request(app.getHttpServer())
         .get(`/api/auth/verify-email/${token}`)
         .expect(302);
 
-      expect(response.headers.location).toContain('email-verified');
-      expect(response.headers.location).toContain('success=true');
+      expect(response.headers.location).toContain("email-verified");
+      expect(response.headers.location).toContain("success=true");
       expect(authService.verifyEmail).toHaveBeenCalledWith(token);
     });
 
-    it('should redirect to frontend with error on invalid token', async () => {
+    it("should redirect to frontend with error on invalid token", async () => {
       // Arrange
-      const token = 'invalid-token';
+      const token = "invalid-token";
       authService.verifyEmail.mockRejectedValue(
-        new Error('Invalid verification token'),
+        new Error("Invalid verification token"),
       );
-      process.env.FRONTEND_URL = 'http://localhost:3000';
+      process.env.FRONTEND_URL = "http://localhost:3000";
 
       // Act & Assert
       const response = await request(app.getHttpServer())
         .get(`/api/auth/verify-email/${token}`)
         .expect(302);
 
-      expect(response.headers.location).toContain('email-verified');
-      expect(response.headers.location).toContain('success=false');
+      expect(response.headers.location).toContain("email-verified");
+      expect(response.headers.location).toContain("success=false");
     });
   });
 
-  describe('POST /api/auth/resend-verification', () => {
-    it('should return 200 on successful resend', async () => {
+  describe("POST /api/auth/resend-verification", () => {
+    it("should return 200 on successful resend", async () => {
       // Arrange
       const dto = {
-        email: 'test@example.com',
+        email: "test@example.com",
       };
 
       const expectedResult = {
         ok: true,
-        message: 'Verification email sent',
+        message: "Verification email sent",
         emailSent: true,
       };
 
@@ -334,7 +352,7 @@ describe('AuthController (Integration)', () => {
 
       // Act & Assert
       const response = await request(app.getHttpServer())
-        .post('/api/auth/resend-verification')
+        .post("/api/auth/resend-verification")
         .send(dto)
         .expect(200);
 
@@ -342,22 +360,23 @@ describe('AuthController (Integration)', () => {
       expect(authService.resendVerification).toHaveBeenCalledWith(dto.email);
     });
 
-    it('should return generic success message even if user not found', async () => {
+    it("should return generic success message even if user not found", async () => {
       // Arrange
       const dto = {
-        email: 'nonexistent@example.com',
+        email: "nonexistent@example.com",
       };
 
       const expectedResult = {
         ok: true,
-        message: 'If the email exists and is unverified, a verification email has been sent',
+        message:
+          "If the email exists and is unverified, a verification email has been sent",
       };
 
       authService.resendVerification.mockResolvedValue(expectedResult);
 
       // Act & Assert
       const response = await request(app.getHttpServer())
-        .post('/api/auth/resend-verification')
+        .post("/api/auth/resend-verification")
         .send(dto)
         .expect(200);
 
@@ -365,103 +384,107 @@ describe('AuthController (Integration)', () => {
     });
   });
 
-  describe('POST /api/auth/refresh-token', () => {
-    it('should return 200 with new tokens on valid refresh token', async () => {
+  describe("POST /api/auth/refresh-token", () => {
+    it("should return 200 with new tokens on valid refresh token", async () => {
       // Arrange
       const dto = {
-        refreshToken: 'valid-refresh-token',
+        refreshToken: "valid-refresh-token",
       };
 
       const expectedTokens = {
-        accessToken: 'new-access-token',
-        refreshToken: 'new-refresh-token',
+        accessToken: "new-access-token",
+        refreshToken: "new-refresh-token",
       };
 
       authService.refresh.mockResolvedValue(expectedTokens);
 
       // Act & Assert
       const response = await request(app.getHttpServer())
-        .post('/api/auth/refresh-token')
+        .post("/api/auth/refresh-token")
         .send(dto)
         .expect(200);
 
-      expect(response.body).toHaveProperty('accessToken');
-      expect(response.body).toHaveProperty('refreshToken');
+      expect(response.body).toHaveProperty("accessToken");
+      expect(response.body).toHaveProperty("refreshToken");
       expect(authService.refresh).toHaveBeenCalledWith(dto.refreshToken);
     });
 
-    it('should accept refresh token from cookie', async () => {
+    it("should accept refresh token from cookie", async () => {
       // Arrange
-      const refreshToken = 'cookie-refresh-token';
+      const refreshToken = "cookie-refresh-token";
 
       const expectedTokens = {
-        accessToken: 'new-access-token',
-        refreshToken: 'new-refresh-token',
+        accessToken: "new-access-token",
+        refreshToken: "new-refresh-token",
       };
 
       authService.refresh.mockResolvedValue(expectedTokens);
 
       // Act & Assert
       const response = await request(app.getHttpServer())
-        .post('/api/auth/refresh-token')
-        .set('Cookie', [`refreshToken=${refreshToken}`])
+        .post("/api/auth/refresh-token")
+        .set("Cookie", [`refreshToken=${refreshToken}`])
         .expect(200);
 
-      expect(response.body).toHaveProperty('accessToken');
+      expect(response.body).toHaveProperty("accessToken");
       expect(authService.refresh).toHaveBeenCalledWith(refreshToken);
     });
 
-    it('should return 401 if no refresh token provided', async () => {
+    it("should return 401 if no refresh token provided", async () => {
       // Act & Assert
       const response = await request(app.getHttpServer())
-        .post('/api/auth/refresh-token')
+        .post("/api/auth/refresh-token")
         .send({})
         .expect(401);
 
-      expect(response.body.message).toContain('Refresh token missing');
+      expect(response.body.message).toContain("Refresh token missing");
     });
 
-    it('should return 401 for invalid refresh token', async () => {
+    it("should return 401 for invalid refresh token", async () => {
       // Arrange
       const dto = {
-        refreshToken: 'invalid-token',
+        refreshToken: "invalid-token",
       };
 
-      authService.refresh.mockRejectedValue(new UnauthorizedException('Invalid refresh token'));
+      authService.refresh.mockRejectedValue(
+        new UnauthorizedException("Invalid refresh token"),
+      );
 
       // Act & Assert
       await request(app.getHttpServer())
-        .post('/api/auth/refresh-token')
+        .post("/api/auth/refresh-token")
         .send(dto)
         .expect(401);
     });
 
-    it('should return 401 for expired refresh token', async () => {
+    it("should return 401 for expired refresh token", async () => {
       // Arrange
       const dto = {
-        refreshToken: 'expired-token',
+        refreshToken: "expired-token",
       };
 
-      authService.refresh.mockRejectedValue(new UnauthorizedException('Refresh token expired'));
+      authService.refresh.mockRejectedValue(
+        new UnauthorizedException("Refresh token expired"),
+      );
 
       // Act & Assert
       await request(app.getHttpServer())
-        .post('/api/auth/refresh-token')
+        .post("/api/auth/refresh-token")
         .send(dto)
         .expect(401);
     });
   });
 
-  describe('POST /api/auth/forgot-password', () => {
-    it('should return 200 on successful request', async () => {
+  describe("POST /api/auth/forgot-password", () => {
+    it("should return 200 on successful request", async () => {
       // Arrange
       const dto = {
-        email: 'test@example.com',
+        email: "test@example.com",
       };
 
       const expectedResult = {
         ok: true,
-        message: 'Password reset email sent',
+        message: "Password reset email sent",
         emailSent: true,
       };
 
@@ -469,7 +492,7 @@ describe('AuthController (Integration)', () => {
 
       // Act & Assert
       const response = await request(app.getHttpServer())
-        .post('/api/auth/forgot-password')
+        .post("/api/auth/forgot-password")
         .send(dto)
         .expect(200);
 
@@ -477,22 +500,22 @@ describe('AuthController (Integration)', () => {
       expect(authService.forgotPassword).toHaveBeenCalledWith(dto.email);
     });
 
-    it('should return generic success message even if user not found', async () => {
+    it("should return generic success message even if user not found", async () => {
       // Arrange
       const dto = {
-        email: 'nonexistent@example.com',
+        email: "nonexistent@example.com",
       };
 
       const expectedResult = {
         ok: true,
-        message: 'If the email exists, a password reset link has been sent',
+        message: "If the email exists, a password reset link has been sent",
       };
 
       authService.forgotPassword.mockResolvedValue(expectedResult);
 
       // Act & Assert
       const response = await request(app.getHttpServer())
-        .post('/api/auth/forgot-password')
+        .post("/api/auth/forgot-password")
         .send(dto)
         .expect(200);
 
@@ -500,24 +523,24 @@ describe('AuthController (Integration)', () => {
     });
   });
 
-  describe('POST /api/auth/reset-password', () => {
-    it('should return 200 on successful password reset', async () => {
+  describe("POST /api/auth/reset-password", () => {
+    it("should return 200 on successful password reset", async () => {
       // Arrange
       const dto = {
-        token: 'valid-reset-token',
-        newPassword: 'newPassword123',
+        token: "valid-reset-token",
+        newPassword: "newPassword123",
       };
 
       const expectedResult = {
         ok: true,
-        message: 'Password reset successfully',
+        message: "Password reset successfully",
       };
 
       authService.resetPassword.mockResolvedValue(expectedResult);
 
       // Act & Assert
       const response = await request(app.getHttpServer())
-        .post('/api/auth/reset-password')
+        .post("/api/auth/reset-password")
         .send(dto)
         .expect(200);
 
@@ -528,52 +551,54 @@ describe('AuthController (Integration)', () => {
       );
     });
 
-    it('should return 401 for invalid reset token', async () => {
+    it("should return 401 for invalid reset token", async () => {
       // Arrange
       const dto = {
-        token: 'invalid-token',
-        newPassword: 'newPassword123',
+        token: "invalid-token",
+        newPassword: "newPassword123",
       };
 
-      authService.resetPassword.mockRejectedValue(new UnauthorizedException('Invalid reset token'));
+      authService.resetPassword.mockRejectedValue(
+        new UnauthorizedException("Invalid reset token"),
+      );
 
       // Act & Assert
       await request(app.getHttpServer())
-        .post('/api/auth/reset-password')
+        .post("/api/auth/reset-password")
         .send(dto)
         .expect(401);
     });
 
-    it('should return 401 for expired reset token', async () => {
+    it("should return 401 for expired reset token", async () => {
       // Arrange
       const dto = {
-        token: 'expired-token',
-        newPassword: 'newPassword123',
+        token: "expired-token",
+        newPassword: "newPassword123",
       };
 
-      authService.resetPassword.mockRejectedValue(new UnauthorizedException('Reset token expired'));
+      authService.resetPassword.mockRejectedValue(
+        new UnauthorizedException("Reset token expired"),
+      );
 
       // Act & Assert
       await request(app.getHttpServer())
-        .post('/api/auth/reset-password')
+        .post("/api/auth/reset-password")
         .send(dto)
         .expect(401);
     });
 
-    it('should return 400 for weak password', async () => {
+    it("should return 400 for weak password", async () => {
       // Arrange
       const dto = {
-        token: 'valid-reset-token',
-        newPassword: '123', // Too short
+        token: "valid-reset-token",
+        newPassword: "123", // Too short
       };
 
       // Act & Assert
       await request(app.getHttpServer())
-        .post('/api/auth/reset-password')
+        .post("/api/auth/reset-password")
         .send(dto)
         .expect(400);
     });
   });
 });
-
-

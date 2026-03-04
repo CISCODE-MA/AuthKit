@@ -1,4 +1,5 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import type { TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 import {
   BadRequestException,
   UnauthorizedException,
@@ -6,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { FacebookOAuthProvider } from '@services/oauth/providers/facebook-oauth.provider';
 import { LoggerService } from '@services/logger.service';
-import { OAuthHttpClient } from '@services/oauth/utils/oauth-http.client';
+import type { OAuthHttpClient } from '@services/oauth/utils/oauth-http.client';
 
 jest.mock('@services/oauth/utils/oauth-http.client');
 

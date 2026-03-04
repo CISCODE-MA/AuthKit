@@ -1,4 +1,4 @@
-import { ExecutionContext } from '@nestjs/common';
+import type { ExecutionContext } from '@nestjs/common';
 import { hasRole } from '@guards/role.guard';
 
 describe('RoleGuard (hasRole factory)', () => {

@@ -1,4 +1,5 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import type { TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 import { InternalServerErrorException } from '@nestjs/common';
 import axios from 'axios';
 import { OAuthHttpClient } from '@services/oauth/utils/oauth-http.client';

@@ -1,8 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import type { TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { GoogleOAuthProvider } from '@services/oauth/providers/google-oauth.provider';
 import { LoggerService } from '@services/logger.service';
-import { OAuthHttpClient } from '@services/oauth/utils/oauth-http.client';
+import type { OAuthHttpClient } from '@services/oauth/utils/oauth-http.client';
 
 jest.mock('@services/oauth/utils/oauth-http.client');
 

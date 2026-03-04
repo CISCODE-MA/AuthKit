@@ -1,5 +1,5 @@
 import { registerOAuthStrategies } from '@config/passport.config';
-import { OAuthService } from '@services/oauth.service';
+import type { OAuthService } from '@services/oauth.service';
 import passport from 'passport';
 
 jest.mock('passport', () => ({

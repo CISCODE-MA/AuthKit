@@ -1,5 +1,5 @@
-import { RegisterDto } from '@dto/auth/register.dto';
-import { LoginDto } from '@dto/auth/login.dto';
+import type { RegisterDto } from '@dto/auth/register.dto';
+import type { LoginDto } from '@dto/auth/login.dto';
 
 /**
  * Authentication tokens response

@@ -1,4 +1,5 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import type { TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 import { InternalServerErrorException } from '@nestjs/common';
 import { Types } from 'mongoose';
 import { OAuthService } from '@services/oauth.service';
@@ -6,9 +7,9 @@ import { UserRepository } from '@repos/user.repository';
 import { RoleRepository } from '@repos/role.repository';
 import { AuthService } from '@services/auth.service';
 import { LoggerService } from '@services/logger.service';
-import { GoogleOAuthProvider } from '@services/oauth/providers/google-oauth.provider';
-import { MicrosoftOAuthProvider } from '@services/oauth/providers/microsoft-oauth.provider';
-import { FacebookOAuthProvider } from '@services/oauth/providers/facebook-oauth.provider';
+import type { GoogleOAuthProvider } from '@services/oauth/providers/google-oauth.provider';
+import type { MicrosoftOAuthProvider } from '@services/oauth/providers/microsoft-oauth.provider';
+import type { FacebookOAuthProvider } from '@services/oauth/providers/facebook-oauth.provider';
 
 jest.mock('@services/oauth/providers/google-oauth.provider');
 jest.mock('@services/oauth/providers/microsoft-oauth.provider');

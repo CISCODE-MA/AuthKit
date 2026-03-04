@@ -1,6 +1,4 @@
-import type { User } from '@entities/user.entity';
-import type { Role } from '@entities/role.entity';
-import type { Permission } from '@entities/permission.entity';
+
 
 /**
  * Create a mock user for testing

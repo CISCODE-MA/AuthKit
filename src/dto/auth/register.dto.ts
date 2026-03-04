@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEmail, IsOptional, IsString, MinLength, ValidateNested, IsArray } from 'class-validator';
+import { IsEmail, IsOptional, IsString, MinLength, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
 /**
@@ -7,11 +7,11 @@ import { Type } from 'class-transformer';
  */
 class FullNameDto {
     @ApiProperty({ description: 'First name', example: 'John' })
-    @IsString() 
+    @IsString()
     fname!: string;
-    
+
     @ApiProperty({ description: 'Last name', example: 'Doe' })
-    @IsString() 
+    @IsString()
     lname!: string;
 }
 

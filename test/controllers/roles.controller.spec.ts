@@ -1,9 +1,10 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { Response } from 'express';
+import type { TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
+import type { Response } from 'express';
 import { RolesController } from '@controllers/roles.controller';
 import { RolesService } from '@services/roles.service';
-import { CreateRoleDto } from '@dto/role/create-role.dto';
-import { UpdateRoleDto, UpdateRolePermissionsDto } from '@dto/role/update-role.dto';
+import type { CreateRoleDto } from '@dto/role/create-role.dto';
+import type { UpdateRoleDto, UpdateRolePermissionsDto } from '@dto/role/update-role.dto';
 import { AdminGuard } from '@guards/admin.guard';
 import { AuthenticateGuard } from '@guards/authenticate.guard';
 

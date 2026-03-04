@@ -1,4 +1,5 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import type { TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 import { InternalServerErrorException } from '@nestjs/common';
 import { AdminRoleService } from '@services/admin-role.service';
 import { RoleRepository } from '@repos/role.repository';

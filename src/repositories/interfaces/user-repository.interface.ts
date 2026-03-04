@@ -1,6 +1,6 @@
-import { Types } from 'mongoose';
-import { IRepository } from './repository.interface';
-import { User } from '@entities/user.entity';
+import type { Types } from 'mongoose';
+import type { IRepository } from './repository.interface';
+import type { User } from '@entities/user.entity';
 
 /**
  * User repository interface extending base repository

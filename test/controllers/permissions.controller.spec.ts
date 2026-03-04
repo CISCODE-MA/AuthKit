@@ -1,9 +1,10 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { Response } from 'express';
+import type { TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
+import type { Response } from 'express';
 import { PermissionsController } from '@controllers/permissions.controller';
 import { PermissionsService } from '@services/permissions.service';
-import { CreatePermissionDto } from '@dto/permission/create-permission.dto';
-import { UpdatePermissionDto } from '@dto/permission/update-permission.dto';
+import type { CreatePermissionDto } from '@dto/permission/create-permission.dto';
+import type { UpdatePermissionDto } from '@dto/permission/update-permission.dto';
 import { AdminGuard } from '@guards/admin.guard';
 import { AuthenticateGuard } from '@guards/authenticate.guard';
 

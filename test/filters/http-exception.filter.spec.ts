@@ -1,6 +1,7 @@
 import { GlobalExceptionFilter } from '@filters/http-exception.filter';
-import { HttpException, HttpStatus, ArgumentsHost } from '@nestjs/common';
-import { Request, Response } from 'express';
+import type { ArgumentsHost } from '@nestjs/common';
+import { HttpException, HttpStatus } from '@nestjs/common';
+import type { Request, Response } from 'express';
 
 describe('GlobalExceptionFilter', () => {
   let filter: GlobalExceptionFilter;

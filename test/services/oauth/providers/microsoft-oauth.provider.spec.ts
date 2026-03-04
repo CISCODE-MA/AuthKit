@@ -1,4 +1,5 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import type { TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 import jwt from 'jsonwebtoken';
 import { MicrosoftOAuthProvider } from '@services/oauth/providers/microsoft-oauth.provider';

@@ -10,7 +10,7 @@ import {
     BadRequestException,
     InternalServerErrorException,
 } from '@nestjs/common';
-import { LoggerService } from '@services/logger.service';
+import type { LoggerService } from '@services/logger.service';
 
 export class OAuthErrorHandler {
     constructor(private readonly logger: LoggerService) {}

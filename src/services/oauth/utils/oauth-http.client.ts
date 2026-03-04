@@ -5,9 +5,10 @@
  * for OAuth API calls.
  */
 
-import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+import type { AxiosError, AxiosRequestConfig } from 'axios';
+import axios from 'axios';
 import { InternalServerErrorException } from '@nestjs/common';
-import { LoggerService } from '@services/logger.service';
+import type { LoggerService } from '@services/logger.service';
 
 export class OAuthHttpClient {
     private readonly config: AxiosRequestConfig = {

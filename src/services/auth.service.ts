@@ -100,18 +100,18 @@ export class AuthService {
             // Manually query roles by IDs
             const roleIds = user.roles || [];
             const roles = await this.roles.findByIds(roleIds.map(id => id.toString()));
-            
+
             console.log('[DEBUG] Roles from DB:', roles);
 
             // Extract role names
             const roleNames = roles.map(r => r.name).filter(Boolean);
-            
+
             // Extract all permission IDs from all roles
             const permissionIds = roles.flatMap(role => {
                 if (!role.permissions || role.permissions.length === 0) return [];
                 return role.permissions.map((p: any) => p.toString ? p.toString() : p);
             }).filter(Boolean);
-            
+
             console.log('[DEBUG] Permission IDs:', permissionIds);
 
             // Query permissions by IDs to get names
@@ -180,7 +180,7 @@ export class AuthService {
 
             // Return user data without sensitive information
             const userObject = user.toObject ? user.toObject() : user;
-            const { password, passwordChangedAt, ...safeUser } = userObject as any;
+            const { password: _password, passwordChangedAt: _passwordChangedAt, ...safeUser } = userObject as any;
 
             return {
                 ok: true,

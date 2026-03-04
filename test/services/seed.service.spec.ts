@@ -1,4 +1,5 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import type { TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 import { SeedService } from '@services/seed.service';
 import { RoleRepository } from '@repos/role.repository';
 import { PermissionRepository } from '@repos/permission.repository';

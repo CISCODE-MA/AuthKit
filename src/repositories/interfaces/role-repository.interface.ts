@@ -1,6 +1,6 @@
-import { Types } from 'mongoose';
-import { IRepository } from './repository.interface';
-import { Role } from '@entities/role.entity';
+import type { Types } from 'mongoose';
+import type { IRepository } from './repository.interface';
+import type { Role } from '@entities/role.entity';
 
 /**
  * Role repository interface

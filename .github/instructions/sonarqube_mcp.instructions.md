@@ -1,5 +1,5 @@
 ---
-applyTo: '**/*'
+applyTo: "**/*"
 ---
 
 These are some guidelines when using the SonarQube MCP server.

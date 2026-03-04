@@ -1,5 +1,5 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Document, Types } from "mongoose";
 
 export type UserDocument = User & Document;
 
@@ -19,7 +19,13 @@ export class User {
   @Prop({ type: FullNameSchema, required: true })
   fullname!: FullName;
 
-  @Prop({ required: true, unique: true, trim: true, minlength: 3, maxlength: 30 })
+  @Prop({
+    required: true,
+    unique: true,
+    trim: true,
+    minlength: 3,
+    maxlength: 30,
+  })
   username!: string;
 
   @Prop({
@@ -31,7 +37,7 @@ export class User {
   })
   email!: string;
 
-  @Prop({ default: 'default.jpg' })
+  @Prop({ default: "default.jpg" })
   avatar?: string;
 
   @Prop({
@@ -48,7 +54,7 @@ export class User {
   @Prop({ default: Date.now })
   passwordChangedAt!: Date;
 
-  @Prop({ type: [{ type: Types.ObjectId, ref: 'Role' }], required: true })
+  @Prop({ type: [{ type: Types.ObjectId, ref: "Role" }], required: true })
   roles!: Types.ObjectId[];
 
   @Prop({ default: false })
@@ -62,7 +68,6 @@ export class User {
 
   @Prop({ trim: true, sparse: true })
   company?: string;
-
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -15,6 +15,7 @@ Each task follows the template in main app but with MODULE- prefix.
 ## Breaking Changes
 
 For module tasks, ALWAYS document:
+
 - What changes in public API
 - How apps need to update
 - Migration guide if needed

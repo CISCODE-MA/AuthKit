@@ -1,5 +1,5 @@
 export function getMillisecondsFromExpiry(expiry: string | number): number {
-  if (typeof expiry === 'number') {
+  if (typeof expiry === "number") {
     return expiry * 1000;
   }
 
@@ -7,13 +7,13 @@ export function getMillisecondsFromExpiry(expiry: string | number): number {
   const value = parseInt(expiry.slice(0, -1), 10);
 
   switch (unit) {
-    case 's':
+    case "s":
       return value * 1000;
-    case 'm':
+    case "m":
       return value * 60 * 1000;
-    case 'h':
+    case "h":
       return value * 60 * 60 * 1000;
-    case 'd':
+    case "d":
       return value * 24 * 60 * 60 * 1000;
     default:
       return 0;

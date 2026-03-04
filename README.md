@@ -84,9 +84,9 @@ NODE_ENV=development
 ### 2. Host app example
 
 ```typescript
-import { Module, OnModuleInit } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
-import { AuthKitModule, SeedService } from '@ciscode/authentication-kit';
+import { Module, OnModuleInit } from "@nestjs/common";
+import { MongooseModule } from "@nestjs/mongoose";
+import { AuthKitModule, SeedService } from "@ciscode/authentication-kit";
 
 @Module({
   imports: [MongooseModule.forRoot(process.env.MONGO_URI), AuthKitModule],

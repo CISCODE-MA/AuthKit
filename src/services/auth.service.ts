@@ -184,7 +184,7 @@ export class AuthService {
 
             return {
                 ok: true,
-                data: safeUser
+                data: safeUser,
             };
         } catch (error) {
             if (error instanceof NotFoundException || error instanceof ForbiddenException) {

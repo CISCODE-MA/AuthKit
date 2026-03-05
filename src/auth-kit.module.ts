@@ -1,38 +1,44 @@
-import 'dotenv/config';
-import { MiddlewareConsumer, Module, NestModule, OnModuleInit, RequestMethod } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
-import { APP_FILTER } from '@nestjs/core';
-import cookieParser from 'cookie-parser';
+import "dotenv/config";
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  OnModuleInit,
+  RequestMethod,
+} from "@nestjs/common";
+import { MongooseModule } from "@nestjs/mongoose";
+import { APP_FILTER } from "@nestjs/core";
+import cookieParser from "cookie-parser";
 
-import { AuthController } from '@controllers/auth.controller';
-import { UsersController } from '@controllers/users.controller';
-import { RolesController } from '@controllers/roles.controller';
-import { PermissionsController } from '@controllers/permissions.controller';
-import { HealthController } from '@controllers/health.controller';
+import { AuthController } from "@controllers/auth.controller";
+import { UsersController } from "@controllers/users.controller";
+import { RolesController } from "@controllers/roles.controller";
+import { PermissionsController } from "@controllers/permissions.controller";
+import { HealthController } from "@controllers/health.controller";
 
-import { User, UserSchema } from '@entities/user.entity';
-import { Role, RoleSchema } from '@entities/role.entity';
-import { Permission, PermissionSchema } from '@entities/permission.entity';
+import { User, UserSchema } from "@entities/user.entity";
+import { Role, RoleSchema } from "@entities/role.entity";
+import { Permission, PermissionSchema } from "@entities/permission.entity";
 
-import { AuthService } from '@services/auth.service';
-import { UsersService } from '@services/users.service';
-import { RolesService } from '@services/roles.service';
-import { PermissionsService } from '@services/permissions.service';
-import { MailService } from '@services/mail.service';
-import { SeedService } from '@services/seed.service';
-import { LoggerService } from '@services/logger.service';
+import { AuthService } from "@services/auth.service";
+import { UsersService } from "@services/users.service";
+import { RolesService } from "@services/roles.service";
+import { PermissionsService } from "@services/permissions.service";
+import { MailService } from "@services/mail.service";
+import { SeedService } from "@services/seed.service";
+import { LoggerService } from "@services/logger.service";
 
-import { UserRepository } from '@repos/user.repository';
-import { RoleRepository } from '@repos/role.repository';
-import { PermissionRepository } from '@repos/permission.repository';
+import { UserRepository } from "@repos/user.repository";
+import { RoleRepository } from "@repos/role.repository";
+import { PermissionRepository } from "@repos/permission.repository";
 
-import { AuthenticateGuard } from '@guards/authenticate.guard';
-import { AdminGuard } from '@guards/admin.guard';
-import { AdminRoleService } from '@services/admin-role.service';
-import { OAuthService } from '@services/oauth.service';
-import { GlobalExceptionFilter } from '@filters/http-exception.filter';
-import passport from 'passport';
-import { registerOAuthStrategies } from '@config/passport.config';
+import { AuthenticateGuard } from "@guards/authenticate.guard";
+import { AdminGuard } from "@guards/admin.guard";
+import { AdminRoleService } from "@services/admin-role.service";
+import { OAuthService } from "@services/oauth.service";
+import { GlobalExceptionFilter } from "@filters/http-exception.filter";
+import passport from "passport";
+import { registerOAuthStrategies } from "@config/passport.config";
 
 @Module({
   imports: [
@@ -85,7 +91,7 @@ import { registerOAuthStrategies } from '@config/passport.config';
   ],
 })
 export class AuthKitModule implements NestModule, OnModuleInit {
-  constructor(private readonly oauth: OAuthService) { }
+  constructor(private readonly oauth: OAuthService) {}
 
   onModuleInit() {
     registerOAuthStrategies(this.oauth);
@@ -94,6 +100,6 @@ export class AuthKitModule implements NestModule, OnModuleInit {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(cookieParser(), passport.initialize())
-      .forRoutes({ path: '*', method: RequestMethod.ALL });
+      .forRoutes({ path: "*", method: RequestMethod.ALL });
   }
 }

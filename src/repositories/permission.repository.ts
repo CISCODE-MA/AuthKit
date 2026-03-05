@@ -1,41 +1,47 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import type { Model, Types } from 'mongoose';
-import { Permission, PermissionDocument } from '@entities/permission.entity';
-import { IPermissionRepository } from './interfaces/permission-repository.interface';
+import { Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import type { Model, Types } from "mongoose";
+import { Permission, PermissionDocument } from "@entities/permission.entity";
+import { IPermissionRepository } from "./interfaces/permission-repository.interface";
 
 /**
  * Permission repository implementation using Mongoose
  */
 @Injectable()
 export class PermissionRepository implements IPermissionRepository {
-    constructor(@InjectModel(Permission.name) private readonly permModel: Model<PermissionDocument>) { }
+  constructor(
+    @InjectModel(Permission.name)
+    private readonly permModel: Model<PermissionDocument>,
+  ) {}
 
-    create(data: Partial<Permission>) {
-        return this.permModel.create(data);
-    }
+  create(data: Partial<Permission>) {
+    return this.permModel.create(data);
+  }
 
-    findById(id: string | Types.ObjectId) {
-        return this.permModel.findById(id);
-    }
+  findById(id: string | Types.ObjectId) {
+    return this.permModel.findById(id);
+  }
 
-    findByName(name: string) {
-        return this.permModel.findOne({ name });
-    }
+  findByName(name: string) {
+    return this.permModel.findOne({ name });
+  }
 
-    list() {
-        return this.permModel.find().lean();
-    }
+  list() {
+    return this.permModel.find().lean();
+  }
 
-    updateById(id: string | Types.ObjectId, data: Partial<Permission>) {
-        return this.permModel.findByIdAndUpdate(id, data, { new: true });
-    }
+  updateById(id: string | Types.ObjectId, data: Partial<Permission>) {
+    return this.permModel.findByIdAndUpdate(id, data, { new: true });
+  }
 
-    deleteById(id: string | Types.ObjectId) {
-        return this.permModel.findByIdAndDelete(id);
-    }
+  deleteById(id: string | Types.ObjectId) {
+    return this.permModel.findByIdAndDelete(id);
+  }
 
-    findByIds(ids: string[]) {
-        return this.permModel.find({ _id: { $in: ids } }).lean().exec();
-    }
+  findByIds(ids: string[]) {
+    return this.permModel
+      .find({ _id: { $in: ids } })
+      .lean()
+      .exec();
+  }
 }

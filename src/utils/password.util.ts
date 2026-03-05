@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import bcrypt from 'bcryptjs';
+=======
+import bcrypt from "bcryptjs";
+>>>>>>> 3e15d93b706eeffb27c8710ef8c593767c9a564e
 
 /**
  * Default number of salt rounds for password hashing

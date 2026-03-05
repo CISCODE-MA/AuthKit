@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 import { RegisterDto } from '@dto/auth/register.dto';
 import { LoginDto } from '@dto/auth/login.dto';
+=======
+import type { RegisterDto } from "@dto/auth/register.dto";
+import type { LoginDto } from "@dto/auth/login.dto";
+>>>>>>> 3e15d93b706eeffb27c8710ef8c593767c9a564e
 
 /**
  * Authentication tokens response

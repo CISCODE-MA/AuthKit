@@ -1,4 +1,9 @@
-import { CanActivate, ExecutionContext, Injectable, mixin } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  mixin,
+} from "@nestjs/common";
 
 export const hasRole = (requiredRoleId: string) => {
   @Injectable()
@@ -10,7 +15,7 @@ export const hasRole = (requiredRoleId: string) => {
 
       if (roles.includes(requiredRoleId)) return true;
 
-      res.status(403).json({ message: 'Forbidden: role required.' });
+      res.status(403).json({ message: "Forbidden: role required." });
       return false;
     }
   }

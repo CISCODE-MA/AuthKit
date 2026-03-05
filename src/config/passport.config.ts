@@ -1,28 +1,36 @@
-import passport from 'passport';
-import { Strategy as AzureStrategy } from 'passport-azure-ad-oauth2';
-import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import { Strategy as FacebookStrategy } from 'passport-facebook';
-import { OAuthService } from '@services/oauth.service';
-import axios from 'axios';
+import passport from "passport";
+import { Strategy as AzureStrategy } from "passport-azure-ad-oauth2";
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import { Strategy as FacebookStrategy } from "passport-facebook";
+import type { OAuthService } from "@services/oauth.service";
+import axios from "axios";
 
-export const registerOAuthStrategies = (
-  oauth: OAuthService
-) => {
+export const registerOAuthStrategies = (oauth: OAuthService) => {
   // Microsoft
-  if (process.env.MICROSOFT_CLIENT_ID && process.env.MICROSOFT_CLIENT_SECRET && process.env.MICROSOFT_CALLBACK_URL) {
+  if (
+    process.env.MICROSOFT_CLIENT_ID &&
+    process.env.MICROSOFT_CLIENT_SECRET &&
+    process.env.MICROSOFT_CALLBACK_URL
+  ) {
     passport.use(
-      'azure_ad_oauth2',
+      "azure_ad_oauth2",
       new AzureStrategy(
         {
           clientID: process.env.MICROSOFT_CLIENT_ID,
           clientSecret: process.env.MICROSOFT_CLIENT_SECRET,
           callbackURL: process.env.MICROSOFT_CALLBACK_URL,
-          resource: 'https://graph.microsoft.com',
-          tenant: process.env.MICROSOFT_TENANT_ID || 'common'
+          resource: "https://graph.microsoft.com",
+          tenant: process.env.MICROSOFT_TENANT_ID || "common",
         },
-        async (accessToken: any, _rt: any, _params: any, _profile: any, done: any) => {
+        async (
+          accessToken: any,
+          _rt: any,
+          _params: any,
+          _profile: any,
+          done: any,
+        ) => {
           try {
-            const me = await axios.get('https://graph.microsoft.com/v1.0/me', {
+            const me = await axios.get("https://graph.microsoft.com/v1.0/me", {
               headers: { Authorization: `Bearer ${accessToken}` },
             });
 
@@ -38,15 +46,19 @@ export const registerOAuthStrategies = (
           } catch (err) {
             return done(err);
           }
-        }
-      )
+        },
+      ),
     );
   }
 
   // Google
-  if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.env.GOOGLE_CALLBACK_URL) {
+  if (
+    process.env.GOOGLE_CLIENT_ID &&
+    process.env.GOOGLE_CLIENT_SECRET &&
+    process.env.GOOGLE_CALLBACK_URL
+  ) {
     passport.use(
-      'google',
+      "google",
       new GoogleStrategy(
         {
           clientID: process.env.GOOGLE_CLIENT_ID,
@@ -57,38 +69,48 @@ export const registerOAuthStrategies = (
           try {
             const email = profile.emails?.[0]?.value;
             if (!email) return done(null, false);
-            const { accessToken, refreshToken } = await oauth.findOrCreateOAuthUser(email, profile.displayName);
+            const { accessToken, refreshToken } =
+              await oauth.findOrCreateOAuthUser(email, profile.displayName);
             return done(null, { accessToken, refreshToken });
           } catch (err) {
             return done(err);
           }
-        }
-      )
+        },
+      ),
     );
   }
 
   // Facebook
-  if (process.env.FB_CLIENT_ID && process.env.FB_CLIENT_SECRET && process.env.FB_CALLBACK_URL) {
+  if (
+    process.env.FB_CLIENT_ID &&
+    process.env.FB_CLIENT_SECRET &&
+    process.env.FB_CALLBACK_URL
+  ) {
     passport.use(
-      'facebook',
+      "facebook",
       new FacebookStrategy(
         {
           clientID: process.env.FB_CLIENT_ID,
           clientSecret: process.env.FB_CLIENT_SECRET,
           callbackURL: process.env.FB_CALLBACK_URL,
-          profileFields: ['id', 'displayName'],
+          profileFields: ["id", "displayName"],
         },
         async (_at: any, _rt: any, profile: any, done: any) => {
           try {
             // Use Facebook ID as email fallback (testing without email permission)
-            const email = profile.emails?.[0]?.value || `${profile.id}@facebook.test`;
-            const { accessToken, refreshToken } = await oauth.findOrCreateOAuthUser(email, profile.displayName || 'Facebook User');
+            const email =
+              profile.emails?.[0]?.value || `${profile.id}@facebook.test`;
+            const { accessToken, refreshToken } =
+              await oauth.findOrCreateOAuthUser(
+                email,
+                profile.displayName || "Facebook User",
+              );
             return done(null, { accessToken, refreshToken });
           } catch (err) {
             return done(err);
           }
-        }
-      )
+        },
+      ),
     );
   }
 };

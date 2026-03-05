@@ -1,42 +1,47 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import type { Model, Types } from 'mongoose';
-import { Role, RoleDocument } from '@entities/role.entity';
-import { IRoleRepository } from './interfaces/role-repository.interface';
+import { Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import type { Model, Types } from "mongoose";
+import { Role, RoleDocument } from "@entities/role.entity";
+import { IRoleRepository } from "./interfaces/role-repository.interface";
 
 /**
  * Role repository implementation using Mongoose
  */
 @Injectable()
 export class RoleRepository implements IRoleRepository {
-    constructor(@InjectModel(Role.name) private readonly roleModel: Model<RoleDocument>) { }
+  constructor(
+    @InjectModel(Role.name) private readonly roleModel: Model<RoleDocument>,
+  ) {}
 
-    create(data: Partial<Role>) {
-        return this.roleModel.create(data);
-    }
+  create(data: Partial<Role>) {
+    return this.roleModel.create(data);
+  }
 
-    findById(id: string | Types.ObjectId) {
-        return this.roleModel.findById(id);
-    }
+  findById(id: string | Types.ObjectId) {
+    return this.roleModel.findById(id);
+  }
 
-    findByName(name: string) {
-        return this.roleModel.findOne({ name });
-    }
+  findByName(name: string) {
+    return this.roleModel.findOne({ name });
+  }
 
-    list() {
-        return this.roleModel.find().populate('permissions').lean();
-    }
+  list() {
+    return this.roleModel.find().populate("permissions").lean();
+  }
 
-    updateById(id: string | Types.ObjectId, data: Partial<Role>) {
-        return this.roleModel.findByIdAndUpdate(id, data, { new: true });
-    }
+  updateById(id: string | Types.ObjectId, data: Partial<Role>) {
+    return this.roleModel.findByIdAndUpdate(id, data, { new: true });
+  }
 
-    deleteById(id: string | Types.ObjectId) {
-        return this.roleModel.findByIdAndDelete(id);
-    }
+  deleteById(id: string | Types.ObjectId) {
+    return this.roleModel.findByIdAndDelete(id);
+  }
 
-    findByIds(ids: string[]) {
-        return this.roleModel.find({ _id: { $in: ids } }).populate('permissions').lean().exec();
-    }
-
+  findByIds(ids: string[]) {
+    return this.roleModel
+      .find({ _id: { $in: ids } })
+      .populate("permissions")
+      .lean()
+      .exec();
+  }
 }

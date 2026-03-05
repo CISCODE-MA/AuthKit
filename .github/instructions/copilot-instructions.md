@@ -92,12 +92,12 @@ src/
 
 ```typescript
 // src/index.ts - Only export what consumers need
-export { AuthKitModule } from "./auth-kit.module";
-export { AuthService, UsersService, RolesService } from "./services";
-export { AuthenticateGuard, AdminGuard, hasRole } from "./middleware";
-export { CurrentUser, Admin } from "./decorators";
-export { SeedService } from "./seed.service";
-export type { User, Role, Permission } from "./models";
+export { AuthKitModule } from './auth-kit.module';
+export { AuthService, UsersService, RolesService } from './services';
+export { AuthenticateGuard, AdminGuard, hasRole } from './middleware';
+export { CurrentUser, Admin } from './decorators';
+export { SeedService } from './seed.service';
+export type { User, Role, Permission } from './models';
 ```
 
 ---
@@ -232,13 +232,13 @@ async login(@Body() dto: LoginDto) { }
 
 ```typescript
 // ✅ Export what apps need
-export { AuthService } from "./auth/auth.service";
-export { AuthenticateGuard } from "./middleware/guards";
-export { CurrentUser } from "./decorators";
+export { AuthService } from './auth/auth.service';
+export { AuthenticateGuard } from './middleware/guards';
+export { CurrentUser } from './decorators';
 
 // ❌ NEVER export
-export { AuthRepository } from "./auth/auth.repository"; // Internal
-export { User } from "./models"; // Internal
+export { AuthRepository } from './auth/auth.repository'; // Internal
+export { User } from './models'; // Internal
 ```
 
 ### 3. Configuration
@@ -251,7 +251,7 @@ export class AuthKitModule {
   static forRoot(options: AuthKitOptions): DynamicModule {
     return {
       module: AuthKitModule,
-      providers: [{ provide: "AUTH_OPTIONS", useValue: options }, AuthService],
+      providers: [{ provide: 'AUTH_OPTIONS', useValue: options }, AuthService],
       exports: [AuthService],
     };
   }

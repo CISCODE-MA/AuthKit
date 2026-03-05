@@ -342,16 +342,16 @@ Error: Invalid ID token
 
    ```typescript
    // ✅ Correct - send ID token
-   fetch("/api/auth/oauth/google", {
-     method: "POST",
+   fetch('/api/auth/oauth/google', {
+     method: 'POST',
      body: JSON.stringify({
        idToken: googleResponse.tokenId,
      }),
    });
 
    // ❌ Wrong - using code
-   fetch("/api/auth/oauth/google", {
-     method: "POST",
+   fetch('/api/auth/oauth/google', {
+     method: 'POST',
      body: JSON.stringify({
        code: googleResponse.code, // Wrong format
      }),
@@ -466,14 +466,14 @@ UnauthorizedException: Unauthorized
 
    ```typescript
    // ✅ Correct
-   fetch("/api/auth/me", {
+   fetch('/api/auth/me', {
      headers: {
-       Authorization: "Bearer " + accessToken,
+       Authorization: 'Bearer ' + accessToken,
      },
    });
 
    // ❌ Wrong
-   fetch("/api/auth/me");
+   fetch('/api/auth/me');
    ```
 
 2. **Invalid Authorization format:**
@@ -537,15 +537,15 @@ ForbiddenException: Permission denied
 
 ```typescript
 // In your main.ts or app.module.ts
-import { Logger } from "@nestjs/common";
+import { Logger } from '@nestjs/common';
 
 const logger = new Logger();
-logger.debug("AuthKit initialized");
+logger.debug('AuthKit initialized');
 
 // For development, log JWT payload
-import * as jwt from "jsonwebtoken";
+import * as jwt from 'jsonwebtoken';
 const decoded = jwt.decode(token);
-logger.debug("Token payload:", decoded);
+logger.debug('Token payload:', decoded);
 ```
 
 ### Check JWT Payload

@@ -10,10 +10,14 @@ async function testRepositoryPopulate() {
   const app = await NestFactory.createApplicationContext(AppModule);
   const userRepo = app.get(UserRepository);
 
-  console.log('\n=== Testing UserRepository.findByIdWithRolesAndPermissions ===\n');
+  console.log(
+    '\n=== Testing UserRepository.findByIdWithRolesAndPermissions ===\n',
+  );
 
-  const user = await userRepo.findByIdWithRolesAndPermissions('6983622688347e9d3b51ca00');
-  
+  const user = await userRepo.findByIdWithRolesAndPermissions(
+    '6983622688347e9d3b51ca00',
+  );
+
   console.log('User ID:', user?._id);
   console.log('User email:', user?.email);
   console.log('\nuser.roles (typeof):', typeof user?.roles);

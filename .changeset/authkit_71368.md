@@ -1,5 +1,5 @@
 ---
-"@ciscode/authentication-kit": patch
+'@ciscode/authentication-kit': patch
 ---
 
 ## Summary

@@ -19,6 +19,7 @@
 **Status**: 🟡 Partially complete
 
 **Completed**:
+
 - ✅ Auth Kit UI integrated
 - ✅ Login page functional
 - ✅ Auth guards implemented
@@ -26,6 +27,7 @@
 - ✅ Route protection working
 
 **To Complete** (1-2 days):
+
 - [ ] Register page full implementation
 - [ ] Forgot/Reset password flow UI
 - [ ] Email verification flow UI
@@ -44,6 +46,7 @@
 **Goal**: Align frontend structure with backend best practices
 
 **Tasks** (2-3 days):
+
 1. **Restructure** `src/` folder
    - Separate reusable components from page templates
    - Clear hooks/services/models organization
@@ -73,11 +76,13 @@
 ### Goal: Verify complete auth flows in ComptAlEyes
 
 **Setup** (½ day):
+
 - Install Playwright
 - Configure test environment
 - Setup test database
 
 **Test Scenarios** (1-2 days):
+
 - Registration → Email verify → Login
 - Login → Access protected route
 - Forgot password → Reset → Login
@@ -94,6 +99,7 @@
 ### For Auth Kit Backend
 
 **Improvements** (1 day):
+
 - Add JSDoc to all public methods (currently ~60%)
 - Complete Swagger decorators
 - More usage examples in README
@@ -102,6 +108,7 @@
 ### For Auth Kit UI
 
 **Create** (1 day):
+
 - Component API documentation
 - Customization guide (theming, styling)
 - Advanced usage examples
@@ -114,12 +121,14 @@
 ### Goal: Extract learnings and update developer kits
 
 **NestJS Developer Kit** (1 day):
+
 - Update Copilot instructions with Auth Kit patterns
 - Document CSR architecture more clearly
 - Testing best practices from Auth Kit
 - Public API export guidelines
 
 **ReactTS Developer Kit** (1 day):
+
 - Update instructions with Auth Kit UI patterns
 - Hook-first API approach
 - Component organization best practices
@@ -134,6 +143,7 @@
 ### Auth Kit Backend
 
 **Low priority fixes**:
+
 - Increase config layer coverage (currently 37%)
 - Add more edge case tests
 - Performance optimization
@@ -142,6 +152,7 @@
 ### Auth Kit UI
 
 **Polish**:
+
 - Accessibility improvements
 - Mobile responsiveness refinement
 - Loading skeleton components
@@ -152,6 +163,7 @@
 ## 🔐 Priority 7: Security Audit (Before v2.0.0)
 
 **Tasks** (1-2 days):
+
 - Review all input validation
 - Check for common vulnerabilities
 - Rate limiting recommendations
@@ -164,12 +176,14 @@
 ### Prepare for npm publish
 
 **Tasks** (½ day):
+
 - Verify package.json metadata
 - Test installation in clean project
 - Create migration guide
 - Publish to npm (or private registry)
 
 **Files to check**:
+
 - `package.json` - correct metadata
 - `README.md` - installation instructions
 - `CHANGELOG.md` - version history
@@ -180,18 +194,22 @@
 ## 🎯 Roadmap Summary
 
 ### This Week (Priority 1-2)
+
 - Complete ComptAlEyes frontend integration
 - Start Auth Kit UI refactoring
 
 ### Next Week (Priority 3-4)
+
 - E2E testing
 - Documentation polish
 
 ### Following Week (Priority 5-6)
+
 - Update templates
 - Minor improvements
 
 ### Before Release (Priority 7-8)
+
 - Security audit
 - Package publishing
 
@@ -200,13 +218,15 @@
 ## 📝 Task Tracking
 
 Use `docs/tasks/active/` for work in progress:
+
 - Create task document before starting
 - Track progress and decisions
 - Archive on completion
 
 ---
 
-**Next Immediate Action**: 
+**Next Immediate Action**:
+
 1. Continue work on `test/auth-integration` branch
 2. Complete Register/Forgot/Reset pages
 3. Then move to Auth Kit UI refactoring

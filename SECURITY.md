@@ -192,7 +192,7 @@ Reporter: security@example.com
 
    // ❌ DON'T - Allow all origins with credentials
    app.enableCors({
-     origin: "*",
+     origin: '*',
      credentials: true, // BAD
    });
    ```

@@ -49,7 +49,12 @@ This release refactors the module architecture to align with the **Controller-Se
 
 ```typescript
 // ✅ This continues to work (recommended usage)
-import { AuthKitModule, AuthService, LoginDto, AuthenticateGuard } from '@ciscode/authentication-kit';
+import {
+  AuthKitModule,
+  AuthService,
+  LoginDto,
+  AuthenticateGuard,
+} from '@ciscode/authentication-kit';
 ```
 
 **If you were importing from internal paths (NOT recommended), update imports:**
@@ -83,4 +88,3 @@ The 4-layer Clean Architecture is now reserved for complex business applications
 ## [1.5.0] - Previous Release
 
 (Previous changelog entries...)
-

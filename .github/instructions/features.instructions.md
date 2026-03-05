@@ -113,10 +113,10 @@ async getUsersByRole(roleId: string): Promise<User[]> {
 **File**: [src/repositories/user.repository.ts](src/repositories/user.repository.ts)
 
 ```typescript
-import { Injectable } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
-import { Model, Types } from "mongoose";
-import { User, UserDocument } from "@models/user.model";
+import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, Types } from 'mongoose';
+import { User, UserDocument } from '@models/user.model';
 
 @Injectable()
 export class UserRepository {
@@ -129,7 +129,7 @@ export class UserRepository {
   async findByRole(roleId: string | Types.ObjectId) {
     return this.userModel
       .find({ roles: roleId })
-      .populate({ path: "roles", select: "name" })
+      .populate({ path: 'roles', select: 'name' })
       .lean();
   }
 }
@@ -140,10 +140,10 @@ export class UserRepository {
 **File**: [src/services/users.service.ts](src/services/users.service.ts)
 
 ```typescript
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { UserRepository } from "@repos/user.repository";
-import { RoleRepository } from "@repos/role.repository";
-import { LoggerService } from "@services/logger.service";
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { UserRepository } from '@repos/user.repository';
+import { RoleRepository } from '@repos/role.repository';
+import { LoggerService } from '@services/logger.service';
 
 @Injectable()
 export class UsersService {
@@ -167,7 +167,7 @@ export class UsersService {
       const users = await this.users.findByRole(roleId);
       this.logger.log(
         `Retrieved ${users.length} users for role ${roleId}`,
-        "UsersService",
+        'UsersService',
       );
       return users;
     } catch (error) {
@@ -177,9 +177,9 @@ export class UsersService {
       this.logger.error(
         `Failed to get users by role: ${error.message}`,
         error.stack,
-        "UsersService",
+        'UsersService',
       );
-      throw new InternalServerErrorException("Failed to retrieve users");
+      throw new InternalServerErrorException('Failed to retrieve users');
     }
   }
 }
@@ -190,20 +190,20 @@ export class UsersService {
 **File**: [src/controllers/users.controller.ts](src/controllers/users.controller.ts)
 
 ```typescript
-import { Controller, Get, Param, UseGuards } from "@nestjs/common";
-import { UsersService } from "@services/users.service";
-import { AuthenticateGuard } from "@middleware/authenticate.guard";
-import { AdminGuard } from "@middleware/admin.guard";
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import { UsersService } from '@services/users.service';
+import { AuthenticateGuard } from '@middleware/authenticate.guard';
+import { AdminGuard } from '@middleware/admin.guard';
 
-@Controller("api/users")
+@Controller('api/users')
 @UseGuards(AuthenticateGuard, AdminGuard)
 export class UsersController {
   constructor(private readonly users: UsersService) {}
 
   // ... existing endpoints ...
 
-  @Get("by-role/:roleId")
-  async getUsersByRole(@Param("roleId") roleId: string) {
+  @Get('by-role/:roleId')
+  async getUsersByRole(@Param('roleId') roleId: string) {
     return this.users.getUsersByRole(roleId);
   }
 }
@@ -214,33 +214,33 @@ export class UsersController {
 **File**: [src/services/users.service.spec.ts](src/services/users.service.spec.ts)
 
 ```typescript
-describe("UsersService", () => {
+describe('UsersService', () => {
   let service: UsersService;
   let userRepository: jest.Mocked<UserRepository>;
   let roleRepository: jest.Mocked<RoleRepository>;
 
-  describe("getUsersByRole", () => {
-    it("should return users for valid role ID", async () => {
-      const mockRole = { _id: "role123", name: "admin" };
+  describe('getUsersByRole', () => {
+    it('should return users for valid role ID', async () => {
+      const mockRole = { _id: 'role123', name: 'admin' };
       const mockUsers = [
-        { _id: "user1", email: "user1@example.com", roles: ["role123"] },
-        { _id: "user2", email: "user2@example.com", roles: ["role123"] },
+        { _id: 'user1', email: 'user1@example.com', roles: ['role123'] },
+        { _id: 'user2', email: 'user2@example.com', roles: ['role123'] },
       ];
 
       roleRepository.findById.mockResolvedValue(mockRole as any);
       userRepository.findByRole.mockResolvedValue(mockUsers as any);
 
-      const result = await service.getUsersByRole("role123");
+      const result = await service.getUsersByRole('role123');
 
       expect(result).toEqual(mockUsers);
-      expect(roleRepository.findById).toHaveBeenCalledWith("role123");
-      expect(userRepository.findByRole).toHaveBeenCalledWith("role123");
+      expect(roleRepository.findById).toHaveBeenCalledWith('role123');
+      expect(userRepository.findByRole).toHaveBeenCalledWith('role123');
     });
 
-    it("should throw NotFoundException for invalid role ID", async () => {
+    it('should throw NotFoundException for invalid role ID', async () => {
       roleRepository.findById.mockResolvedValue(null);
 
-      await expect(service.getUsersByRole("invalid_id")).rejects.toThrow(
+      await expect(service.getUsersByRole('invalid_id')).rejects.toThrow(
         NotFoundException,
       );
     });
@@ -257,7 +257,7 @@ describe("UsersService", () => {
 
 ```typescript
 // Get all users with a specific role
-const admins = await usersService.getUsersByRole("admin_role_id");
+const admins = await usersService.getUsersByRole('admin_role_id');
 ```
 ````
 
@@ -303,8 +303,8 @@ export interface AuthKitConfig {
 **File**: [src/auth-kit.module.ts](src/auth-kit.module.ts)
 
 ```typescript
-import { DynamicModule, Module } from "@nestjs/common";
-import { AuthKitConfig } from "./types/auth-config.interface";
+import { DynamicModule, Module } from '@nestjs/common';
+import { AuthKitConfig } from './types/auth-config.interface';
 
 @Module({})
 export class AuthKitModule {
@@ -313,7 +313,7 @@ export class AuthKitModule {
       module: AuthKitModule,
       providers: [
         {
-          provide: "AUTH_KIT_CONFIG",
+          provide: 'AUTH_KIT_CONFIG',
           useValue: config || {},
         },
         // ... other providers
@@ -331,25 +331,25 @@ export class AuthKitModule {
 **File**: [src/services/auth.service.ts](src/services/auth.service.ts)
 
 ```typescript
-import { Injectable, Inject } from "@nestjs/common";
-import { AuthKitConfig } from "../types/auth-config.interface";
+import { Injectable, Inject } from '@nestjs/common';
+import { AuthKitConfig } from '../types/auth-config.interface';
 
 @Injectable()
 export class AuthService {
   private readonly defaultTokenExpiry = {
-    accessToken: "15m",
-    refreshToken: "7d",
-    emailToken: "1d",
-    resetToken: "1h",
+    accessToken: '15m',
+    refreshToken: '7d',
+    emailToken: '1d',
+    resetToken: '1h',
   };
 
   constructor(
-    @Inject("AUTH_KIT_CONFIG") private readonly config: AuthKitConfig,
+    @Inject('AUTH_KIT_CONFIG') private readonly config: AuthKitConfig,
     private readonly users: UserRepository,
     // ... other dependencies
   ) {}
 
-  private getTokenExpiry(type: keyof AuthKitConfig["tokenExpiry"]): string {
+  private getTokenExpiry(type: keyof AuthKitConfig['tokenExpiry']): string {
     return (
       this.config.tokenExpiry?.[type] ||
       process.env[`JWT_${type.toUpperCase()}_EXPIRES_IN`] ||
@@ -358,8 +358,8 @@ export class AuthService {
   }
 
   private signAccessToken(payload: any) {
-    const expiresIn = this.getTokenExpiry("accessToken");
-    return jwt.sign(payload, this.getEnv("JWT_SECRET"), { expiresIn });
+    const expiresIn = this.getTokenExpiry('accessToken');
+    return jwt.sign(payload, this.getEnv('JWT_SECRET'), { expiresIn });
   }
 
   // ... other methods
@@ -374,14 +374,14 @@ export class AuthService {
 ### Advanced Configuration
 
 ```typescript
-import { AuthKitModule } from "@ciscode/authentication-kit";
+import { AuthKitModule } from '@ciscode/authentication-kit';
 
 @Module({
   imports: [
     AuthKitModule.forRoot({
       tokenExpiry: {
-        accessToken: "30m", // Override default 15m
-        refreshToken: "14d", // Override default 7d
+        accessToken: '30m', // Override default 15m
+        refreshToken: '14d', // Override default 7d
       },
       security: {
         saltRounds: 14, // Override default 12
@@ -454,7 +454,7 @@ export const hasPermissions = (requiredPermissions: string[]): Type<CanActivate>
 **File**: [src/index.ts](src/index.ts)
 
 ```typescript
-export { hasPermissions } from "./middleware/permissions.guard";
+export { hasPermissions } from './middleware/permissions.guard';
 ```
 
 #### Step 3: Write Tests
@@ -462,18 +462,18 @@ export { hasPermissions } from "./middleware/permissions.guard";
 **File**: [src/middleware/permissions.guard.spec.ts](src/middleware/permissions.guard.spec.ts)
 
 ```typescript
-import { hasPermissions } from "./permissions.guard";
-import { ExecutionContext } from "@nestjs/common";
+import { hasPermissions } from './permissions.guard';
+import { ExecutionContext } from '@nestjs/common';
 
-describe("hasPermissions", () => {
-  it("should allow access when user has all required permissions", () => {
-    const PermissionsGuard = hasPermissions(["users:read", "users:write"]);
+describe('hasPermissions', () => {
+  it('should allow access when user has all required permissions', () => {
+    const PermissionsGuard = hasPermissions(['users:read', 'users:write']);
     const guard = new PermissionsGuard();
 
     const mockContext = {
       switchToHttp: () => ({
         getRequest: () => ({
-          user: { permissions: ["users:read", "users:write", "posts:read"] },
+          user: { permissions: ['users:read', 'users:write', 'posts:read'] },
         }),
         getResponse: () => ({
           status: jest.fn().mockReturnThis(),
@@ -486,8 +486,8 @@ describe("hasPermissions", () => {
     expect(canActivate).toBe(true);
   });
 
-  it("should deny access when user lacks required permissions", () => {
-    const PermissionsGuard = hasPermissions(["users:delete"]);
+  it('should deny access when user lacks required permissions', () => {
+    const PermissionsGuard = hasPermissions(['users:delete']);
     const guard = new PermissionsGuard();
 
     const mockResponse = {
@@ -497,7 +497,7 @@ describe("hasPermissions", () => {
     const mockContext = {
       switchToHttp: () => ({
         getRequest: () => ({
-          user: { permissions: ["users:read"] },
+          user: { permissions: ['users:read'] },
         }),
         getResponse: () => mockResponse,
       }),
@@ -509,7 +509,7 @@ describe("hasPermissions", () => {
     expect(mockResponse.status).toHaveBeenCalledWith(403);
     expect(mockResponse.json).toHaveBeenCalledWith(
       expect.objectContaining({
-        message: expect.stringContaining("insufficient permissions"),
+        message: expect.stringContaining('insufficient permissions'),
       }),
     );
   });
@@ -524,13 +524,13 @@ describe("hasPermissions", () => {
 ### Permission-Based Guards
 
 ```typescript
-import { hasPermissions } from "@ciscode/authentication-kit";
+import { hasPermissions } from '@ciscode/authentication-kit';
 
-@Controller("api/admin")
+@Controller('api/admin')
 export class AdminController {
-  @UseGuards(AuthenticateGuard, hasPermissions(["users:delete"]))
-  @Delete("users/:id")
-  async deleteUser(@Param("id") id: string) {
+  @UseGuards(AuthenticateGuard, hasPermissions(['users:delete']))
+  @Delete('users/:id')
+  async deleteUser(@Param('id') id: string) {
     // Only accessible to users with 'users:delete' permission
   }
 }
@@ -562,7 +562,7 @@ export interface AuthEvents {
 **File**: [src/types/auth-config.interface.ts](src/types/auth-config.interface.ts)
 
 ```typescript
-import { AuthEvents } from "./auth-events.interface";
+import { AuthEvents } from './auth-events.interface';
 
 export interface AuthKitConfig {
   tokenExpiry?: {
@@ -583,7 +583,7 @@ export interface AuthKitConfig {
 @Injectable()
 export class AuthService {
   constructor(
-    @Inject("AUTH_KIT_CONFIG") private readonly config: AuthKitConfig,
+    @Inject('AUTH_KIT_CONFIG') private readonly config: AuthKitConfig,
     // ... other dependencies
   ) {}
 
@@ -601,7 +601,7 @@ export class AuthService {
         this.logger.error(
           `Post-login hook failed: ${error.message}`,
           error.stack,
-          "AuthService",
+          'AuthService',
         );
         // Don't fail login if hook fails
       }
@@ -620,7 +620,7 @@ export class AuthService {
 ### Event Hooks
 
 ```typescript
-import { AuthKitModule } from "@ciscode/authentication-kit";
+import { AuthKitModule } from '@ciscode/authentication-kit';
 
 @Module({
   imports: [
@@ -692,33 +692,33 @@ export function generateNumericCode(digits: number = 6): string {
 **File**: [src/utils/crypto.utils.spec.ts](src/utils/crypto.utils.spec.ts)
 
 ```typescript
-import { generateSecureToken, generateNumericCode } from "./crypto.utils";
+import { generateSecureToken, generateNumericCode } from './crypto.utils';
 
-describe("Crypto Utils", () => {
-  describe("generateSecureToken", () => {
-    it("should generate hex token of correct length", () => {
+describe('Crypto Utils', () => {
+  describe('generateSecureToken', () => {
+    it('should generate hex token of correct length', () => {
       const token = generateSecureToken(32);
       expect(token).toHaveLength(64); // 32 bytes = 64 hex chars
       expect(token).toMatch(/^[a-f0-9]{64}$/);
     });
 
-    it("should generate unique tokens", () => {
+    it('should generate unique tokens', () => {
       const token1 = generateSecureToken();
       const token2 = generateSecureToken();
       expect(token1).not.toBe(token2);
     });
   });
 
-  describe("generateNumericCode", () => {
-    it("should generate code with correct number of digits", () => {
+  describe('generateNumericCode', () => {
+    it('should generate code with correct number of digits', () => {
       const code = generateNumericCode(6);
       expect(code).toHaveLength(6);
       expect(code).toMatch(/^\d{6}$/);
     });
 
-    it("should not start with 0", () => {
+    it('should not start with 0', () => {
       const code = generateNumericCode(6);
-      expect(code[0]).not.toBe("0");
+      expect(code[0]).not.toBe('0');
     });
   });
 });
@@ -875,7 +875,7 @@ async generateTokens(userId: string) {
 [src/dtos/auth/login.dto.ts](src/dtos/auth/login.dto.ts):
 
 ```typescript
-import { IsEmail, IsString, IsBoolean, IsOptional } from "class-validator";
+import { IsEmail, IsString, IsBoolean, IsOptional } from 'class-validator';
 
 export class LoginDto {
   @IsEmail()
@@ -947,11 +947,11 @@ async login(@Body() dto: LoginDto, @Res() res: Response) {
 [src/services/auth.service.spec.ts](src/services/auth.service.spec.ts):
 
 ```typescript
-describe("login", () => {
-  it("should use extended expiry when rememberMe is true", async () => {
+describe('login', () => {
+  it('should use extended expiry when rememberMe is true', async () => {
     const dto = {
-      email: "test@example.com",
-      password: "password123",
+      email: 'test@example.com',
+      password: 'password123',
       rememberMe: true,
     };
     userRepository.findByEmailWithPassword.mockResolvedValue(mockUser);
@@ -969,10 +969,10 @@ describe("login", () => {
     expect(actualTTL).toBeGreaterThan(thirtyDaysInSeconds - 3600);
   });
 
-  it("should use default expiry when rememberMe is false", async () => {
+  it('should use default expiry when rememberMe is false', async () => {
     const dto = {
-      email: "test@example.com",
-      password: "password123",
+      email: 'test@example.com',
+      password: 'password123',
       rememberMe: false,
     };
     // ... test 7-day expiry ...
@@ -989,12 +989,12 @@ describe("login", () => {
 
 ```typescript
 // Standard login (refresh token valid for 7 days)
-await authService.login({ email: "user@example.com", password: "password123" });
+await authService.login({ email: 'user@example.com', password: 'password123' });
 
 // Login with "Remember Me" (refresh token valid for 30 days)
 await authService.login({
-  email: "user@example.com",
-  password: "password123",
+  email: 'user@example.com',
+  password: 'password123',
   rememberMe: true,
 });
 ```

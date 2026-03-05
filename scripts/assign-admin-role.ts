@@ -46,16 +46,22 @@ async function assignAdminRole() {
 
     // Find admin role
     console.log('🔑 Finding admin role...');
-    const adminRole = await Role.findOne({ name: 'admin' }).populate('permissions');
+    const adminRole = await Role.findOne({ name: 'admin' }).populate(
+      'permissions',
+    );
     if (!adminRole) {
       console.error('❌ Admin role not found');
       process.exit(1);
     }
     console.log(`✅ Found admin role (ID: ${adminRole._id})`);
-    console.log(`   Permissions: ${(adminRole.permissions as any[]).map((p: any) => p.name).join(', ')}\n`);
+    console.log(
+      `   Permissions: ${(adminRole.permissions as any[]).map((p: any) => p.name).join(', ')}\n`,
+    );
 
     // Check if user already has admin role
-    const hasAdminRole = user.roles.some((roleId) => roleId.toString() === adminRole._id.toString());
+    const hasAdminRole = user.roles.some(
+      (roleId) => roleId.toString() === adminRole._id.toString(),
+    );
     if (hasAdminRole) {
       console.log('ℹ️  User already has admin role');
     } else {
@@ -71,15 +77,16 @@ async function assignAdminRole() {
       path: 'roles',
       populate: { path: 'permissions' },
     });
-    
+
     console.log('📋 User roles and permissions:');
-    const roles = updatedUser?.roles as any[] || [];
+    const roles = (updatedUser?.roles as any[]) || [];
     roles.forEach((role: any) => {
-      console.log(`   - ${role.name}: ${role.permissions.map((p: any) => p.name).join(', ')}`);
+      console.log(
+        `   - ${role.name}: ${role.permissions.map((p: any) => p.name).join(', ')}`,
+      );
     });
 
     console.log('\n✅ Done! Now try logging in again and check the JWT token.');
-
   } catch (error) {
     console.error('\n❌ Error:', error);
     process.exit(1);

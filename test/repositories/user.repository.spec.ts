@@ -1,3 +1,4 @@
+import { TEST_PASSWORDS } from '../test-constants';
 import type { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
@@ -109,7 +110,7 @@ describe('UserRepository', () => {
 
   describe('findByEmailWithPassword', () => {
     it('should find user by email with password field', async () => {
-      const userWithPassword = { ...mockUser, password: 'hashed' };
+      const userWithPassword = { ...mockUser, password: TEST_PASSWORDS.HASHED };
       const chain = (repository as any)._createChainMock(userWithPassword);
       model.findOne.mockReturnValue(chain);
 

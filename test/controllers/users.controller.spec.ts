@@ -1,3 +1,4 @@
+import { TEST_PASSWORDS } from '../test-constants';
 import type { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing';
 import type { Response } from 'express';
@@ -49,7 +50,7 @@ describe('UsersController', () => {
       const dto: RegisterDto = {
         fullname: { fname: 'Test', lname: 'User' },
         email: 'test@example.com',
-        password: 'password123',
+        password: TEST_PASSWORDS.VALID,
         username: 'testuser',
       };
       const created = {

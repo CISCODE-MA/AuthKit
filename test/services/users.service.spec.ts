@@ -1,3 +1,4 @@
+import { TEST_PASSWORDS } from '../test-constants';
 import type { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing';
 import {
@@ -82,7 +83,7 @@ describe('UsersService', () => {
       email: 'test@example.com',
       fullname: { fname: 'John', lname: 'Doe' },
       username: 'johndoe',
-      password: 'password123',
+      password: TEST_PASSWORDS.VALID,
       phoneNumber: '+1234567890',
     };
 
@@ -108,7 +109,7 @@ describe('UsersService', () => {
           fullname: validDto.fullname,
           username: validDto.username,
           email: validDto.email,
-          password: 'hashed-password',
+          password: TEST_PASSWORDS.HASHED_FULL,
           isVerified: true,
           isBanned: false,
         }),

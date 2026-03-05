@@ -1,3 +1,4 @@
+import { TEST_PASSWORDS } from '../test-constants';
 import type { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing';
 import type { INestApplication } from '@nestjs/common';
@@ -89,7 +90,7 @@ describe('AuthController (Integration)', () => {
       const dto = {
         email: 'test@example.com',
         fullname: { fname: 'Test', lname: 'User' },
-        password: 'password123',
+        password: TEST_PASSWORDS.VALID,
       };
 
       const expectedResult: any = {
@@ -130,7 +131,7 @@ describe('AuthController (Integration)', () => {
       const dto = {
         email: 'existing@example.com',
         fullname: { fname: 'Test', lname: 'User' },
-        password: 'password123',
+        password: TEST_PASSWORDS.VALID,
       };
 
       authService.register.mockRejectedValue(
@@ -150,7 +151,7 @@ describe('AuthController (Integration)', () => {
       // Arrange
       const dto = {
         email: 'test@example.com',
-        password: 'password123',
+        password: TEST_PASSWORDS.VALID,
       };
 
       const expectedTokens = {
@@ -176,7 +177,7 @@ describe('AuthController (Integration)', () => {
       // Arrange
       const dto = {
         email: 'test@example.com',
-        password: 'wrongpassword',
+        password: TEST_PASSWORDS.WRONG,
       };
 
       authService.login.mockRejectedValue(
@@ -194,7 +195,7 @@ describe('AuthController (Integration)', () => {
       // Arrange
       const dto = {
         email: 'unverified@example.com',
-        password: 'password123',
+        password: TEST_PASSWORDS.VALID,
       };
 
       authService.login.mockRejectedValue(
@@ -212,7 +213,7 @@ describe('AuthController (Integration)', () => {
       // Arrange
       const dto = {
         email: 'test@example.com',
-        password: 'password123',
+        password: TEST_PASSWORDS.VALID,
       };
 
       const expectedTokens = {
@@ -528,7 +529,7 @@ describe('AuthController (Integration)', () => {
       // Arrange
       const dto = {
         token: 'valid-reset-token',
-        newPassword: 'newPassword123',
+        newPassword: TEST_PASSWORDS.NEW,
       };
 
       const expectedResult = {
@@ -555,7 +556,7 @@ describe('AuthController (Integration)', () => {
       // Arrange
       const dto = {
         token: 'invalid-token',
-        newPassword: 'newPassword123',
+        newPassword: TEST_PASSWORDS.NEW,
       };
 
       authService.resetPassword.mockRejectedValue(
@@ -573,7 +574,7 @@ describe('AuthController (Integration)', () => {
       // Arrange
       const dto = {
         token: 'expired-token',
-        newPassword: 'newPassword123',
+        newPassword: TEST_PASSWORDS.NEW,
       };
 
       authService.resetPassword.mockRejectedValue(

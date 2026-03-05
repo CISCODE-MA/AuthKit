@@ -1,3 +1,4 @@
+import { TEST_PASSWORDS } from '../test-constants';
 import type { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing';
 import {
@@ -122,7 +123,7 @@ describe('AuthService', () => {
       const dto = {
         email: 'test@example.com',
         fullname: { fname: 'Test', lname: 'User' },
-        password: 'password123',
+        password: TEST_PASSWORDS.VALID,
       };
 
       const existingUser = createMockUser({ email: dto.email });
@@ -141,7 +142,7 @@ describe('AuthService', () => {
         email: 'test@example.com',
         fullname: { fname: 'Test', lname: 'User' },
         username: 'testuser',
-        password: 'password123',
+        password: TEST_PASSWORDS.VALID,
       };
 
       const existingUser = createMockUser({ username: dto.username });
@@ -159,7 +160,7 @@ describe('AuthService', () => {
         email: 'test@example.com',
         fullname: { fname: 'Test', lname: 'User' },
         phoneNumber: '1234567890',
-        password: 'password123',
+        password: TEST_PASSWORDS.VALID,
       };
 
       const existingUser = createMockUser({ phoneNumber: dto.phoneNumber });
@@ -176,7 +177,7 @@ describe('AuthService', () => {
       const dto = {
         email: 'test@example.com',
         fullname: { fname: 'Test', lname: 'User' },
-        password: 'password123',
+        password: TEST_PASSWORDS.VALID,
       };
 
       userRepo.findByEmail.mockResolvedValue(null);
@@ -196,7 +197,7 @@ describe('AuthService', () => {
       const dto = {
         email: 'test@example.com',
         fullname: { fname: 'Test', lname: 'User' },
-        password: 'password123',
+        password: TEST_PASSWORDS.VALID,
       };
 
       const mockRole: any = createMockRole({ name: 'user' });
@@ -229,7 +230,7 @@ describe('AuthService', () => {
       const dto = {
         email: 'test@example.com',
         fullname: { fname: 'Test', lname: 'User' },
-        password: 'password123',
+        password: TEST_PASSWORDS.VALID,
       };
 
       const mockRole: any = createMockRole({ name: 'user' });
@@ -264,7 +265,7 @@ describe('AuthService', () => {
       const dto = {
         email: 'test@example.com',
         fullname: { fname: 'Test', lname: 'User' },
-        password: 'password123',
+        password: TEST_PASSWORDS.VALID,
       };
 
       userRepo.findByEmail.mockRejectedValue(new Error('Database error'));
@@ -280,7 +281,7 @@ describe('AuthService', () => {
       const dto = {
         email: 'test@example.com',
         fullname: { fname: 'Test', lname: 'User' },
-        password: 'password123',
+        password: TEST_PASSWORDS.VALID,
       };
 
       const mockRole: any = createMockRole({ name: 'user' });
@@ -328,7 +329,7 @@ describe('AuthService', () => {
     it('should return user data without password', async () => {
       // Arrange
       const mockUser = createMockVerifiedUser({
-        password: 'hashed-password',
+        password: TEST_PASSWORDS.HASHED_FULL,
       });
 
       // Mock toObject method
@@ -453,7 +454,7 @@ describe('AuthService', () => {
   describe('login', () => {
     it('should throw UnauthorizedException if user does not exist', async () => {
       // Arrange
-      const dto = { email: 'test@example.com', password: 'password123' };
+      const dto = { email: 'test@example.com', password: TEST_PASSWORDS.VALID };
       userRepo.findByEmailWithPassword = jest.fn().mockResolvedValue(null);
 
       // Act & Assert
@@ -462,10 +463,10 @@ describe('AuthService', () => {
 
     it('should throw ForbiddenException if user is banned', async () => {
       // Arrange
-      const dto = { email: 'test@example.com', password: 'password123' };
+      const dto = { email: 'test@example.com', password: TEST_PASSWORDS.VALID };
       const bannedUser: any = createMockUser({
         isBanned: true,
-        password: 'hashed',
+        password: TEST_PASSWORDS.HASHED,
       });
       userRepo.findByEmailWithPassword = jest
         .fn()
@@ -478,10 +479,10 @@ describe('AuthService', () => {
 
     it('should throw ForbiddenException if email not verified', async () => {
       // Arrange
-      const dto = { email: 'test@example.com', password: 'password123' };
+      const dto = { email: 'test@example.com', password: TEST_PASSWORDS.VALID };
       const unverifiedUser: any = createMockUser({
         isVerified: false,
-        password: 'hashed',
+        password: TEST_PASSWORDS.HASHED,
       });
       userRepo.findByEmailWithPassword = jest
         .fn()
@@ -496,7 +497,7 @@ describe('AuthService', () => {
       // Generate test password dynamically to avoid security warnings
       const getTestHashedPassword = () =>
         ['$2a', '10', 'validHashedPassword'].join('$');
-      const dto = { email: 'test@example.com', password: 'wrongpassword' };
+      const dto = { email: 'test@example.com', password: TEST_PASSWORDS.WRONG };
       const user: any = createMockVerifiedUser({
         password: getTestHashedPassword(),
       });
@@ -508,7 +509,7 @@ describe('AuthService', () => {
 
     it('should successfully login with valid credentials', async () => {
       // Arrange
-      const dto = { email: 'test@example.com', password: 'password123' };
+      const dto = { email: 'test@example.com', password: TEST_PASSWORDS.VALID };
       const bcrypt = require('bcryptjs');
       const hashedPassword = await bcrypt.hash('password123', 10);
       const mockRole = { _id: 'role-id', permissions: [] };
@@ -813,7 +814,7 @@ describe('AuthService', () => {
     it('should successfully reset password with valid token', async () => {
       // Arrange
       const userId = 'user-id';
-      const newPassword = 'newPassword123';
+      const newPassword = TEST_PASSWORDS.NEW;
       const token = require('jsonwebtoken').sign(
         { sub: userId, purpose: 'reset' },
         process.env.JWT_RESET_SECRET!,
@@ -840,7 +841,7 @@ describe('AuthService', () => {
     it('should throw NotFoundException if user not found', async () => {
       // Arrange
       const userId = 'non-existent';
-      const newPassword = 'newPassword123';
+      const newPassword = TEST_PASSWORDS.NEW;
       const token = require('jsonwebtoken').sign(
         { sub: userId, purpose: 'reset' },
         process.env.JWT_RESET_SECRET!,

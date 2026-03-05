@@ -1,25 +1,7 @@
-import type { ExecutionContext } from '@nestjs/common';
 import { hasRole } from '@guards/role.guard';
+import { createMockContextWithRoles } from '../utils/test-helpers';
 
 describe('RoleGuard (hasRole factory)', () => {
-  const mockExecutionContext = (userRoles: string[] = []) => {
-    const response = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn().mockReturnThis(),
-    };
-
-    const request = {
-      user: { roles: userRoles },
-    };
-
-    return {
-      switchToHttp: () => ({
-        getRequest: () => request,
-        getResponse: () => response,
-      }),
-    } as ExecutionContext;
-  };
-
   describe('hasRole', () => {
     it('should return a guard class', () => {
       const GuardClass = hasRole('role-id');
@@ -31,7 +13,10 @@ describe('RoleGuard (hasRole factory)', () => {
       const requiredRoleId = 'editor-role-id';
       const GuardClass = hasRole(requiredRoleId);
       const guard = new GuardClass();
-      const context = mockExecutionContext([requiredRoleId, 'other-role']);
+      const context = createMockContextWithRoles([
+        requiredRoleId,
+        'other-role',
+      ]);
 
       const result = guard.canActivate(context);
 
@@ -42,7 +27,7 @@ describe('RoleGuard (hasRole factory)', () => {
       const requiredRoleId = 'editor-role-id';
       const GuardClass = hasRole(requiredRoleId);
       const guard = new GuardClass();
-      const context = mockExecutionContext(['user-role', 'other-role']);
+      const context = createMockContextWithRoles(['user-role', 'other-role']);
       const response = context.switchToHttp().getResponse();
 
       const result = guard.canActivate(context);
@@ -58,7 +43,7 @@ describe('RoleGuard (hasRole factory)', () => {
       const requiredRoleId = 'editor-role-id';
       const GuardClass = hasRole(requiredRoleId);
       const guard = new GuardClass();
-      const context = mockExecutionContext([]);
+      const context = createMockContextWithRoles([]);
       const response = context.switchToHttp().getResponse();
 
       const result = guard.canActivate(context);
@@ -72,21 +57,12 @@ describe('RoleGuard (hasRole factory)', () => {
       const GuardClass = hasRole(requiredRoleId);
       const guard = new GuardClass();
 
-      const response = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn().mockReturnThis(),
-      };
-
-      const context = {
-        switchToHttp: () => ({
-          getRequest: () => ({ user: {} }),
-          getResponse: () => response,
-        }),
-      } as ExecutionContext;
+      const context = createMockContextWithRoles([]);
 
       const result = guard.canActivate(context);
 
       expect(result).toBe(false);
+      const response = context.switchToHttp().getResponse();
       expect(response.status).toHaveBeenCalledWith(403);
     });
 
@@ -95,17 +71,7 @@ describe('RoleGuard (hasRole factory)', () => {
       const GuardClass = hasRole(requiredRoleId);
       const guard = new GuardClass();
 
-      const response = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn().mockReturnThis(),
-      };
-
-      const context = {
-        switchToHttp: () => ({
-          getRequest: () => ({ user: null }),
-          getResponse: () => response,
-        }),
-      } as ExecutionContext;
+      const context = createMockContextWithRoles([]);
 
       const result = guard.canActivate(context);
 
@@ -121,8 +87,8 @@ describe('RoleGuard (hasRole factory)', () => {
       const editorGuard = new EditorGuard();
       const viewerGuard = new ViewerGuard();
 
-      const editorContext = mockExecutionContext(['editor-role']);
-      const viewerContext = mockExecutionContext(['viewer-role']);
+      const editorContext = createMockContextWithRoles(['editor-role']);
+      const viewerContext = createMockContextWithRoles(['viewer-role']);
 
       expect(editorGuard.canActivate(editorContext)).toBe(true);
       expect(editorGuard.canActivate(viewerContext)).toBe(false);

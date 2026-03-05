@@ -1,6 +1,5 @@
 import type { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing';
-import type { ExecutionContext } from '@nestjs/common';
 import {
   UnauthorizedException,
   ForbiddenException,
@@ -10,6 +9,7 @@ import jwt from 'jsonwebtoken';
 import { AuthenticateGuard } from '@guards/authenticate.guard';
 import { UserRepository } from '@repos/user.repository';
 import { LoggerService } from '@services/logger.service';
+import { createMockContextWithAuth } from '../utils/test-helpers';
 
 jest.mock('jsonwebtoken');
 const mockedJwt = jwt as jest.Mocked<typeof jwt>;
@@ -18,19 +18,6 @@ describe('AuthenticateGuard', () => {
   let guard: AuthenticateGuard;
   let mockUserRepo: jest.Mocked<UserRepository>;
   let mockLogger: jest.Mocked<LoggerService>;
-
-  const mockExecutionContext = (authHeader?: string) => {
-    const request = {
-      headers: authHeader ? { authorization: authHeader } : {},
-      user: undefined as any,
-    };
-
-    return {
-      switchToHttp: () => ({
-        getRequest: () => request,
-      }),
-    } as ExecutionContext;
-  };
 
   beforeEach(async () => {
     process.env.JWT_SECRET = 'test-secret';
@@ -62,7 +49,7 @@ describe('AuthenticateGuard', () => {
 
   describe('canActivate', () => {
     it('should throw UnauthorizedException if no Authorization header', async () => {
-      const context = mockExecutionContext();
+      const context = createMockContextWithAuth();
 
       const error = guard.canActivate(context);
       await expect(error).rejects.toThrow(UnauthorizedException);
@@ -72,7 +59,7 @@ describe('AuthenticateGuard', () => {
     });
 
     it('should throw UnauthorizedException if Authorization header does not start with Bearer', async () => {
-      const context = mockExecutionContext('Basic token123');
+      const context = createMockContextWithAuth('Basic token123');
 
       const error = guard.canActivate(context);
       await expect(error).rejects.toThrow(UnauthorizedException);
@@ -82,7 +69,7 @@ describe('AuthenticateGuard', () => {
     });
 
     it('should throw UnauthorizedException if user not found', async () => {
-      const context = mockExecutionContext('Bearer valid-token');
+      const context = createMockContextWithAuth('Bearer valid-token');
       mockedJwt.verify.mockReturnValue({ sub: 'user-id' } as any);
       mockUserRepo.findById.mockResolvedValue(null);
 
@@ -92,7 +79,7 @@ describe('AuthenticateGuard', () => {
     });
 
     it('should throw ForbiddenException if email not verified', async () => {
-      const context = mockExecutionContext('Bearer valid-token');
+      const context = createMockContextWithAuth('Bearer valid-token');
       mockedJwt.verify.mockReturnValue({ sub: 'user-id' } as any);
       mockUserRepo.findById.mockResolvedValue({
         _id: 'user-id',
@@ -106,7 +93,7 @@ describe('AuthenticateGuard', () => {
     });
 
     it('should throw ForbiddenException if user is banned', async () => {
-      const context = mockExecutionContext('Bearer valid-token');
+      const context = createMockContextWithAuth('Bearer valid-token');
       mockedJwt.verify.mockReturnValue({ sub: 'user-id' } as any);
       mockUserRepo.findById.mockResolvedValue({
         _id: 'user-id',
@@ -120,7 +107,7 @@ describe('AuthenticateGuard', () => {
     });
 
     it('should throw UnauthorizedException if token issued before password change', async () => {
-      const context = mockExecutionContext('Bearer valid-token');
+      const context = createMockContextWithAuth('Bearer valid-token');
       const passwordChangedAt = new Date('2025-01-01');
       const tokenIssuedAt = Math.floor(new Date('2024-12-01').getTime() / 1000);
 
@@ -143,7 +130,7 @@ describe('AuthenticateGuard', () => {
     });
 
     it('should return true and attach user to request if valid token', async () => {
-      const context = mockExecutionContext('Bearer valid-token');
+      const context = createMockContextWithAuth('Bearer valid-token');
       const decoded = { sub: 'user-id', email: 'user@test.com' };
 
       mockedJwt.verify.mockReturnValue(decoded as any);
@@ -160,7 +147,7 @@ describe('AuthenticateGuard', () => {
     });
 
     it('should throw UnauthorizedException if token expired', async () => {
-      const context = mockExecutionContext('Bearer expired-token');
+      const context = createMockContextWithAuth('Bearer expired-token');
       const error = new Error('Token expired');
       error.name = 'TokenExpiredError';
       mockedJwt.verify.mockImplementation(() => {
@@ -173,7 +160,7 @@ describe('AuthenticateGuard', () => {
     });
 
     it('should throw UnauthorizedException if token invalid', async () => {
-      const context = mockExecutionContext('Bearer invalid-token');
+      const context = createMockContextWithAuth('Bearer invalid-token');
       const error = new Error('Invalid token');
       error.name = 'JsonWebTokenError';
       mockedJwt.verify.mockImplementation(() => {
@@ -186,7 +173,7 @@ describe('AuthenticateGuard', () => {
     });
 
     it('should throw UnauthorizedException if token not yet valid', async () => {
-      const context = mockExecutionContext('Bearer future-token');
+      const context = createMockContextWithAuth('Bearer future-token');
       const error = new Error('Token not yet valid');
       error.name = 'NotBeforeError';
       mockedJwt.verify.mockImplementation(() => {
@@ -199,7 +186,7 @@ describe('AuthenticateGuard', () => {
     });
 
     it('should throw UnauthorizedException and log error for unknown errors', async () => {
-      const context = mockExecutionContext('Bearer token');
+      const context = createMockContextWithAuth('Bearer token');
       const error = new Error('Unknown error');
       mockedJwt.verify.mockImplementation(() => {
         throw error;
@@ -218,7 +205,7 @@ describe('AuthenticateGuard', () => {
 
     it('should throw InternalServerErrorException if JWT_SECRET not set', async () => {
       delete process.env.JWT_SECRET;
-      const context = mockExecutionContext('Bearer token');
+      const context = createMockContextWithAuth('Bearer token');
 
       // getEnv throws InternalServerErrorException, but it's NOT in the canActivate catch
       // because it's thrown BEFORE jwt.verify, so it propagates directly

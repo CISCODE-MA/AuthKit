@@ -1,30 +1,12 @@
 import type { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing';
-import type { ExecutionContext } from '@nestjs/common';
 import { AdminGuard } from '@guards/admin.guard';
 import { AdminRoleService } from '@services/admin-role.service';
+import { createMockContextWithRoles } from '../utils/test-helpers';
 
 describe('AdminGuard', () => {
   let guard: AdminGuard;
   let mockAdminRoleService: jest.Mocked<AdminRoleService>;
-
-  const mockExecutionContext = (userRoles: string[] = []) => {
-    const response = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn().mockReturnThis(),
-    };
-
-    const request = {
-      user: { roles: userRoles },
-    };
-
-    return {
-      switchToHttp: () => ({
-        getRequest: () => request,
-        getResponse: () => response,
-      }),
-    } as ExecutionContext;
-  };
 
   beforeEach(async () => {
     mockAdminRoleService = {
@@ -49,7 +31,7 @@ describe('AdminGuard', () => {
     it('should return true if user has admin role', async () => {
       const adminRoleId = 'admin-role-id';
       mockAdminRoleService.loadAdminRoleId.mockResolvedValue(adminRoleId);
-      const context = mockExecutionContext([adminRoleId, 'other-role']);
+      const context = createMockContextWithRoles([adminRoleId, 'other-role']);
 
       const result = await guard.canActivate(context);
 
@@ -60,7 +42,7 @@ describe('AdminGuard', () => {
     it('should return false and send 403 if user does not have admin role', async () => {
       const adminRoleId = 'admin-role-id';
       mockAdminRoleService.loadAdminRoleId.mockResolvedValue(adminRoleId);
-      const context = mockExecutionContext(['user-role', 'other-role']);
+      const context = createMockContextWithRoles(['user-role', 'other-role']);
       const response = context.switchToHttp().getResponse();
 
       const result = await guard.canActivate(context);
@@ -75,7 +57,7 @@ describe('AdminGuard', () => {
     it('should return false if user has no roles', async () => {
       const adminRoleId = 'admin-role-id';
       mockAdminRoleService.loadAdminRoleId.mockResolvedValue(adminRoleId);
-      const context = mockExecutionContext([]);
+      const context = createMockContextWithRoles([]);
       const response = context.switchToHttp().getResponse();
 
       const result = await guard.canActivate(context);
@@ -88,21 +70,12 @@ describe('AdminGuard', () => {
       const adminRoleId = 'admin-role-id';
       mockAdminRoleService.loadAdminRoleId.mockResolvedValue(adminRoleId);
 
-      const response = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn().mockReturnThis(),
-      };
-
-      const context = {
-        switchToHttp: () => ({
-          getRequest: () => ({ user: {} }),
-          getResponse: () => response,
-        }),
-      } as ExecutionContext;
+      const context = createMockContextWithRoles([]);
 
       const result = await guard.canActivate(context);
 
       expect(result).toBe(false);
+      const response = context.switchToHttp().getResponse();
       expect(response.status).toHaveBeenCalledWith(403);
     });
 
@@ -110,17 +83,7 @@ describe('AdminGuard', () => {
       const adminRoleId = 'admin-role-id';
       mockAdminRoleService.loadAdminRoleId.mockResolvedValue(adminRoleId);
 
-      const response = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn().mockReturnThis(),
-      };
-
-      const context = {
-        switchToHttp: () => ({
-          getRequest: () => ({ user: null }),
-          getResponse: () => response,
-        }),
-      } as ExecutionContext;
+      const context = createMockContextWithRoles([]);
 
       const result = await guard.canActivate(context);
 

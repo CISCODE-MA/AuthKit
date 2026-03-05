@@ -4,7 +4,6 @@
  */
 export enum AuthErrorCode {
   // Authentication errors
-<<<<<<< HEAD
   INVALID_CREDENTIALS = 'AUTH_001',
   EMAIL_NOT_VERIFIED = 'AUTH_002',
   ACCOUNT_BANNED = 'AUTH_003',
@@ -48,51 +47,6 @@ export enum AuthErrorCode {
   SYSTEM_ERROR = 'SYS_001',
   CONFIG_ERROR = 'SYS_002',
   DATABASE_ERROR = 'SYS_003',
-=======
-  INVALID_CREDENTIALS = "AUTH_001",
-  EMAIL_NOT_VERIFIED = "AUTH_002",
-  ACCOUNT_BANNED = "AUTH_003",
-  INVALID_TOKEN = "AUTH_004",
-  TOKEN_EXPIRED = "AUTH_005",
-  REFRESH_TOKEN_MISSING = "AUTH_006",
-  UNAUTHORIZED = "AUTH_007",
-
-  // Registration errors
-  EMAIL_EXISTS = "REG_001",
-  USERNAME_EXISTS = "REG_002",
-  PHONE_EXISTS = "REG_003",
-  CREDENTIALS_EXIST = "REG_004",
-
-  // User management errors
-  USER_NOT_FOUND = "USER_001",
-  USER_ALREADY_VERIFIED = "USER_002",
-
-  // Role & Permission errors
-  ROLE_NOT_FOUND = "ROLE_001",
-  ROLE_EXISTS = "ROLE_002",
-  PERMISSION_NOT_FOUND = "PERM_001",
-  PERMISSION_EXISTS = "PERM_002",
-  DEFAULT_ROLE_MISSING = "ROLE_003",
-
-  // Password errors
-  INVALID_PASSWORD = "PWD_001",
-  PASSWORD_RESET_FAILED = "PWD_002",
-
-  // Email errors
-  EMAIL_SEND_FAILED = "EMAIL_001",
-  VERIFICATION_FAILED = "EMAIL_002",
-
-  // OAuth errors
-  OAUTH_INVALID_TOKEN = "OAUTH_001",
-  OAUTH_GOOGLE_FAILED = "OAUTH_002",
-  OAUTH_MICROSOFT_FAILED = "OAUTH_003",
-  OAUTH_FACEBOOK_FAILED = "OAUTH_004",
-
-  // System errors
-  SYSTEM_ERROR = "SYS_001",
-  CONFIG_ERROR = "SYS_002",
-  DATABASE_ERROR = "SYS_003",
->>>>>>> 3e15d93b706eeffb27c8710ef8c593767c9a564e
 }
 
 /**
@@ -142,38 +96,22 @@ export const ErrorCodeToStatus: Record<string, number> = {
   [AuthErrorCode.INVALID_PASSWORD]: 400,
   [AuthErrorCode.INVALID_TOKEN]: 400,
   [AuthErrorCode.OAUTH_INVALID_TOKEN]: 400,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> 3e15d93b706eeffb27c8710ef8c593767c9a564e
   // 401 Unauthorized
   [AuthErrorCode.INVALID_CREDENTIALS]: 401,
   [AuthErrorCode.TOKEN_EXPIRED]: 401,
   [AuthErrorCode.UNAUTHORIZED]: 401,
   [AuthErrorCode.REFRESH_TOKEN_MISSING]: 401,
-<<<<<<< HEAD
-  
-  // 403 Forbidden
-  [AuthErrorCode.EMAIL_NOT_VERIFIED]: 403,
-  [AuthErrorCode.ACCOUNT_BANNED]: 403,
-  
-=======
 
   // 403 Forbidden
   [AuthErrorCode.EMAIL_NOT_VERIFIED]: 403,
   [AuthErrorCode.ACCOUNT_BANNED]: 403,
 
->>>>>>> 3e15d93b706eeffb27c8710ef8c593767c9a564e
   // 404 Not Found
   [AuthErrorCode.USER_NOT_FOUND]: 404,
   [AuthErrorCode.ROLE_NOT_FOUND]: 404,
   [AuthErrorCode.PERMISSION_NOT_FOUND]: 404,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> 3e15d93b706eeffb27c8710ef8c593767c9a564e
   // 409 Conflict
   [AuthErrorCode.EMAIL_EXISTS]: 409,
   [AuthErrorCode.USERNAME_EXISTS]: 409,
@@ -182,11 +120,7 @@ export const ErrorCodeToStatus: Record<string, number> = {
   [AuthErrorCode.USER_ALREADY_VERIFIED]: 409,
   [AuthErrorCode.ROLE_EXISTS]: 409,
   [AuthErrorCode.PERMISSION_EXISTS]: 409,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> 3e15d93b706eeffb27c8710ef8c593767c9a564e
   // 500 Internal Server Error
   [AuthErrorCode.SYSTEM_ERROR]: 500,
   [AuthErrorCode.CONFIG_ERROR]: 500,

@@ -1,58 +1,58 @@
-import { describe, it, expect } from "@jest/globals";
+import { describe, it, expect } from '@jest/globals';
 
-describe("AuthKit", () => {
-  describe("Module", () => {
-    it("should load the AuthKit module", () => {
+describe('AuthKit', () => {
+  describe('Module', () => {
+    it('should load the AuthKit module', () => {
       expect(true).toBe(true);
     });
   });
 
-  describe("Service Stubs", () => {
-    it("placeholder for auth service tests", () => {
+  describe('Service Stubs', () => {
+    it('placeholder for auth service tests', () => {
       expect(true).toBe(true);
     });
 
-    it("placeholder for user service tests", () => {
+    it('placeholder for user service tests', () => {
       expect(true).toBe(true);
     });
 
-    it("placeholder for role service tests", () => {
-      expect(true).toBe(true);
-    });
-  });
-
-  describe("Guard Tests", () => {
-    it("placeholder for authenticate guard tests", () => {
-      expect(true).toBe(true);
-    });
-
-    it("placeholder for admin guard tests", () => {
+    it('placeholder for role service tests', () => {
       expect(true).toBe(true);
     });
   });
 
-  describe("OAuth Tests", () => {
-    it("placeholder for Google OAuth strategy tests", () => {
+  describe('Guard Tests', () => {
+    it('placeholder for authenticate guard tests', () => {
       expect(true).toBe(true);
     });
 
-    it("placeholder for Microsoft OAuth strategy tests", () => {
-      expect(true).toBe(true);
-    });
-
-    it("placeholder for Facebook OAuth strategy tests", () => {
+    it('placeholder for admin guard tests', () => {
       expect(true).toBe(true);
     });
   });
 
-  describe("Password Reset Tests", () => {
-    it("placeholder for password reset flow tests", () => {
+  describe('OAuth Tests', () => {
+    it('placeholder for Google OAuth strategy tests', () => {
+      expect(true).toBe(true);
+    });
+
+    it('placeholder for Microsoft OAuth strategy tests', () => {
+      expect(true).toBe(true);
+    });
+
+    it('placeholder for Facebook OAuth strategy tests', () => {
       expect(true).toBe(true);
     });
   });
 
-  describe("Email Verification Tests", () => {
-    it("placeholder for email verification flow tests", () => {
+  describe('Password Reset Tests', () => {
+    it('placeholder for password reset flow tests', () => {
+      expect(true).toBe(true);
+    });
+  });
+
+  describe('Email Verification Tests', () => {
+    it('placeholder for email verification flow tests', () => {
       expect(true).toBe(true);
     });
   });

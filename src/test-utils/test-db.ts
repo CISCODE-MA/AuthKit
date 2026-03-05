@@ -1,10 +1,5 @@
-<<<<<<< HEAD
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
-=======
-import { MongoMemoryServer } from "mongodb-memory-server";
-import mongoose from "mongoose";
->>>>>>> 3e15d93b706eeffb27c8710ef8c593767c9a564e
 
 let mongod: MongoMemoryServer;
 

@@ -1,24 +1,14 @@
-<<<<<<< HEAD
-import { Types } from 'mongoose';
-import { IRepository } from './repository.interface';
-import { User } from '@entities/user.entity';
-=======
-import type { Types } from "mongoose";
-import type { IRepository } from "./repository.interface";
-import type { User } from "@entities/user.entity";
->>>>>>> 3e15d93b706eeffb27c8710ef8c593767c9a564e
+import type { Types } from 'mongoose';
+import type { IRepository } from './repository.interface';
+import type { User } from '@entities/user.entity';
 
 /**
  * User repository interface extending base repository
  */
-<<<<<<< HEAD
-export interface IUserRepository extends IRepository<User, string | Types.ObjectId> {
-=======
 export interface IUserRepository extends IRepository<
   User,
   string | Types.ObjectId
 > {
->>>>>>> 3e15d93b706eeffb27c8710ef8c593767c9a564e
   /**
    * Find user by email address
    * @param email - User email
@@ -52,13 +42,9 @@ export interface IUserRepository extends IRepository<
    * @param id - User identifier
    * @returns User with populated relations
    */
-<<<<<<< HEAD
-  findByIdWithRolesAndPermissions(id: string | Types.ObjectId): Promise<User | null>;
-=======
   findByIdWithRolesAndPermissions(
     id: string | Types.ObjectId,
   ): Promise<User | null>;
->>>>>>> 3e15d93b706eeffb27c8710ef8c593767c9a564e
 
   /**
    * List users with optional filters

@@ -3,11 +3,11 @@ import {
   ConflictException,
   NotFoundException,
   InternalServerErrorException,
-} from "@nestjs/common";
-import { PermissionRepository } from "@repos/permission.repository";
-import { CreatePermissionDto } from "@dto/permission/create-permission.dto";
-import { UpdatePermissionDto } from "@dto/permission/update-permission.dto";
-import { LoggerService } from "@services/logger.service";
+} from '@nestjs/common';
+import { PermissionRepository } from '@repos/permission.repository';
+import { CreatePermissionDto } from '@dto/permission/create-permission.dto';
+import { UpdatePermissionDto } from '@dto/permission/update-permission.dto';
+import { LoggerService } from '@services/logger.service';
 
 /**
  * Permissions service handling permission management for RBAC
@@ -31,7 +31,7 @@ export class PermissionsService {
   async create(dto: CreatePermissionDto) {
     try {
       if (await this.perms.findByName(dto.name)) {
-        throw new ConflictException("Permission already exists");
+        throw new ConflictException('Permission already exists');
       }
       return this.perms.create(dto);
     } catch (error) {
@@ -39,14 +39,14 @@ export class PermissionsService {
         throw error;
       }
       if (error?.code === 11000) {
-        throw new ConflictException("Permission already exists");
+        throw new ConflictException('Permission already exists');
       }
       this.logger.error(
         `Permission creation failed: ${error.message}`,
         error.stack,
-        "PermissionsService",
+        'PermissionsService',
       );
-      throw new InternalServerErrorException("Failed to create permission");
+      throw new InternalServerErrorException('Failed to create permission');
     }
   }
 
@@ -62,9 +62,9 @@ export class PermissionsService {
       this.logger.error(
         `Permission list failed: ${error.message}`,
         error.stack,
-        "PermissionsService",
+        'PermissionsService',
       );
-      throw new InternalServerErrorException("Failed to retrieve permissions");
+      throw new InternalServerErrorException('Failed to retrieve permissions');
     }
   }
 
@@ -80,7 +80,7 @@ export class PermissionsService {
     try {
       const perm = await this.perms.updateById(id, dto);
       if (!perm) {
-        throw new NotFoundException("Permission not found");
+        throw new NotFoundException('Permission not found');
       }
       return perm;
     } catch (error) {
@@ -90,9 +90,9 @@ export class PermissionsService {
       this.logger.error(
         `Permission update failed: ${error.message}`,
         error.stack,
-        "PermissionsService",
+        'PermissionsService',
       );
-      throw new InternalServerErrorException("Failed to update permission");
+      throw new InternalServerErrorException('Failed to update permission');
     }
   }
 
@@ -107,7 +107,7 @@ export class PermissionsService {
     try {
       const perm = await this.perms.deleteById(id);
       if (!perm) {
-        throw new NotFoundException("Permission not found");
+        throw new NotFoundException('Permission not found');
       }
       return { ok: true };
     } catch (error) {
@@ -117,9 +117,9 @@ export class PermissionsService {
       this.logger.error(
         `Permission deletion failed: ${error.message}`,
         error.stack,
-        "PermissionsService",
+        'PermissionsService',
       );
-      throw new InternalServerErrorException("Failed to delete permission");
+      throw new InternalServerErrorException('Failed to delete permission');
     }
   }
 

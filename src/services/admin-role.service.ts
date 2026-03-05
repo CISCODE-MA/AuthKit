@@ -1,6 +1,6 @@
-import { Injectable, InternalServerErrorException } from "@nestjs/common";
-import { RoleRepository } from "@repos/role.repository";
-import { LoggerService } from "@services/logger.service";
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { RoleRepository } from '@repos/role.repository';
+import { LoggerService } from '@services/logger.service';
 
 @Injectable()
 export class AdminRoleService {
@@ -15,13 +15,13 @@ export class AdminRoleService {
     try {
       if (this.adminRoleId) return this.adminRoleId;
 
-      const admin = await this.roles.findByName("admin");
+      const admin = await this.roles.findByName('admin');
       if (!admin) {
         this.logger.error(
-          "Admin role not found - seed data may be missing",
-          "AdminRoleService",
+          'Admin role not found - seed data may be missing',
+          'AdminRoleService',
         );
-        throw new InternalServerErrorException("System configuration error");
+        throw new InternalServerErrorException('System configuration error');
       }
 
       this.adminRoleId = admin._id.toString();
@@ -33,10 +33,10 @@ export class AdminRoleService {
       this.logger.error(
         `Failed to load admin role: ${error.message}`,
         error.stack,
-        "AdminRoleService",
+        'AdminRoleService',
       );
       throw new InternalServerErrorException(
-        "Failed to verify admin permissions",
+        'Failed to verify admin permissions',
       );
     }
   }

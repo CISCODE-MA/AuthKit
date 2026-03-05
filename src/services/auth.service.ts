@@ -6,20 +6,20 @@ import {
   InternalServerErrorException,
   ForbiddenException,
   BadRequestException,
-} from "@nestjs/common";
-import type { SignOptions } from "jsonwebtoken";
-import * as jwt from "jsonwebtoken";
-import { UserRepository } from "@repos/user.repository";
-import { RegisterDto } from "@dto/auth/register.dto";
-import { LoginDto } from "@dto/auth/login.dto";
-import { MailService } from "@services/mail.service";
-import { RoleRepository } from "@repos/role.repository";
-import { PermissionRepository } from "@repos/permission.repository";
-import { generateUsernameFromName } from "@utils/helper";
-import { LoggerService } from "@services/logger.service";
-import { hashPassword, verifyPassword } from "@utils/password.util";
+} from '@nestjs/common';
+import type { SignOptions } from 'jsonwebtoken';
+import * as jwt from 'jsonwebtoken';
+import { UserRepository } from '@repos/user.repository';
+import { RegisterDto } from '@dto/auth/register.dto';
+import { LoginDto } from '@dto/auth/login.dto';
+import { MailService } from '@services/mail.service';
+import { RoleRepository } from '@repos/role.repository';
+import { PermissionRepository } from '@repos/permission.repository';
+import { generateUsernameFromName } from '@utils/helper';
+import { LoggerService } from '@services/logger.service';
+import { hashPassword, verifyPassword } from '@utils/password.util';
 
-type JwtExpiry = SignOptions["expiresIn"];
+type JwtExpiry = SignOptions['expiresIn'];
 
 /**
  * Authentication service handling user registration, login, email verification,
@@ -58,9 +58,9 @@ export class AuthService {
   private signAccessToken(payload: any) {
     const expiresIn = this.resolveExpiry(
       process.env.JWT_ACCESS_TOKEN_EXPIRES_IN,
-      "15m",
+      '15m',
     );
-    return jwt.sign(payload, this.getEnv("JWT_SECRET"), { expiresIn });
+    return jwt.sign(payload, this.getEnv('JWT_SECRET'), { expiresIn });
   }
 
   /**
@@ -71,9 +71,9 @@ export class AuthService {
   private signRefreshToken(payload: any) {
     const expiresIn = this.resolveExpiry(
       process.env.JWT_REFRESH_TOKEN_EXPIRES_IN,
-      "7d",
+      '7d',
     );
-    return jwt.sign(payload, this.getEnv("JWT_REFRESH_SECRET"), { expiresIn });
+    return jwt.sign(payload, this.getEnv('JWT_REFRESH_SECRET'), { expiresIn });
   }
 
   /**
@@ -84,10 +84,10 @@ export class AuthService {
   private signEmailToken(payload: any) {
     const expiresIn = this.resolveExpiry(
       process.env.JWT_EMAIL_TOKEN_EXPIRES_IN,
-      "1d",
+      '1d',
     );
 
-    return jwt.sign(payload, this.getEnv("JWT_EMAIL_SECRET"), { expiresIn });
+    return jwt.sign(payload, this.getEnv('JWT_EMAIL_SECRET'), { expiresIn });
   }
 
   /**
@@ -98,9 +98,9 @@ export class AuthService {
   private signResetToken(payload: any) {
     const expiresIn = this.resolveExpiry(
       process.env.JWT_RESET_TOKEN_EXPIRES_IN,
-      "1h",
+      '1h',
     );
-    return jwt.sign(payload, this.getEnv("JWT_RESET_SECRET"), { expiresIn });
+    return jwt.sign(payload, this.getEnv('JWT_RESET_SECRET'), { expiresIn });
   }
 
   /**
@@ -115,10 +115,10 @@ export class AuthService {
       // Get user with raw role IDs
       const user = await this.users.findById(userId);
       if (!user) {
-        throw new NotFoundException("User not found");
+        throw new NotFoundException('User not found');
       }
 
-      console.log("[DEBUG] User found, querying roles...");
+      console.log('[DEBUG] User found, querying roles...');
 
       // Manually query roles by IDs
       const roleIds = user.roles || [];
@@ -126,7 +126,7 @@ export class AuthService {
         roleIds.map((id) => id.toString()),
       );
 
-      console.log("[DEBUG] Roles from DB:", roles);
+      console.log('[DEBUG] Roles from DB:', roles);
 
       // Extract role names
       const roleNames = roles.map((r) => r.name).filter(Boolean);
@@ -141,7 +141,7 @@ export class AuthService {
         })
         .filter(Boolean);
 
-      console.log("[DEBUG] Permission IDs:", permissionIds);
+      console.log('[DEBUG] Permission IDs:', permissionIds);
 
       // Query permissions by IDs to get names
       const permissionObjects = await this.perms.findByIds([
@@ -150,9 +150,9 @@ export class AuthService {
       const permissions = permissionObjects.map((p) => p.name).filter(Boolean);
 
       console.log(
-        "[DEBUG] Final roles:",
+        '[DEBUG] Final roles:',
         roleNames,
-        "permissions:",
+        'permissions:',
         permissions,
       );
 
@@ -162,10 +162,10 @@ export class AuthService {
       this.logger.error(
         `Failed to build token payload: ${error.message}`,
         error.stack,
-        "AuthService",
+        'AuthService',
       );
       throw new InternalServerErrorException(
-        "Failed to generate authentication token",
+        'Failed to generate authentication token',
       );
     }
   }
@@ -181,9 +181,9 @@ export class AuthService {
     if (!v) {
       this.logger.error(
         `Environment variable ${name} is not set`,
-        "AuthService",
+        'AuthService',
       );
-      throw new InternalServerErrorException("Server configuration error");
+      throw new InternalServerErrorException('Server configuration error');
     }
     return v;
   }
@@ -198,7 +198,7 @@ export class AuthService {
     const accessToken = this.signAccessToken(payload);
     const refreshToken = this.signRefreshToken({
       sub: userId,
-      purpose: "refresh",
+      purpose: 'refresh',
     });
     return { accessToken, refreshToken };
   }
@@ -219,12 +219,12 @@ export class AuthService {
       const user = await this.users.findByIdWithRolesAndPermissions(userId);
 
       if (!user) {
-        throw new NotFoundException("User not found");
+        throw new NotFoundException('User not found');
       }
 
       if (user.isBanned) {
         throw new ForbiddenException(
-          "Account has been banned. Please contact support",
+          'Account has been banned. Please contact support',
         );
       }
 
@@ -251,9 +251,9 @@ export class AuthService {
       this.logger.error(
         `Get profile failed: ${error.message}`,
         error.stack,
-        "AuthService",
+        'AuthService',
       );
-      throw new InternalServerErrorException("Failed to retrieve profile");
+      throw new InternalServerErrorException('Failed to retrieve profile');
     }
   }
 
@@ -271,7 +271,7 @@ export class AuthService {
   async register(dto: RegisterDto) {
     try {
       // Generate username from fname-lname if not provided
-      if (!dto.username || dto.username.trim() === "") {
+      if (!dto.username || dto.username.trim() === '') {
         dto.username = generateUsernameFromName(
           dto.fullname.fname,
           dto.fullname.lname,
@@ -288,7 +288,7 @@ export class AuthService {
 
       if (existingEmail || existingUsername || existingPhone) {
         throw new ConflictException(
-          "An account with these credentials already exists",
+          'An account with these credentials already exists',
         );
       }
 
@@ -300,19 +300,19 @@ export class AuthService {
         this.logger.error(
           `Password hashing failed: ${error.message}`,
           error.stack,
-          "AuthService",
+          'AuthService',
         );
-        throw new InternalServerErrorException("Registration failed");
+        throw new InternalServerErrorException('Registration failed');
       }
 
       // Get default role
-      const userRole = await this.roles.findByName("user");
+      const userRole = await this.roles.findByName('user');
       if (!userRole) {
         this.logger.error(
-          "Default user role not found - seed data may be missing",
-          "AuthService",
+          'Default user role not found - seed data may be missing',
+          'AuthService',
         );
-        throw new InternalServerErrorException("System configuration error");
+        throw new InternalServerErrorException('System configuration error');
       }
 
       // Create user
@@ -337,16 +337,16 @@ export class AuthService {
       try {
         const emailToken = this.signEmailToken({
           sub: user._id.toString(),
-          purpose: "verify",
+          purpose: 'verify',
         });
         await this.mail.sendVerificationEmail(user.email, emailToken);
       } catch (error) {
         emailSent = false;
-        emailError = error.message || "Failed to send verification email";
+        emailError = error.message || 'Failed to send verification email';
         this.logger.error(
           `Failed to send verification email: ${error.message}`,
           error.stack,
-          "AuthService",
+          'AuthService',
         );
         // Continue - user is created, they can resend verification
       }
@@ -359,7 +359,7 @@ export class AuthService {
         ...(emailError && {
           emailError,
           emailHint:
-            "User created successfully. You can resend verification email later.",
+            'User created successfully. You can resend verification email later.',
         }),
       };
     } catch (error) {
@@ -374,17 +374,17 @@ export class AuthService {
       // Handle MongoDB duplicate key error (race condition)
       if (error?.code === 11000) {
         throw new ConflictException(
-          "An account with these credentials already exists",
+          'An account with these credentials already exists',
         );
       }
 
       this.logger.error(
         `Registration failed: ${error.message}`,
         error.stack,
-        "AuthService",
+        'AuthService',
       );
       throw new InternalServerErrorException(
-        "Registration failed. Please try again",
+        'Registration failed. Please try again',
       );
     }
   }
@@ -404,25 +404,25 @@ export class AuthService {
    */
   async verifyEmail(token: string) {
     try {
-      const decoded: any = jwt.verify(token, this.getEnv("JWT_EMAIL_SECRET"));
+      const decoded: any = jwt.verify(token, this.getEnv('JWT_EMAIL_SECRET'));
 
-      if (decoded.purpose !== "verify") {
-        throw new BadRequestException("Invalid verification token");
+      if (decoded.purpose !== 'verify') {
+        throw new BadRequestException('Invalid verification token');
       }
 
       const user = await this.users.findById(decoded.sub);
       if (!user) {
-        throw new NotFoundException("User not found");
+        throw new NotFoundException('User not found');
       }
 
       if (user.isVerified) {
-        return { ok: true, message: "Email already verified" };
+        return { ok: true, message: 'Email already verified' };
       }
 
       user.isVerified = true;
       await user.save();
 
-      return { ok: true, message: "Email verified successfully" };
+      return { ok: true, message: 'Email verified successfully' };
     } catch (error) {
       if (
         error instanceof BadRequestException ||
@@ -431,20 +431,20 @@ export class AuthService {
         throw error;
       }
 
-      if (error.name === "TokenExpiredError") {
-        throw new UnauthorizedException("Verification token has expired");
+      if (error.name === 'TokenExpiredError') {
+        throw new UnauthorizedException('Verification token has expired');
       }
 
-      if (error.name === "JsonWebTokenError") {
-        throw new UnauthorizedException("Invalid verification token");
+      if (error.name === 'JsonWebTokenError') {
+        throw new UnauthorizedException('Invalid verification token');
       }
 
       this.logger.error(
         `Email verification failed: ${error.message}`,
         error.stack,
-        "AuthService",
+        'AuthService',
       );
-      throw new InternalServerErrorException("Email verification failed");
+      throw new InternalServerErrorException('Email verification failed');
     }
   }
 
@@ -463,20 +463,20 @@ export class AuthService {
         return {
           ok: true,
           message:
-            "If the email exists and is unverified, a verification email has been sent",
+            'If the email exists and is unverified, a verification email has been sent',
         };
       }
 
       const emailToken = this.signEmailToken({
         sub: user._id.toString(),
-        purpose: "verify",
+        purpose: 'verify',
       });
 
       try {
         await this.mail.sendVerificationEmail(user.email, emailToken);
         return {
           ok: true,
-          message: "Verification email sent successfully",
+          message: 'Verification email sent successfully',
           emailSent: true,
         };
       } catch (emailError) {
@@ -484,25 +484,25 @@ export class AuthService {
         this.logger.error(
           `Failed to send verification email: ${emailError.message}`,
           emailError.stack,
-          "AuthService",
+          'AuthService',
         );
         return {
           ok: false,
-          message: "Failed to send verification email",
+          message: 'Failed to send verification email',
           emailSent: false,
-          error: emailError.message || "Email service error",
+          error: emailError.message || 'Email service error',
         };
       }
     } catch (error) {
       this.logger.error(
         `Resend verification failed: ${error.message}`,
         error.stack,
-        "AuthService",
+        'AuthService',
       );
       // Return error details for debugging
       return {
         ok: false,
-        message: "Failed to resend verification email",
+        message: 'Failed to resend verification email',
         error: error.message,
       };
     }
@@ -525,18 +525,18 @@ export class AuthService {
 
       // Use generic message to prevent user enumeration
       if (!user) {
-        throw new UnauthorizedException("Invalid email or password");
+        throw new UnauthorizedException('Invalid email or password');
       }
 
       if (user.isBanned) {
         throw new ForbiddenException(
-          "Account has been banned. Please contact support",
+          'Account has been banned. Please contact support',
         );
       }
 
       if (!user.isVerified) {
         throw new ForbiddenException(
-          "Email not verified. Please check your inbox",
+          'Email not verified. Please check your inbox',
         );
       }
 
@@ -545,14 +545,14 @@ export class AuthService {
         user.password as string,
       );
       if (!passwordMatch) {
-        throw new UnauthorizedException("Invalid email or password");
+        throw new UnauthorizedException('Invalid email or password');
       }
 
       const payload = await this.buildTokenPayload(user._id.toString());
       const accessToken = this.signAccessToken(payload);
       const refreshToken = this.signRefreshToken({
         sub: user._id.toString(),
-        purpose: "refresh",
+        purpose: 'refresh',
       });
 
       return { accessToken, refreshToken };
@@ -567,9 +567,9 @@ export class AuthService {
       this.logger.error(
         `Login failed: ${error.message}`,
         error.stack,
-        "AuthService",
+        'AuthService',
       );
-      throw new InternalServerErrorException("Login failed. Please try again");
+      throw new InternalServerErrorException('Login failed. Please try again');
     }
   }
 
@@ -589,24 +589,24 @@ export class AuthService {
     try {
       const decoded: any = jwt.verify(
         refreshToken,
-        this.getEnv("JWT_REFRESH_SECRET"),
+        this.getEnv('JWT_REFRESH_SECRET'),
       );
 
-      if (decoded.purpose !== "refresh") {
-        throw new UnauthorizedException("Invalid token type");
+      if (decoded.purpose !== 'refresh') {
+        throw new UnauthorizedException('Invalid token type');
       }
 
       const user = await this.users.findById(decoded.sub);
       if (!user) {
-        throw new UnauthorizedException("Invalid refresh token");
+        throw new UnauthorizedException('Invalid refresh token');
       }
 
       if (user.isBanned) {
-        throw new ForbiddenException("Account has been banned");
+        throw new ForbiddenException('Account has been banned');
       }
 
       if (!user.isVerified) {
-        throw new ForbiddenException("Email not verified");
+        throw new ForbiddenException('Email not verified');
       }
 
       // Check if token was issued before password change
@@ -614,14 +614,14 @@ export class AuthService {
         user.passwordChangedAt &&
         decoded.iat * 1000 < user.passwordChangedAt.getTime()
       ) {
-        throw new UnauthorizedException("Token expired due to password change");
+        throw new UnauthorizedException('Token expired due to password change');
       }
 
       const payload = await this.buildTokenPayload(user._id.toString());
       const accessToken = this.signAccessToken(payload);
       const newRefreshToken = this.signRefreshToken({
         sub: user._id.toString(),
-        purpose: "refresh",
+        purpose: 'refresh',
       });
 
       return { accessToken, refreshToken: newRefreshToken };
@@ -633,20 +633,20 @@ export class AuthService {
         throw error;
       }
 
-      if (error.name === "TokenExpiredError") {
-        throw new UnauthorizedException("Refresh token has expired");
+      if (error.name === 'TokenExpiredError') {
+        throw new UnauthorizedException('Refresh token has expired');
       }
 
-      if (error.name === "JsonWebTokenError") {
-        throw new UnauthorizedException("Invalid refresh token");
+      if (error.name === 'JsonWebTokenError') {
+        throw new UnauthorizedException('Invalid refresh token');
       }
 
       this.logger.error(
         `Token refresh failed: ${error.message}`,
         error.stack,
-        "AuthService",
+        'AuthService',
       );
-      throw new InternalServerErrorException("Token refresh failed");
+      throw new InternalServerErrorException('Token refresh failed');
     }
   }
 
@@ -668,20 +668,20 @@ export class AuthService {
       if (!user) {
         return {
           ok: true,
-          message: "If the email exists, a password reset link has been sent",
+          message: 'If the email exists, a password reset link has been sent',
         };
       }
 
       const resetToken = this.signResetToken({
         sub: user._id.toString(),
-        purpose: "reset",
+        purpose: 'reset',
       });
 
       try {
         await this.mail.sendPasswordResetEmail(user.email, resetToken);
         return {
           ok: true,
-          message: "Password reset link sent successfully",
+          message: 'Password reset link sent successfully',
           emailSent: true,
         };
       } catch (emailError) {
@@ -689,41 +689,41 @@ export class AuthService {
         this.logger.error(
           `Failed to send reset email: ${emailError.message}`,
           emailError.stack,
-          "AuthService",
+          'AuthService',
         );
 
         // In development, return error details; in production, hide for security
-        if (process.env.NODE_ENV === "development") {
+        if (process.env.NODE_ENV === 'development') {
           return {
             ok: false,
-            message: "Failed to send password reset email",
+            message: 'Failed to send password reset email',
             emailSent: false,
             error: emailError.message,
           };
         }
         return {
           ok: true,
-          message: "If the email exists, a password reset link has been sent",
+          message: 'If the email exists, a password reset link has been sent',
         };
       }
     } catch (error) {
       this.logger.error(
         `Forgot password failed: ${error.message}`,
         error.stack,
-        "AuthService",
+        'AuthService',
       );
 
       // In development, return error; in production, hide for security
-      if (process.env.NODE_ENV === "development") {
+      if (process.env.NODE_ENV === 'development') {
         return {
           ok: false,
-          message: "Failed to process password reset",
+          message: 'Failed to process password reset',
           error: error.message,
         };
       }
       return {
         ok: true,
-        message: "If the email exists, a password reset link has been sent",
+        message: 'If the email exists, a password reset link has been sent',
       };
     }
   }
@@ -740,15 +740,15 @@ export class AuthService {
    */
   async resetPassword(token: string, newPassword: string) {
     try {
-      const decoded: any = jwt.verify(token, this.getEnv("JWT_RESET_SECRET"));
+      const decoded: any = jwt.verify(token, this.getEnv('JWT_RESET_SECRET'));
 
-      if (decoded.purpose !== "reset") {
-        throw new BadRequestException("Invalid reset token");
+      if (decoded.purpose !== 'reset') {
+        throw new BadRequestException('Invalid reset token');
       }
 
       const user = await this.users.findById(decoded.sub);
       if (!user) {
-        throw new NotFoundException("User not found");
+        throw new NotFoundException('User not found');
       }
 
       // Hash new password
@@ -759,16 +759,16 @@ export class AuthService {
         this.logger.error(
           `Password hashing failed: ${error.message}`,
           error.stack,
-          "AuthService",
+          'AuthService',
         );
-        throw new InternalServerErrorException("Password reset failed");
+        throw new InternalServerErrorException('Password reset failed');
       }
 
       user.password = hashedPassword;
       user.passwordChangedAt = new Date();
       await user.save();
 
-      return { ok: true, message: "Password reset successfully" };
+      return { ok: true, message: 'Password reset successfully' };
     } catch (error) {
       if (
         error instanceof BadRequestException ||
@@ -778,20 +778,20 @@ export class AuthService {
         throw error;
       }
 
-      if (error.name === "TokenExpiredError") {
-        throw new UnauthorizedException("Reset token has expired");
+      if (error.name === 'TokenExpiredError') {
+        throw new UnauthorizedException('Reset token has expired');
       }
 
-      if (error.name === "JsonWebTokenError") {
-        throw new UnauthorizedException("Invalid reset token");
+      if (error.name === 'JsonWebTokenError') {
+        throw new UnauthorizedException('Invalid reset token');
       }
 
       this.logger.error(
         `Password reset failed: ${error.message}`,
         error.stack,
-        "AuthService",
+        'AuthService',
       );
-      throw new InternalServerErrorException("Password reset failed");
+      throw new InternalServerErrorException('Password reset failed');
     }
   }
 
@@ -810,9 +810,9 @@ export class AuthService {
     try {
       const user = await this.users.deleteById(userId);
       if (!user) {
-        throw new NotFoundException("User not found");
+        throw new NotFoundException('User not found');
       }
-      return { ok: true, message: "Account deleted successfully" };
+      return { ok: true, message: 'Account deleted successfully' };
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
@@ -820,9 +820,9 @@ export class AuthService {
       this.logger.error(
         `Account deletion failed: ${error.message}`,
         error.stack,
-        "AuthService",
+        'AuthService',
       );
-      throw new InternalServerErrorException("Account deletion failed");
+      throw new InternalServerErrorException('Account deletion failed');
     }
   }
 

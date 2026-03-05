@@ -1,34 +1,18 @@
-<<<<<<< HEAD
-import { Test, TestingModule } from '@nestjs/testing';
+import type { TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
 import { PermissionRepository } from '@repos/permission.repository';
 import { Permission } from '@entities/permission.entity';
 import { Model, Types } from 'mongoose';
 
 describe('PermissionRepository', () => {
-=======
-import type { TestingModule } from "@nestjs/testing";
-import { Test } from "@nestjs/testing";
-import { getModelToken } from "@nestjs/mongoose";
-import { PermissionRepository } from "@repos/permission.repository";
-import { Permission } from "@entities/permission.entity";
-import { Model, Types } from "mongoose";
-
-describe("PermissionRepository", () => {
->>>>>>> 3e15d93b706eeffb27c8710ef8c593767c9a564e
   let repository: PermissionRepository;
   let model: any;
 
   const mockPermission = {
-<<<<<<< HEAD
     _id: new Types.ObjectId('507f1f77bcf86cd799439011'),
     name: 'read:users',
     description: 'Read users',
-=======
-    _id: new Types.ObjectId("507f1f77bcf86cd799439011"),
-    name: "read:users",
-    description: "Read users",
->>>>>>> 3e15d93b706eeffb27c8710ef8c593767c9a564e
   };
 
   beforeEach(async () => {
@@ -59,7 +43,6 @@ describe("PermissionRepository", () => {
     model = module.get(getModelToken(Permission.name));
   });
 
-<<<<<<< HEAD
   it('should be defined', () => {
     expect(repository).toBeDefined();
   });
@@ -71,30 +54,12 @@ describe("PermissionRepository", () => {
       const result = await repository.create({ name: 'read:users' });
 
       expect(model.create).toHaveBeenCalledWith({ name: 'read:users' });
-=======
-  it("should be defined", () => {
-    expect(repository).toBeDefined();
-  });
-
-  describe("create", () => {
-    it("should create a new permission", async () => {
-      model.create.mockResolvedValue(mockPermission);
-
-      const result = await repository.create({ name: "read:users" });
-
-      expect(model.create).toHaveBeenCalledWith({ name: "read:users" });
->>>>>>> 3e15d93b706eeffb27c8710ef8c593767c9a564e
       expect(result).toEqual(mockPermission);
     });
   });
 
-<<<<<<< HEAD
   describe('findById', () => {
     it('should find permission by id', async () => {
-=======
-  describe("findById", () => {
-    it("should find permission by id", async () => {
->>>>>>> 3e15d93b706eeffb27c8710ef8c593767c9a564e
       model.findById.mockResolvedValue(mockPermission);
 
       const result = await repository.findById(mockPermission._id);
@@ -103,17 +68,14 @@ describe("PermissionRepository", () => {
       expect(result).toEqual(mockPermission);
     });
 
-<<<<<<< HEAD
     it('should accept string id', async () => {
-=======
-    it("should accept string id", async () => {
->>>>>>> 3e15d93b706eeffb27c8710ef8c593767c9a564e
       model.findById.mockResolvedValue(mockPermission);
 
       await repository.findById(mockPermission._id.toString());
 
-<<<<<<< HEAD
-      expect(model.findById).toHaveBeenCalledWith(mockPermission._id.toString());
+      expect(model.findById).toHaveBeenCalledWith(
+        mockPermission._id.toString(),
+      );
     });
   });
 
@@ -124,32 +86,12 @@ describe("PermissionRepository", () => {
       const result = await repository.findByName('read:users');
 
       expect(model.findOne).toHaveBeenCalledWith({ name: 'read:users' });
-=======
-      expect(model.findById).toHaveBeenCalledWith(
-        mockPermission._id.toString(),
-      );
-    });
-  });
-
-  describe("findByName", () => {
-    it("should find permission by name", async () => {
-      model.findOne.mockResolvedValue(mockPermission);
-
-      const result = await repository.findByName("read:users");
-
-      expect(model.findOne).toHaveBeenCalledWith({ name: "read:users" });
->>>>>>> 3e15d93b706eeffb27c8710ef8c593767c9a564e
       expect(result).toEqual(mockPermission);
     });
   });
 
-<<<<<<< HEAD
   describe('list', () => {
     it('should return all permissions', async () => {
-=======
-  describe("list", () => {
-    it("should return all permissions", async () => {
->>>>>>> 3e15d93b706eeffb27c8710ef8c593767c9a564e
       const permissions = [mockPermission];
       const leanSpy = model.find().lean;
       leanSpy.mockResolvedValue(permissions);
@@ -162,7 +104,6 @@ describe("PermissionRepository", () => {
     });
   });
 
-<<<<<<< HEAD
   describe('updateById', () => {
     it('should update permission by id', async () => {
       const updatedPerm = { ...mockPermission, description: 'Updated' };
@@ -170,37 +111,19 @@ describe("PermissionRepository", () => {
 
       const result = await repository.updateById(mockPermission._id, {
         description: 'Updated',
-=======
-  describe("updateById", () => {
-    it("should update permission by id", async () => {
-      const updatedPerm = { ...mockPermission, description: "Updated" };
-      model.findByIdAndUpdate.mockResolvedValue(updatedPerm);
-
-      const result = await repository.updateById(mockPermission._id, {
-        description: "Updated",
->>>>>>> 3e15d93b706eeffb27c8710ef8c593767c9a564e
       });
 
       expect(model.findByIdAndUpdate).toHaveBeenCalledWith(
         mockPermission._id,
-<<<<<<< HEAD
         { description: 'Updated' },
-=======
-        { description: "Updated" },
->>>>>>> 3e15d93b706eeffb27c8710ef8c593767c9a564e
         { new: true },
       );
       expect(result).toEqual(updatedPerm);
     });
   });
 
-<<<<<<< HEAD
   describe('deleteById', () => {
     it('should delete permission by id', async () => {
-=======
-  describe("deleteById", () => {
-    it("should delete permission by id", async () => {
->>>>>>> 3e15d93b706eeffb27c8710ef8c593767c9a564e
       model.findByIdAndDelete.mockResolvedValue(mockPermission);
 
       const result = await repository.deleteById(mockPermission._id);
@@ -210,8 +133,3 @@ describe("PermissionRepository", () => {
     });
   });
 });
-<<<<<<< HEAD
-
-
-=======
->>>>>>> 3e15d93b706eeffb27c8710ef8c593767c9a564e

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { Admin } from '@decorators/admin.decorator';
 
 describe('Admin Decorator', () => {
@@ -9,7 +8,7 @@ describe('Admin Decorator', () => {
 
   it('should return a decorator function', () => {
     const decorator = Admin();
-    
+
     expect(decorator).toBeDefined();
   });
 
@@ -17,34 +16,8 @@ describe('Admin Decorator', () => {
     // The decorator combines AuthenticateGuard and AdminGuard
     // This is tested indirectly through controller tests where guards are applied
     const decorator = Admin();
-    
-=======
-import { Admin } from "@decorators/admin.decorator";
 
-describe("Admin Decorator", () => {
-  it("should be defined", () => {
-    expect(Admin).toBeDefined();
-    expect(typeof Admin).toBe("function");
-  });
-
-  it("should return a decorator function", () => {
-    const decorator = Admin();
-
-    expect(decorator).toBeDefined();
-  });
-
-  it("should apply both AuthenticateGuard and AdminGuard via UseGuards", () => {
-    // The decorator combines AuthenticateGuard and AdminGuard
-    // This is tested indirectly through controller tests where guards are applied
-    const decorator = Admin();
-
->>>>>>> 3e15d93b706eeffb27c8710ef8c593767c9a564e
     // Just verify it returns something (the composed decorator)
     expect(decorator).toBeDefined();
   });
 });
-<<<<<<< HEAD
-
-
-=======
->>>>>>> 3e15d93b706eeffb27c8710ef8c593767c9a564e

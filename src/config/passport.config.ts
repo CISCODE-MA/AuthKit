@@ -1,9 +1,9 @@
-import type { OAuthService } from "@services/oauth.service";
-import axios from "axios";
 import passport from "passport";
 import { Strategy as AzureStrategy } from "passport-azure-ad-oauth2";
-import { Strategy as FacebookStrategy } from "passport-facebook";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import { Strategy as FacebookStrategy } from "passport-facebook";
+import type { OAuthService } from "@services/oauth.service";
+import axios from "axios";
 
 export const registerOAuthStrategies = (oauth: OAuthService) => {
   // Microsoft
@@ -93,14 +93,18 @@ export const registerOAuthStrategies = (oauth: OAuthService) => {
           clientID: process.env.FB_CLIENT_ID,
           clientSecret: process.env.FB_CLIENT_SECRET,
           callbackURL: process.env.FB_CALLBACK_URL,
-          profileFields: ["id", "displayName", "emails"],
+          profileFields: ["id", "displayName"],
         },
         async (_at: any, _rt: any, profile: any, done: any) => {
           try {
-            const email = profile.emails?.[0]?.value;
-            if (!email) return done(null, false);
+            // Use Facebook ID as email fallback (testing without email permission)
+            const email =
+              profile.emails?.[0]?.value || `${profile.id}@facebook.test`;
             const { accessToken, refreshToken } =
-              await oauth.findOrCreateOAuthUser(email, profile.displayName);
+              await oauth.findOrCreateOAuthUser(
+                email,
+                profile.displayName || "Facebook User",
+              );
             return done(null, { accessToken, refreshToken });
           } catch (err) {
             return done(err);

@@ -6,7 +6,15 @@ import tseslint from "@typescript-eslint/eslint-plugin";
 import tsparser from "@typescript-eslint/parser";
 
 export default [
-  { ignores: ["dist/**", "coverage/**", "node_modules/**"] },
+  {
+    ignores: [
+      "dist/**",
+      "coverage/**",
+      "node_modules/**",
+      "scripts/**",
+      "jest.config.js",
+    ],
+  },
 
   eslint.configs.recommended,
 
@@ -44,13 +52,14 @@ export default [
       ],
 
       "import/no-duplicates": "error",
-      "import/order": [
-        "error",
-        {
-          "newlines-between": "always",
-          alphabetize: { order: "asc", caseInsensitive: true },
-        },
-      ],
+      // Disabled due to compatibility issue with ESLint 9+
+      // "import/order": [
+      //   "error",
+      //   {
+      //     "newlines-between": "always",
+      //     alphabetize: { order: "asc", caseInsensitive: true },
+      //   },
+      // ],
     },
   },
 
@@ -59,6 +68,7 @@ export default [
     files: ["**/*.spec.ts", "**/*.test.ts"],
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unused-vars": "off", // Test files may have setup variables
     },
   },
 

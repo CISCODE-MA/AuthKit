@@ -1,10 +1,14 @@
-import { Permission, PermissionDocument } from "@models/permission.model";
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import type { Model, Types } from "mongoose";
+import { Permission, PermissionDocument } from "@entities/permission.entity";
+import { IPermissionRepository } from "./interfaces/permission-repository.interface";
 
+/**
+ * Permission repository implementation using Mongoose
+ */
 @Injectable()
-export class PermissionRepository {
+export class PermissionRepository implements IPermissionRepository {
   constructor(
     @InjectModel(Permission.name)
     private readonly permModel: Model<PermissionDocument>,
@@ -32,5 +36,12 @@ export class PermissionRepository {
 
   deleteById(id: string | Types.ObjectId) {
     return this.permModel.findByIdAndDelete(id);
+  }
+
+  findByIds(ids: string[]) {
+    return this.permModel
+      .find({ _id: { $in: ids } })
+      .lean()
+      .exec();
   }
 }

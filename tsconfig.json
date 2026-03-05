@@ -4,26 +4,59 @@
     "target": "ES2019",
     "declaration": true,
     "outDir": "dist",
-    "rootDir": "src",
     "strict": false,
     "baseUrl": ".",
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "skipLibCheck": true,
-    "types": ["node"],
+    "types": [
+      "node",
+      "jest"
+    ],
     "paths": {
-      "@models/*": ["src/models/*"],
-      "@dtos/*": ["src/dtos/*"],
-      "@repos/*": ["src/repositories/*"],
-      "@services/*": ["src/services/*"],
-      "@controllers/*": ["src/controllers/*"],
-      "@config/*": ["src/config/*"],
-      "@middleware/*": ["src/middleware/*"],
-      "@filters/*": ["src/filters/*"],
-      "@utils/*": ["src/utils/*"]
+      "@entities/*": [
+        "src/entities/*"
+      ],
+      "@dto/*": [
+        "src/dto/*"
+      ],
+      "@repos/*": [
+        "src/repositories/*"
+      ],
+      "@services/*": [
+        "src/services/*"
+      ],
+      "@controllers/*": [
+        "src/controllers/*"
+      ],
+      "@guards/*": [
+        "src/guards/*"
+      ],
+      "@decorators/*": [
+        "src/decorators/*"
+      ],
+      "@config/*": [
+        "src/config/*"
+      ],
+      "@filters/*": [
+        "src/filters/*"
+      ],
+      "@utils/*": [
+        "src/utils/*"
+      ],
+      "@test-utils/*": [
+        "src/test-utils/*"
+      ]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.d.ts",
+    "test/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }

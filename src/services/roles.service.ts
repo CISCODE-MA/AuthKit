@@ -1,5 +1,3 @@
-import { CreateRoleDto } from "@dtos/role/create-role.dto";
-import { UpdateRoleDto } from "@dtos/role/update-role.dto";
 import {
   Injectable,
   ConflictException,
@@ -7,9 +5,14 @@ import {
   InternalServerErrorException,
 } from "@nestjs/common";
 import { RoleRepository } from "@repos/role.repository";
-import { LoggerService } from "@services/logger.service";
+import { CreateRoleDto } from "@dto/role/create-role.dto";
+import { UpdateRoleDto } from "@dto/role/update-role.dto";
 import { Types } from "mongoose";
+import { LoggerService } from "@services/logger.service";
 
+/**
+ * Roles service handling role-based access control (RBAC) operations
+ */
 @Injectable()
 export class RolesService {
   constructor(
@@ -17,6 +20,15 @@ export class RolesService {
     private readonly logger: LoggerService,
   ) {}
 
+  //#region Role Management
+
+  /**
+   * Creates a new role with optional permissions
+   * @param dto - Role creation data including name and permission IDs
+   * @returns Created role object
+   * @throws ConflictException if role name already exists
+   * @throws InternalServerErrorException on creation errors
+   */
   async create(dto: CreateRoleDto) {
     try {
       if (await this.roles.findByName(dto.name)) {
@@ -40,6 +52,11 @@ export class RolesService {
     }
   }
 
+  /**
+   * Retrieves all roles with their permissions
+   * @returns Array of all roles
+   * @throws InternalServerErrorException on query errors
+   */
   async list() {
     try {
       return this.roles.list();
@@ -53,6 +70,14 @@ export class RolesService {
     }
   }
 
+  /**
+   * Updates an existing role
+   * @param id - Role ID to update
+   * @param dto - Update data (name and/or permissions)
+   * @returns Updated role object
+   * @throws NotFoundException if role not found
+   * @throws InternalServerErrorException on update errors
+   */
   async update(id: string, dto: UpdateRoleDto) {
     try {
       const data: any = { ...dto };
@@ -79,6 +104,13 @@ export class RolesService {
     }
   }
 
+  /**
+   * Deletes a role
+   * @param id - Role ID to delete
+   * @returns Success confirmation
+   * @throws NotFoundException if role not found
+   * @throws InternalServerErrorException on deletion errors
+   */
   async delete(id: string) {
     try {
       const role = await this.roles.deleteById(id);
@@ -99,6 +131,18 @@ export class RolesService {
     }
   }
 
+  //#endregion
+
+  //#region Permission Assignment
+
+  /**
+   * Sets permissions for a role (replaces existing)
+   * @param roleId - Role ID to update
+   * @param permissionIds - Array of permission IDs to assign
+   * @returns Updated role with new permissions
+   * @throws NotFoundException if role not found
+   * @throws InternalServerErrorException on update errors
+   */
   async setPermissions(roleId: string, permissionIds: string[]) {
     try {
       const permIds = permissionIds.map((p) => new Types.ObjectId(p));
@@ -121,4 +165,6 @@ export class RolesService {
       throw new InternalServerErrorException("Failed to set permissions");
     }
   }
+
+  //#endregion
 }

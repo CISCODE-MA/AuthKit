@@ -1,10 +1,14 @@
-import { User, UserDocument } from "@models/user.model";
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import type { Model, Types } from "mongoose";
+import { User, UserDocument } from "@entities/user.entity";
+import { IUserRepository } from "./interfaces/user-repository.interface";
 
+/**
+ * User repository implementation using Mongoose
+ */
 @Injectable()
-export class UserRepository {
+export class UserRepository implements IUserRepository {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
   ) {}
@@ -42,11 +46,15 @@ export class UserRepository {
   }
 
   findByIdWithRolesAndPermissions(id: string | Types.ObjectId) {
-    return this.userModel.findById(id).populate({
-      path: "roles",
-      populate: { path: "permissions", select: "name" },
-      select: "name permissions",
-    });
+    return this.userModel
+      .findById(id)
+      .populate({
+        path: "roles",
+        populate: { path: "permissions", select: "name" },
+        select: "name permissions",
+      })
+      .lean()
+      .exec();
   }
 
   list(filter: { email?: string; username?: string }) {

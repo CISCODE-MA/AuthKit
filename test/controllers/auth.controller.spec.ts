@@ -592,7 +592,7 @@ describe('AuthController (Integration)', () => {
       // Arrange
       const dto = {
         token: 'valid-reset-token',
-        newPassword: '123', // Too short
+        newPassword: TEST_PASSWORDS.WEAK, // Too short
       };
 
       // Act & Assert

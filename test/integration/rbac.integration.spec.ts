@@ -11,6 +11,9 @@ import { PermissionRepository } from '@repos/permission.repository';
 import { MailService } from '@services/mail.service';
 import { LoggerService } from '@services/logger.service';
 
+// Test constants
+const TEST_HASHED_PASSWORD = '$2a$10$validHashedPassword';
+
 describe('RBAC Integration - Login & JWT with Roles/Permissions', () => {
   let authService: AuthService;
   let userRepo: jest.Mocked<UserRepository>;
@@ -129,7 +132,7 @@ describe('RBAC Integration - Login & JWT with Roles/Permissions', () => {
       const userWithNoRoles = {
         _id: userId,
         email: 'user@example.com',
-        password: '$2a$10$validHashedPassword',
+        password: TEST_HASHED_PASSWORD,
         isVerified: true,
         isBanned: false,
         roles: [], // NO ROLES
@@ -180,7 +183,7 @@ describe('RBAC Integration - Login & JWT with Roles/Permissions', () => {
       const adminUser = {
         _id: userId,
         email: 'admin@example.com',
-        password: '$2a$10$validHashedPassword',
+        password: TEST_HASHED_PASSWORD,
         isVerified: true,
         isBanned: false,
         roles: [adminRoleId],
@@ -253,7 +256,7 @@ describe('RBAC Integration - Login & JWT with Roles/Permissions', () => {
       const userWithMultipleRoles = {
         _id: userId,
         email: 'user@example.com',
-        password: '$2a$10$validHashedPassword',
+        password: TEST_HASHED_PASSWORD,
         isVerified: true,
         isBanned: false,
         roles: [editorRoleId, moderatorRoleId],
@@ -306,7 +309,7 @@ describe('RBAC Integration - Login & JWT with Roles/Permissions', () => {
       const user = {
         _id: userId,
         email: 'test@example.com',
-        password: '$2a$10$validHashedPassword',
+        password: TEST_HASHED_PASSWORD,
         isVerified: true,
         isBanned: false,
         roles: [],
@@ -352,7 +355,7 @@ describe('RBAC Integration - Login & JWT with Roles/Permissions', () => {
       const userNoRoles = {
         _id: userId,
         email: 'test@example.com',
-        password: '$2a$10$validHashedPassword',
+        password: TEST_HASHED_PASSWORD,
         isVerified: true,
         isBanned: false,
         roles: [],
@@ -380,7 +383,7 @@ describe('RBAC Integration - Login & JWT with Roles/Permissions', () => {
       const userWithRole = {
         _id: userId,
         email: 'test@example.com',
-        password: '$2a$10$validHashedPassword',
+        password: TEST_HASHED_PASSWORD,
         isVerified: true,
         isBanned: false,
         roles: [adminRoleId],

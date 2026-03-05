@@ -8,6 +8,7 @@
 ## 🎯 Cosa Otterremo
 
 Al termine avremo:
+
 - ✅ `FB_CLIENT_ID` (App ID)
 - ✅ `FB_CLIENT_SECRET` (App Secret)
 - ✅ App configurata per OAuth testing locale
@@ -41,8 +42,9 @@ Vai su: **https://developers.facebook.com/**
 ### 2.3 Scegli Tipo App
 
 **Opzioni disponibili:**
+
 - ❌ Business
-- ❌ Consumer  
+- ❌ Consumer
 - ✅ **Other** ← **SCEGLI QUESTO**
 
 **Perché "Other"?**  
@@ -67,6 +69,7 @@ App contact email: tua.email@example.com
 ### 3.2 (Opzionale) Business Account
 
 Se chiede "Connect a business account":
+
 - **Puoi saltare** per testing
 - O crea un test business account
 
@@ -121,17 +124,21 @@ App Secret: abc123def456ghi789jkl012mno345pqr
 Scorri in basso fino a trovare:
 
 **App Domains:**
+
 ```
 localhost
 ```
+
 Aggiungi `localhost` e salva.
 
 **Privacy Policy URL:** (richiesto per prod, opzionale per test)
+
 ```
 http://localhost:3000/privacy
 ```
 
 **Terms of Service URL:** (opzionale)
+
 ```
 http://localhost:3000/terms
 ```
@@ -153,6 +160,7 @@ http://localhost:3000/terms
 ### 6.3 Scegli Platform
 
 Nella schermata "Quickstart":
+
 - Salta il quickstart
 - Sidebar sinistra → **"Facebook Login"** → **"Settings"**
 
@@ -204,6 +212,7 @@ Verifica che ci sia un toggle con **"Development"** mode attivo.
 ### 9.2 Screenshot Configurazione Finale
 
 **Settings → Basic:**
+
 ```
 App ID: 1234567890123456
 App Secret: ••••••••••••• (copiato)
@@ -211,6 +220,7 @@ App Domains: localhost
 ```
 
 **Facebook Login → Settings:**
+
 ```
 Valid OAuth Redirect URIs:
 http://localhost:3000/api/auth/facebook/callback
@@ -235,7 +245,8 @@ FB_CLIENT_SECRET=abc123def456ghi789jkl012mno345pqr
 
 ### ❌ "Can't see App Secret"
 
-**Soluzione**: 
+**Soluzione**:
+
 - Click "Show"
 - Inserisci password Facebook
 - Se non funziona, abilita 2FA sul tuo account Facebook
@@ -244,6 +255,7 @@ FB_CLIENT_SECRET=abc123def456ghi789jkl012mno345pqr
 
 **Soluzione**:
 Verifica che in `.env` backend ci sia:
+
 ```env
 FB_CALLBACK_URL=http://localhost:3000/api/auth/facebook/callback
 ```
@@ -259,6 +271,7 @@ Deve corrispondere **esattamente** a quello in Facebook Login Settings.
 ## 📸 Screenshot di Riferimento
 
 ### Dashboard dopo creazione:
+
 ```
 ┌─────────────────────────────────────────┐
 │ Auth Kit Test                [🔴 Dev]  │
@@ -276,6 +289,7 @@ Deve corrispondere **esattamente** a quello in Facebook Login Settings.
 ```
 
 ### Facebook Login Settings:
+
 ```
 Valid OAuth Redirect URIs
 ┌─────────────────────────────────────────┐
@@ -305,9 +319,9 @@ Dopo che mi fornisci le credenziali:
 ## 📞 Supporto
 
 **Bloccato in qualche step?**
+
 - Dimmi in quale step sei
 - Descrivi cosa vedi (o screenshot)
 - Ti aiuto a risolvere
 
 **Pronto quando lo sei tu!** 🚀
-

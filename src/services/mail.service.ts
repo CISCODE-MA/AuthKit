@@ -1,7 +1,7 @@
-import { Injectable, InternalServerErrorException } from "@nestjs/common";
-import { LoggerService } from "@services/logger.service";
-import nodemailer from "nodemailer";
-import type { Transporter } from "nodemailer";
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { LoggerService } from '@services/logger.service';
+import nodemailer from 'nodemailer';
+import type { Transporter } from 'nodemailer';
 
 @Injectable()
 export class MailService {
@@ -17,8 +17,8 @@ export class MailService {
       // Check if SMTP is configured
       if (!process.env.SMTP_HOST || !process.env.SMTP_PORT) {
         this.logger.warn(
-          "SMTP not configured - email functionality will be disabled",
-          "MailService",
+          'SMTP not configured - email functionality will be disabled',
+          'MailService',
         );
         this.smtpConfigured = false;
         return;
@@ -27,7 +27,7 @@ export class MailService {
       this.transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
         port: parseInt(process.env.SMTP_PORT as string, 10),
-        secure: process.env.SMTP_SECURE === "true",
+        secure: process.env.SMTP_SECURE === 'true',
         auth: {
           user: process.env.SMTP_USER,
           pass: process.env.SMTP_PASS,
@@ -40,7 +40,7 @@ export class MailService {
       this.logger.error(
         `Failed to initialize SMTP transporter: ${error.message}`,
         error.stack,
-        "MailService",
+        'MailService',
       );
       this.smtpConfigured = false;
     }
@@ -48,16 +48,16 @@ export class MailService {
 
   async verifyConnection(): Promise<{ connected: boolean; error?: string }> {
     if (!this.smtpConfigured) {
-      return { connected: false, error: "SMTP not configured" };
+      return { connected: false, error: 'SMTP not configured' };
     }
 
     try {
       await this.transporter.verify();
-      this.logger.log("SMTP connection verified successfully", "MailService");
+      this.logger.log('SMTP connection verified successfully', 'MailService');
       return { connected: true };
     } catch (error) {
       const errorMsg = `SMTP connection failed: ${error.message}`;
-      this.logger.error(errorMsg, error.stack, "MailService");
+      this.logger.error(errorMsg, error.stack, 'MailService');
       return { connected: false, error: errorMsg };
     }
   }
@@ -65,12 +65,12 @@ export class MailService {
   async sendVerificationEmail(email: string, token: string) {
     if (!this.smtpConfigured) {
       const error = new InternalServerErrorException(
-        "SMTP not configured - cannot send emails",
+        'SMTP not configured - cannot send emails',
       );
       this.logger.error(
-        "Attempted to send email but SMTP is not configured",
-        "",
-        "MailService",
+        'Attempted to send email but SMTP is not configured',
+        '',
+        'MailService',
       );
       throw error;
     }
@@ -82,24 +82,24 @@ export class MailService {
       // Option 2: Link directly to backend API (backend verifies and redirects)
       const backendUrl =
         process.env.BACKEND_URL ||
-        process.env.FRONTEND_URL?.replace(/:\d+$/, ":3000") ||
-        "http://localhost:3000";
+        process.env.FRONTEND_URL?.replace(/:\d+$/, ':3000') ||
+        'http://localhost:3000';
       const url = `${backendUrl}/api/auth/verify-email/${token}`;
 
       await this.transporter.sendMail({
         from: process.env.FROM_EMAIL,
         to: email,
-        subject: "Verify your email",
+        subject: 'Verify your email',
         text: `Click to verify your email: ${url}`,
         html: `<p>Click <a href="${url}">here</a> to verify your email</p>`,
       });
-      this.logger.log(`Verification email sent to ${email}`, "MailService");
+      this.logger.log(`Verification email sent to ${email}`, 'MailService');
     } catch (error) {
       const detailedError = this.getDetailedSmtpError(error);
       this.logger.error(
         `Failed to send verification email to ${email}: ${detailedError}`,
         error.stack,
-        "MailService",
+        'MailService',
       );
       throw new InternalServerErrorException(detailedError);
     }
@@ -108,12 +108,12 @@ export class MailService {
   async sendPasswordResetEmail(email: string, token: string) {
     if (!this.smtpConfigured) {
       const error = new InternalServerErrorException(
-        "SMTP not configured - cannot send emails",
+        'SMTP not configured - cannot send emails',
       );
       this.logger.error(
-        "Attempted to send email but SMTP is not configured",
-        "",
-        "MailService",
+        'Attempted to send email but SMTP is not configured',
+        '',
+        'MailService',
       );
       throw error;
     }
@@ -123,31 +123,31 @@ export class MailService {
       await this.transporter.sendMail({
         from: process.env.FROM_EMAIL,
         to: email,
-        subject: "Reset your password",
+        subject: 'Reset your password',
         text: `Reset your password: ${url}`,
         html: `<p>Click <a href="${url}">here</a> to reset your password</p>`,
       });
-      this.logger.log(`Password reset email sent to ${email}`, "MailService");
+      this.logger.log(`Password reset email sent to ${email}`, 'MailService');
     } catch (error) {
       const detailedError = this.getDetailedSmtpError(error);
       this.logger.error(
         `Failed to send password reset email to ${email}: ${detailedError}`,
         error.stack,
-        "MailService",
+        'MailService',
       );
       throw new InternalServerErrorException(detailedError);
     }
   }
 
   private getDetailedSmtpError(error: any): string {
-    if (error.code === "EAUTH") {
-      return "SMTP authentication failed. Check SMTP_USER and SMTP_PASS environment variables.";
+    if (error.code === 'EAUTH') {
+      return 'SMTP authentication failed. Check SMTP_USER and SMTP_PASS environment variables.';
     }
-    if (error.code === "ESOCKET" || error.code === "ECONNECTION") {
+    if (error.code === 'ESOCKET' || error.code === 'ECONNECTION') {
       return `Cannot connect to SMTP server at ${process.env.SMTP_HOST}:${process.env.SMTP_PORT}. Check network/firewall settings.`;
     }
-    if (error.code === "ETIMEDOUT" || error.code === "ECONNABORTED") {
-      return "SMTP connection timed out. Server may be unreachable or firewalled.";
+    if (error.code === 'ETIMEDOUT' || error.code === 'ECONNABORTED') {
+      return 'SMTP connection timed out. Server may be unreachable or firewalled.';
     }
     if (error.responseCode >= 500) {
       return `SMTP server error (${error.responseCode}): ${error.response}`;
@@ -155,6 +155,6 @@ export class MailService {
     if (error.responseCode >= 400) {
       return `SMTP client error (${error.responseCode}): Check FROM_EMAIL and recipient addresses.`;
     }
-    return error.message || "Unknown SMTP error";
+    return error.message || 'Unknown SMTP error';
   }
 }

@@ -20,12 +20,12 @@
 
 ```typescript
 // auth.service.spec.ts - Add failing test FIRST
-describe("Bug: Token validation fails after password reset", () => {
-  it("should accept tokens issued after password reset", async () => {
+describe('Bug: Token validation fails after password reset', () => {
+  it('should accept tokens issued after password reset', async () => {
     const user = await createMockUser({
-      passwordChangedAt: new Date("2026-01-01"),
+      passwordChangedAt: new Date('2026-01-01'),
     });
-    const token = generateToken(user._id, new Date("2026-01-02")); // Token AFTER reset
+    const token = generateToken(user._id, new Date('2026-01-02')); // Token AFTER reset
 
     // This should PASS but currently FAILS
     const result = await guard.canActivate(createContextWithToken(token));
@@ -47,15 +47,15 @@ describe("Bug: Token validation fails after password reset", () => {
 
 ```typescript
 // Add debug logging
-this.logger.debug(`Token iat: ${decoded.iat * 1000}`, "AuthenticateGuard");
+this.logger.debug(`Token iat: ${decoded.iat * 1000}`, 'AuthenticateGuard');
 this.logger.debug(
   `Password changed at: ${user.passwordChangedAt.getTime()}`,
-  "AuthenticateGuard",
+  'AuthenticateGuard',
 );
 
 // Check assumptions
-console.assert(decoded.iat, "Token has no iat claim");
-console.assert(user.passwordChangedAt, "User has no passwordChangedAt");
+console.assert(decoded.iat, 'Token has no iat claim');
+console.assert(user.passwordChangedAt, 'User has no passwordChangedAt');
 ```
 
 ### Phase 3: Understand Impact
@@ -91,7 +91,7 @@ if (decoded.iat < user.passwordChangedAt.getTime()) {
 
 // ✅ FIX - Convert iat to milliseconds
 if (decoded.iat * 1000 < user.passwordChangedAt.getTime()) {
-  throw new UnauthorizedException("Token expired due to password change");
+  throw new UnauthorizedException('Token expired due to password change');
 }
 ```
 
@@ -219,12 +219,12 @@ async findByIdWithRoles(id: string) {
 
 ```typescript
 // auth.service.spec.ts
-describe("Bug #123: Login fails with uppercase email", () => {
-  it("should login successfully with uppercase email", async () => {
+describe('Bug #123: Login fails with uppercase email', () => {
+  it('should login successfully with uppercase email', async () => {
     const user = {
-      _id: "user123",
-      email: "test@example.com", // Stored lowercase
-      password: await bcrypt.hash("password123", 12),
+      _id: 'user123',
+      email: 'test@example.com', // Stored lowercase
+      password: await bcrypt.hash('password123', 12),
       isVerified: true,
       isBanned: false,
     };
@@ -237,11 +237,11 @@ describe("Bug #123: Login fails with uppercase email", () => {
 
     // Bug: This fails because we search for 'TEST@EXAMPLE.COM'
     const result = await service.login({
-      email: "TEST@EXAMPLE.COM", // ← Uppercase
-      password: "password123",
+      email: 'TEST@EXAMPLE.COM', // ← Uppercase
+      password: 'password123',
     });
 
-    expect(result).toHaveProperty("accessToken");
+    expect(result).toHaveProperty('accessToken');
   });
 });
 ```
@@ -285,17 +285,17 @@ npm test -- auth.service.spec.ts
 **Add tests for related scenarios:**
 
 ```typescript
-describe("Email normalization", () => {
-  it("should handle mixed case emails", async () => {
-    await expectLoginSuccess("TeSt@ExAmPlE.cOm", "password123");
+describe('Email normalization', () => {
+  it('should handle mixed case emails', async () => {
+    await expectLoginSuccess('TeSt@ExAmPlE.cOm', 'password123');
   });
 
-  it("should handle emails with whitespace", async () => {
-    await expectLoginSuccess("  test@example.com  ", "password123");
+  it('should handle emails with whitespace', async () => {
+    await expectLoginSuccess('  test@example.com  ', 'password123');
   });
 
-  it("should preserve password case sensitivity", async () => {
-    await expectLoginFailure("test@example.com", "PASSWORD123"); // Wrong case
+  it('should preserve password case sensitivity', async () => {
+    await expectLoginFailure('test@example.com', 'PASSWORD123'); // Wrong case
   });
 });
 ```
@@ -386,19 +386,19 @@ async login(dto: LoginDto): Promise<{ accessToken: string; refreshToken: string 
 
 ```typescript
 // ❌ BAD - Only test happy path
-it("should login successfully", async () => {
+it('should login successfully', async () => {
   const result = await service.login(validDto);
-  expect(result).toHaveProperty("accessToken");
+  expect(result).toHaveProperty('accessToken');
 });
 
 // ✅ GOOD - Test both paths
-describe("login", () => {
-  it("should login successfully with valid credentials", async () => {
+describe('login', () => {
+  it('should login successfully with valid credentials', async () => {
     const result = await service.login(validDto);
-    expect(result).toHaveProperty("accessToken");
+    expect(result).toHaveProperty('accessToken');
   });
 
-  it("should reject invalid credentials", async () => {
+  it('should reject invalid credentials', async () => {
     userRepository.findByEmailWithPassword.mockResolvedValue(null);
     await expect(service.login(invalidDto)).rejects.toThrow(
       UnauthorizedException,
@@ -467,13 +467,13 @@ LOG_LEVEL=debug
 **Use jwt.io or decode manually:**
 
 ```typescript
-import jwt from "jsonwebtoken";
+import jwt from 'jsonwebtoken';
 
-const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...";
+const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...';
 const decoded = jwt.decode(token);
-console.log("Token payload:", decoded);
-console.log("Token issued at:", new Date(decoded.iat * 1000));
-console.log("Token expires at:", new Date(decoded.exp * 1000));
+console.log('Token payload:', decoded);
+console.log('Token issued at:', new Date(decoded.iat * 1000));
+console.log('Token expires at:', new Date(decoded.exp * 1000));
 ```
 
 ### Check Database State
@@ -481,10 +481,10 @@ console.log("Token expires at:", new Date(decoded.exp * 1000));
 **Inspect user record:**
 
 ```typescript
-const user = await this.users.findById("user123");
-console.log("User record:", JSON.stringify(user, null, 2));
-console.log("Roles:", user.roles);
-console.log("passwordChangedAt:", user.passwordChangedAt);
+const user = await this.users.findById('user123');
+console.log('User record:', JSON.stringify(user, null, 2));
+console.log('Roles:', user.roles);
+console.log('passwordChangedAt:', user.passwordChangedAt);
 ```
 
 ### Test in Isolation
@@ -493,15 +493,15 @@ console.log("passwordChangedAt:", user.passwordChangedAt);
 
 ```typescript
 // standalone-test.ts
-import { AuthService } from "./services/auth.service";
+import { AuthService } from './services/auth.service';
 
 async function testBug() {
   const service = new AuthService(/* mock dependencies */);
   const result = await service.login({
-    email: "TEST@EXAMPLE.COM",
-    password: "pass",
+    email: 'TEST@EXAMPLE.COM',
+    password: 'pass',
   });
-  console.log("Result:", result);
+  console.log('Result:', result);
 }
 
 testBug().catch(console.error);
@@ -522,19 +522,19 @@ testBug().catch(console.error);
 **Create failing test:**
 
 ```typescript
-describe("Bug #156: Refresh fails after password reset", () => {
-  it("should accept refresh tokens issued after password reset", async () => {
+describe('Bug #156: Refresh fails after password reset', () => {
+  it('should accept refresh tokens issued after password reset', async () => {
     // Simulate user flow:
     // 1. User resets password (passwordChangedAt updated)
     // 2. User logs in (new tokens issued AFTER reset)
     // 3. User tries to refresh (should work)
 
-    const passwordResetTime = new Date("2026-02-01T10:00:00Z");
-    const loginTime = new Date("2026-02-01T10:05:00Z"); // 5 min after reset
+    const passwordResetTime = new Date('2026-02-01T10:00:00Z');
+    const loginTime = new Date('2026-02-01T10:05:00Z'); // 5 min after reset
 
     const user = {
-      _id: "user123",
-      email: "test@example.com",
+      _id: 'user123',
+      email: 'test@example.com',
       passwordChangedAt: passwordResetTime,
       isVerified: true,
       isBanned: false,
@@ -542,9 +542,9 @@ describe("Bug #156: Refresh fails after password reset", () => {
 
     // Create refresh token issued AFTER password change
     const refreshToken = jwt.sign(
-      { sub: user._id, purpose: "refresh" },
+      { sub: user._id, purpose: 'refresh' },
       process.env.JWT_REFRESH_SECRET!,
-      { expiresIn: "7d" },
+      { expiresIn: '7d' },
     );
 
     // Mock user lookup
@@ -556,7 +556,7 @@ describe("Bug #156: Refresh fails after password reset", () => {
 
     // This should PASS but currently FAILS
     const result = await service.refresh(refreshToken);
-    expect(result).toHaveProperty("accessToken");
+    expect(result).toHaveProperty('accessToken');
   });
 });
 ```

@@ -9,8 +9,8 @@ import {
   UnauthorizedException,
   BadRequestException,
   InternalServerErrorException,
-} from "@nestjs/common";
-import type { LoggerService } from "@services/logger.service";
+} from '@nestjs/common';
+import type { LoggerService } from '@services/logger.service';
 
 export class OAuthErrorHandler {
   constructor(private readonly logger: LoggerService) {}
@@ -35,8 +35,8 @@ export class OAuthErrorHandler {
     // Log and wrap unexpected errors
     this.logger.error(
       `${provider} ${operation} failed: ${error.message}`,
-      error.stack || "",
-      "OAuthErrorHandler",
+      error.stack || '',
+      'OAuthErrorHandler',
     );
 
     throw new UnauthorizedException(`${provider} authentication failed`);

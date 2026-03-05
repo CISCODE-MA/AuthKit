@@ -33,7 +33,7 @@ export interface OAuthTokens {
  * OAuth provider name
  */
 export enum OAuthProvider {
-  GOOGLE = "google",
-  MICROSOFT = "microsoft",
-  FACEBOOK = "facebook",
+  GOOGLE = 'google',
+  MICROSOFT = 'microsoft',
+  FACEBOOK = 'facebook',
 }

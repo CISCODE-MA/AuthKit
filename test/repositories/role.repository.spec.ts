@@ -1,17 +1,17 @@
-import type { TestingModule } from "@nestjs/testing";
-import { Test } from "@nestjs/testing";
-import { getModelToken } from "@nestjs/mongoose";
-import { RoleRepository } from "@repos/role.repository";
-import { Role } from "@entities/role.entity";
-import { Model, Types } from "mongoose";
+import type { TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
+import { getModelToken } from '@nestjs/mongoose';
+import { RoleRepository } from '@repos/role.repository';
+import { Role } from '@entities/role.entity';
+import { Model, Types } from 'mongoose';
 
-describe("RoleRepository", () => {
+describe('RoleRepository', () => {
   let repository: RoleRepository;
   let model: any;
 
   const mockRole = {
-    _id: new Types.ObjectId("507f1f77bcf86cd799439011"),
-    name: "admin",
+    _id: new Types.ObjectId('507f1f77bcf86cd799439011'),
+    name: 'admin',
     permissions: [],
   };
 
@@ -58,23 +58,23 @@ describe("RoleRepository", () => {
     (repository as any)._createChainMock = createChainMock;
   });
 
-  it("should be defined", () => {
+  it('should be defined', () => {
     expect(repository).toBeDefined();
   });
 
-  describe("create", () => {
-    it("should create a new role", async () => {
+  describe('create', () => {
+    it('should create a new role', async () => {
       model.create.mockResolvedValue(mockRole);
 
-      const result = await repository.create({ name: "admin" });
+      const result = await repository.create({ name: 'admin' });
 
-      expect(model.create).toHaveBeenCalledWith({ name: "admin" });
+      expect(model.create).toHaveBeenCalledWith({ name: 'admin' });
       expect(result).toEqual(mockRole);
     });
   });
 
-  describe("findById", () => {
-    it("should find role by id", async () => {
+  describe('findById', () => {
+    it('should find role by id', async () => {
       model.findById.mockResolvedValue(mockRole);
 
       const result = await repository.findById(mockRole._id);
@@ -83,7 +83,7 @@ describe("RoleRepository", () => {
       expect(result).toEqual(mockRole);
     });
 
-    it("should accept string id", async () => {
+    it('should accept string id', async () => {
       model.findById.mockResolvedValue(mockRole);
 
       await repository.findById(mockRole._id.toString());
@@ -92,19 +92,19 @@ describe("RoleRepository", () => {
     });
   });
 
-  describe("findByName", () => {
-    it("should find role by name", async () => {
+  describe('findByName', () => {
+    it('should find role by name', async () => {
       model.findOne.mockResolvedValue(mockRole);
 
-      const result = await repository.findByName("admin");
+      const result = await repository.findByName('admin');
 
-      expect(model.findOne).toHaveBeenCalledWith({ name: "admin" });
+      expect(model.findOne).toHaveBeenCalledWith({ name: 'admin' });
       expect(result).toEqual(mockRole);
     });
   });
 
-  describe("list", () => {
-    it("should return all roles with populated permissions", async () => {
+  describe('list', () => {
+    it('should return all roles with populated permissions', async () => {
       const roles = [mockRole];
       const chain = (repository as any)._createChainMock(roles);
       model.find.mockReturnValue(chain);
@@ -112,33 +112,33 @@ describe("RoleRepository", () => {
       const resultPromise = repository.list();
 
       expect(model.find).toHaveBeenCalled();
-      expect(chain.populate).toHaveBeenCalledWith("permissions");
+      expect(chain.populate).toHaveBeenCalledWith('permissions');
       expect(chain.lean).toHaveBeenCalled();
       const result = await chain.exec();
       expect(result).toEqual(roles);
     });
   });
 
-  describe("updateById", () => {
-    it("should update role by id", async () => {
-      const updatedRole = { ...mockRole, name: "super-admin" };
+  describe('updateById', () => {
+    it('should update role by id', async () => {
+      const updatedRole = { ...mockRole, name: 'super-admin' };
       model.findByIdAndUpdate.mockResolvedValue(updatedRole);
 
       const result = await repository.updateById(mockRole._id, {
-        name: "super-admin",
+        name: 'super-admin',
       });
 
       expect(model.findByIdAndUpdate).toHaveBeenCalledWith(
         mockRole._id,
-        { name: "super-admin" },
+        { name: 'super-admin' },
         { new: true },
       );
       expect(result).toEqual(updatedRole);
     });
   });
 
-  describe("deleteById", () => {
-    it("should delete role by id", async () => {
+  describe('deleteById', () => {
+    it('should delete role by id', async () => {
       model.findByIdAndDelete.mockResolvedValue(mockRole);
 
       const result = await repository.deleteById(mockRole._id);
@@ -148,14 +148,14 @@ describe("RoleRepository", () => {
     });
   });
 
-  describe("findByIds", () => {
-    it("should find roles by array of ids", async () => {
+  describe('findByIds', () => {
+    it('should find roles by array of ids', async () => {
       // Simulate DB: role with populated permissions (array of objects)
       const roles = [
         {
           _id: mockRole._id,
           name: mockRole.name,
-          permissions: [{ _id: "perm1", name: "perm:read" }],
+          permissions: [{ _id: 'perm1', name: 'perm:read' }],
         },
       ];
       const ids = [mockRole._id.toString()];

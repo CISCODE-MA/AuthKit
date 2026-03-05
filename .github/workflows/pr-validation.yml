@@ -21,12 +21,13 @@ jobs:
         with:
           node-version: 20
           cache: npm
+          cache-dependency-path: package-lock.json
 
       - name: Install
         run: npm ci
 
       - name: Format (check)
-        run: npm run format
+        run: npm run format:write
 
       - name: Lint
         run: npm run lint

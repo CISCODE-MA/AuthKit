@@ -168,9 +168,9 @@ src/
 - Always use `strict` mode (required)
 - Use path aliases for cleaner imports:
   ```typescript
-  import { LoginDto } from "@api/dto";
-  import { AuthService } from "@application/auth.service";
-  import { User } from "@domain/user.entity";
+  import { LoginDto } from '@api/dto';
+  import { AuthService } from '@application/auth.service';
+  import { User } from '@domain/user.entity';
   ```
 
 ### Documentation
@@ -259,7 +259,7 @@ npm run test:cov            # With coverage report
 
 ```typescript
 // Use class-validator on all DTOs
-import { IsEmail, MinLength } from "class-validator";
+import { IsEmail, MinLength } from 'class-validator';
 
 export class LoginDto {
   @IsEmail()
@@ -273,7 +273,7 @@ export class LoginDto {
 ### Password Hashing
 
 ```typescript
-import * as bcrypt from "bcryptjs";
+import * as bcrypt from 'bcryptjs';
 
 // Hash with minimum 10 rounds
 const hashedPassword = await bcrypt.hash(password, 10);

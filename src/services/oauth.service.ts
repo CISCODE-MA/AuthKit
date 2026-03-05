@@ -10,15 +10,15 @@
  * - Issue authentication tokens
  */
 
-import { Injectable, InternalServerErrorException } from "@nestjs/common";
-import { UserRepository } from "@repos/user.repository";
-import { RoleRepository } from "@repos/role.repository";
-import { AuthService } from "@services/auth.service";
-import { LoggerService } from "@services/logger.service";
-import { GoogleOAuthProvider } from "./oauth/providers/google-oauth.provider";
-import { MicrosoftOAuthProvider } from "./oauth/providers/microsoft-oauth.provider";
-import { FacebookOAuthProvider } from "./oauth/providers/facebook-oauth.provider";
-import { OAuthProfile, OAuthTokens } from "./oauth/oauth.types";
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { UserRepository } from '@repos/user.repository';
+import { RoleRepository } from '@repos/role.repository';
+import { AuthService } from '@services/auth.service';
+import { LoggerService } from '@services/logger.service';
+import { GoogleOAuthProvider } from './oauth/providers/google-oauth.provider';
+import { MicrosoftOAuthProvider } from './oauth/providers/microsoft-oauth.provider';
+import { FacebookOAuthProvider } from './oauth/providers/facebook-oauth.provider';
+import { OAuthProfile, OAuthTokens } from './oauth/oauth.types';
 
 @Injectable()
 export class OAuthService {
@@ -154,9 +154,9 @@ export class OAuthService {
       this.logger.error(
         `OAuth user creation/login failed: ${error.message}`,
         error.stack,
-        "OAuthService",
+        'OAuthService',
       );
-      throw new InternalServerErrorException("Authentication failed");
+      throw new InternalServerErrorException('Authentication failed');
     }
   }
 
@@ -164,14 +164,14 @@ export class OAuthService {
    * Create new user from OAuth profile
    */
   private async createOAuthUser(profile: OAuthProfile) {
-    const [fname, ...rest] = (profile.name || "User OAuth").split(" ");
-    const lname = rest.join(" ") || "OAuth";
+    const [fname, ...rest] = (profile.name || 'User OAuth').split(' ');
+    const lname = rest.join(' ') || 'OAuth';
 
     const defaultRoleId = await this.getDefaultRoleId();
 
     return this.users.create({
       fullname: { fname, lname },
-      username: profile.email.split("@")[0],
+      username: profile.email.split('@')[0],
       email: profile.email,
       roles: [defaultRoleId],
       isVerified: true,
@@ -198,25 +198,25 @@ export class OAuthService {
       this.logger.error(
         `OAuth user retry failed: ${retryError.message}`,
         retryError.stack,
-        "OAuthService",
+        'OAuthService',
       );
     }
 
-    throw new InternalServerErrorException("Authentication failed");
+    throw new InternalServerErrorException('Authentication failed');
   }
 
   /**
    * Get default role ID for new OAuth users
    */
   private async getDefaultRoleId() {
-    const role = await this.roles.findByName("user");
+    const role = await this.roles.findByName('user');
     if (!role) {
       this.logger.error(
-        "Default user role not found - seed data missing",
-        "",
-        "OAuthService",
+        'Default user role not found - seed data missing',
+        '',
+        'OAuthService',
       );
-      throw new InternalServerErrorException("System configuration error");
+      throw new InternalServerErrorException('System configuration error');
     }
     return role._id;
   }

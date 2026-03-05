@@ -1,8 +1,8 @@
-import { Injectable } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
-import type { Model, Types } from "mongoose";
-import { User, UserDocument } from "@entities/user.entity";
-import { IUserRepository } from "./interfaces/user-repository.interface";
+import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import type { Model, Types } from 'mongoose';
+import { User, UserDocument } from '@entities/user.entity';
+import { IUserRepository } from './interfaces/user-repository.interface';
 
 /**
  * User repository implementation using Mongoose
@@ -26,7 +26,7 @@ export class UserRepository implements IUserRepository {
   }
 
   findByEmailWithPassword(email: string) {
-    return this.userModel.findOne({ email }).select("+password");
+    return this.userModel.findOne({ email }).select('+password');
   }
 
   findByUsername(username: string) {
@@ -49,9 +49,9 @@ export class UserRepository implements IUserRepository {
     return this.userModel
       .findById(id)
       .populate({
-        path: "roles",
-        populate: { path: "permissions", select: "name" },
-        select: "name permissions",
+        path: 'roles',
+        populate: { path: 'permissions', select: 'name' },
+        select: 'name permissions',
       })
       .lean()
       .exec();
@@ -64,7 +64,7 @@ export class UserRepository implements IUserRepository {
 
     return this.userModel
       .find(query)
-      .populate({ path: "roles", select: "name" })
+      .populate({ path: 'roles', select: 'name' })
       .lean();
   }
 }

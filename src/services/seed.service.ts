@@ -1,7 +1,7 @@
-import { Injectable } from "@nestjs/common";
-import { PermissionRepository } from "@repos/permission.repository";
-import { RoleRepository } from "@repos/role.repository";
-import { Types } from "mongoose";
+import { Injectable } from '@nestjs/common';
+import { PermissionRepository } from '@repos/permission.repository';
+import { RoleRepository } from '@repos/role.repository';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class SeedService {
@@ -11,7 +11,7 @@ export class SeedService {
   ) {}
 
   async seedDefaults() {
-    const permNames = ["users:manage", "roles:manage", "permissions:manage"];
+    const permNames = ['users:manage', 'roles:manage', 'permissions:manage'];
 
     const permIds: string[] = [];
     for (const name of permNames) {
@@ -20,19 +20,19 @@ export class SeedService {
       permIds.push(p._id.toString());
     }
 
-    let admin = await this.roles.findByName("admin");
+    let admin = await this.roles.findByName('admin');
     const permissions = permIds.map((p) => new Types.ObjectId(p));
     if (!admin)
       admin = await this.roles.create({
-        name: "admin",
+        name: 'admin',
         permissions: permissions,
       });
 
-    let user = await this.roles.findByName("user");
+    let user = await this.roles.findByName('user');
     if (!user)
-      user = await this.roles.create({ name: "user", permissions: [] });
+      user = await this.roles.create({ name: 'user', permissions: [] });
 
-    console.log("[AuthKit] Seeded roles:", {
+    console.log('[AuthKit] Seeded roles:', {
       adminRoleId: admin._id.toString(),
       userRoleId: user._id.toString(),
     });

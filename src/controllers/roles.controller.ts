@@ -7,36 +7,36 @@ import {
   Post,
   Put,
   Res,
-} from "@nestjs/common";
+} from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiParam,
   ApiBearerAuth,
-} from "@nestjs/swagger";
-import type { Response } from "express";
-import { RolesService } from "@services/roles.service";
-import { CreateRoleDto } from "@dto/role/create-role.dto";
+} from '@nestjs/swagger';
+import type { Response } from 'express';
+import { RolesService } from '@services/roles.service';
+import { CreateRoleDto } from '@dto/role/create-role.dto';
 import {
   UpdateRoleDto,
   UpdateRolePermissionsDto,
-} from "@dto/role/update-role.dto";
-import { Admin } from "@decorators/admin.decorator";
+} from '@dto/role/update-role.dto';
+import { Admin } from '@decorators/admin.decorator';
 
-@ApiTags("Admin - Roles")
+@ApiTags('Admin - Roles')
 @ApiBearerAuth()
 @Admin()
-@Controller("api/admin/roles")
+@Controller('api/admin/roles')
 export class RolesController {
   constructor(private readonly roles: RolesService) {}
 
-  @ApiOperation({ summary: "Create a new role" })
-  @ApiResponse({ status: 201, description: "Role created successfully." })
-  @ApiResponse({ status: 409, description: "Role name already exists." })
+  @ApiOperation({ summary: 'Create a new role' })
+  @ApiResponse({ status: 201, description: 'Role created successfully.' })
+  @ApiResponse({ status: 409, description: 'Role name already exists.' })
   @ApiResponse({
     status: 403,
-    description: "Forbidden - admin access required.",
+    description: 'Forbidden - admin access required.',
   })
   @Post()
   async create(@Body() dto: CreateRoleDto, @Res() res: Response) {
@@ -44,11 +44,11 @@ export class RolesController {
     return res.status(201).json(result);
   }
 
-  @ApiOperation({ summary: "List all roles" })
-  @ApiResponse({ status: 200, description: "Roles retrieved successfully." })
+  @ApiOperation({ summary: 'List all roles' })
+  @ApiResponse({ status: 200, description: 'Roles retrieved successfully.' })
   @ApiResponse({
     status: 403,
-    description: "Forbidden - admin access required.",
+    description: 'Forbidden - admin access required.',
   })
   @Get()
   async list(@Res() res: Response) {
@@ -56,17 +56,17 @@ export class RolesController {
     return res.status(200).json(result);
   }
 
-  @ApiOperation({ summary: "Update a role" })
-  @ApiParam({ name: "id", description: "Role ID" })
-  @ApiResponse({ status: 200, description: "Role updated successfully." })
-  @ApiResponse({ status: 404, description: "Role not found." })
+  @ApiOperation({ summary: 'Update a role' })
+  @ApiParam({ name: 'id', description: 'Role ID' })
+  @ApiResponse({ status: 200, description: 'Role updated successfully.' })
+  @ApiResponse({ status: 404, description: 'Role not found.' })
   @ApiResponse({
     status: 403,
-    description: "Forbidden - admin access required.",
+    description: 'Forbidden - admin access required.',
   })
-  @Put(":id")
+  @Put(':id')
   async update(
-    @Param("id") id: string,
+    @Param('id') id: string,
     @Body() dto: UpdateRoleDto,
     @Res() res: Response,
   ) {
@@ -74,34 +74,34 @@ export class RolesController {
     return res.status(200).json(result);
   }
 
-  @ApiOperation({ summary: "Delete a role" })
-  @ApiParam({ name: "id", description: "Role ID" })
-  @ApiResponse({ status: 200, description: "Role deleted successfully." })
-  @ApiResponse({ status: 404, description: "Role not found." })
+  @ApiOperation({ summary: 'Delete a role' })
+  @ApiParam({ name: 'id', description: 'Role ID' })
+  @ApiResponse({ status: 200, description: 'Role deleted successfully.' })
+  @ApiResponse({ status: 404, description: 'Role not found.' })
   @ApiResponse({
     status: 403,
-    description: "Forbidden - admin access required.",
+    description: 'Forbidden - admin access required.',
   })
-  @Delete(":id")
-  async delete(@Param("id") id: string, @Res() res: Response) {
+  @Delete(':id')
+  async delete(@Param('id') id: string, @Res() res: Response) {
     const result = await this.roles.delete(id);
     return res.status(200).json(result);
   }
 
-  @ApiOperation({ summary: "Set permissions for a role" })
-  @ApiParam({ name: "id", description: "Role ID" })
+  @ApiOperation({ summary: 'Set permissions for a role' })
+  @ApiParam({ name: 'id', description: 'Role ID' })
   @ApiResponse({
     status: 200,
-    description: "Role permissions updated successfully.",
+    description: 'Role permissions updated successfully.',
   })
-  @ApiResponse({ status: 404, description: "Role not found." })
+  @ApiResponse({ status: 404, description: 'Role not found.' })
   @ApiResponse({
     status: 403,
-    description: "Forbidden - admin access required.",
+    description: 'Forbidden - admin access required.',
   })
-  @Put(":id/permissions")
+  @Put(':id/permissions')
   async setPermissions(
-    @Param("id") id: string,
+    @Param('id') id: string,
     @Body() dto: UpdateRolePermissionsDto,
     @Res() res: Response,
   ) {

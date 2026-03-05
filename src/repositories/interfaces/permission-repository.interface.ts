@@ -1,6 +1,6 @@
-import type { Types } from "mongoose";
-import type { IRepository } from "./repository.interface";
-import type { Permission } from "@entities/permission.entity";
+import type { Types } from 'mongoose';
+import type { IRepository } from './repository.interface';
+import type { Permission } from '@entities/permission.entity';
 
 /**
  * Permission repository interface

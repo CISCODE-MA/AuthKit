@@ -119,6 +119,7 @@ Body (JSON):
 #### B. **Verifica Email**
 
 **Metodo 1: Link dall'email (GET):**
+
 ```bash
 GET http://localhost:3000/api/auth/verify-email/{TOKEN}
 
@@ -126,6 +127,7 @@ GET http://localhost:3000/api/auth/verify-email/{TOKEN}
 ```
 
 **Metodo 2: POST manuale:**
+
 ```bash
 POST http://localhost:3000/api/auth/verify-email
 
@@ -289,6 +291,7 @@ FB_CALLBACK_URL=http://localhost:3000/api/auth/facebook/callback
 #### 1. **Google OAuth - Web Flow**
 
 **Inizia il flow:**
+
 ```bash
 GET http://localhost:3000/api/auth/google
 
@@ -296,6 +299,7 @@ GET http://localhost:3000/api/auth/google
 ```
 
 **Callback (automatico dopo Google login):**
+
 ```bash
 GET http://localhost:3000/api/auth/google/callback?code=...
 
@@ -307,6 +311,7 @@ GET http://localhost:3000/api/auth/google/callback?code=...
 ```
 
 **Mobile Flow (ID Token):**
+
 ```bash
 POST http://localhost:3000/api/auth/oauth/google
 
@@ -331,6 +336,7 @@ GET http://localhost:3000/api/auth/microsoft
 ```
 
 **Mobile Flow (ID Token):**
+
 ```bash
 POST http://localhost:3000/api/auth/oauth/microsoft
 
@@ -349,6 +355,7 @@ GET http://localhost:3000/api/auth/facebook
 ```
 
 **Mobile Flow (Access Token):**
+
 ```bash
 POST http://localhost:3000/api/auth/oauth/facebook
 
@@ -371,16 +378,14 @@ npm install @nestjs/core @nestjs/common @nestjs/mongoose @ciscode/authentication
 ```
 
 **app.module.ts:**
+
 ```typescript
 import { Module, OnModuleInit } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthKitModule, SeedService } from '@ciscode/authentication-kit';
 
 @Module({
-  imports: [
-    MongooseModule.forRoot(process.env.MONGO_URI),
-    AuthKitModule,
-  ],
+  imports: [MongooseModule.forRoot(process.env.MONGO_URI), AuthKitModule],
 })
 export class AppModule implements OnModuleInit {
   constructor(private readonly seed: SeedService) {}
@@ -392,6 +397,7 @@ export class AppModule implements OnModuleInit {
 ```
 
 **main.ts:**
+
 ```typescript
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
@@ -413,6 +419,7 @@ Scarica e importa la collection Postman:
 📄 File: `ciscode-auth-collection 1.json` (root del progetto)
 
 **Contiene:**
+
 - ✅ Tutti gli endpoints (local + OAuth)
 - ✅ Environment variables pre-configurate
 - ✅ Esempi di request/response
@@ -448,6 +455,7 @@ open coverage/lcov-report/index.html
 ```
 
 **Current Coverage (v1.5.0):**
+
 ```
 Statements   : 90.25% (1065/1180)
 Branches     : 74.95% (404/539)
@@ -495,6 +503,7 @@ Lines        : 90.66% (981/1082)
 **Causa**: SMTP non configurato correttamente
 
 **Soluzione:**
+
 ```env
 # Usa Mailtrap per testing
 SMTP_HOST=sandbox.smtp.mailtrap.io
@@ -509,6 +518,7 @@ SMTP_SECURE=false
 **Causa**: MongoDB non in esecuzione
 
 **Soluzione:**
+
 ```bash
 # Start MongoDB
 mongod --dbpath=/path/to/data
@@ -522,6 +532,7 @@ docker run -d -p 27017:27017 --name mongodb mongo:latest
 **Causa**: Token scaduto
 
 **Soluzione:**
+
 ```bash
 # Usa refresh token per ottenere nuovo access token
 POST /api/auth/refresh-token
@@ -533,6 +544,7 @@ Body: { "refreshToken": "..." }
 **Causa**: URL di callback non corrisponde a quello configurato nel provider
 
 **Soluzione:**
+
 - Google: `http://localhost:3000/api/auth/google/callback`
 - Microsoft: `http://localhost:3000/api/auth/microsoft/callback`
 - Facebook: `http://localhost:3000/api/auth/facebook/callback`
@@ -542,6 +554,7 @@ Body: { "refreshToken": "..." }
 **Causa**: Email non verificata
 
 **Soluzione:**
+
 ```bash
 # 1. Controlla inbox Mailtrap
 # 2. Clicca link di verifica
@@ -555,6 +568,7 @@ Body: { "token": "..." }
 **Causa**: Seed non eseguito
 
 **Soluzione:**
+
 ```typescript
 // In AppModule
 async onModuleInit() {
@@ -580,17 +594,20 @@ async onModuleInit() {
 ### ✅ OAuth Providers
 
 #### Google
+
 - [ ] Web flow (GET /auth/google)
 - [ ] Callback handling
 - [ ] Mobile ID token exchange
 - [ ] Mobile authorization code exchange
 
 #### Microsoft
+
 - [ ] Web flow (GET /auth/microsoft)
 - [ ] Callback handling
 - [ ] Mobile ID token exchange
 
 #### Facebook
+
 - [ ] Web flow (GET /auth/facebook)
 - [ ] Callback handling
 - [ ] Mobile access token exchange
@@ -643,12 +660,14 @@ mongod --verbose
 Dopo aver testato Auth Kit:
 
 1. **Integra in ComptAlEyes**:
+
    ```bash
    cd ~/comptaleyes/backend
    npm install @ciscode/authentication-kit
    ```
 
 2. **Configura Auth Kit UI**:
+
    ```bash
    cd ~/comptaleyes/frontend
    npm install @ciscode/ui-authentication-kit
@@ -673,4 +692,3 @@ Dopo aver testato Auth Kit:
 **Documento compilato da**: GitHub Copilot  
 **Ultimo aggiornamento**: 4 Febbraio 2026  
 **Auth Kit Version**: 1.5.0
-

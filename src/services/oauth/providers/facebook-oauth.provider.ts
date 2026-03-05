@@ -9,12 +9,12 @@ import {
   Injectable,
   InternalServerErrorException,
   UnauthorizedException,
-} from "@nestjs/common";
-import { LoggerService } from "@services/logger.service";
-import { OAuthProfile } from "../oauth.types";
-import { IOAuthProvider } from "./oauth-provider.interface";
-import { OAuthHttpClient } from "../utils/oauth-http.client";
-import { OAuthErrorHandler } from "../utils/oauth-error.handler";
+} from '@nestjs/common';
+import { LoggerService } from '@services/logger.service';
+import { OAuthProfile } from '../oauth.types';
+import { IOAuthProvider } from './oauth-provider.interface';
+import { OAuthHttpClient } from '../utils/oauth-http.client';
+import { OAuthErrorHandler } from '../utils/oauth-error.handler';
 
 @Injectable()
 export class FacebookOAuthProvider implements IOAuthProvider {
@@ -43,11 +43,11 @@ export class FacebookOAuthProvider implements IOAuthProvider {
 
       // Step 3: Fetch user profile
       const profileData = await this.httpClient.get(
-        "https://graph.facebook.com/me",
+        'https://graph.facebook.com/me',
         {
           params: {
             access_token: accessToken,
-            fields: "id,name,email",
+            fields: 'id,name,email',
           },
         },
       );
@@ -55,8 +55,8 @@ export class FacebookOAuthProvider implements IOAuthProvider {
       // Validate email presence (required by app logic)
       this.errorHandler.validateRequiredField(
         profileData.email,
-        "Email",
-        "Facebook",
+        'Email',
+        'Facebook',
       );
 
       return {
@@ -67,8 +67,8 @@ export class FacebookOAuthProvider implements IOAuthProvider {
     } catch (error) {
       this.errorHandler.handleProviderError(
         error,
-        "Facebook",
-        "access token verification",
+        'Facebook',
+        'access token verification',
       );
     }
   }
@@ -82,24 +82,24 @@ export class FacebookOAuthProvider implements IOAuthProvider {
    */
   private async getAppAccessToken(): Promise<string> {
     const data = await this.httpClient.get(
-      "https://graph.facebook.com/oauth/access_token",
+      'https://graph.facebook.com/oauth/access_token',
       {
         params: {
           client_id: process.env.FB_CLIENT_ID,
           client_secret: process.env.FB_CLIENT_SECRET,
-          grant_type: "client_credentials",
+          grant_type: 'client_credentials',
         },
       },
     );
 
     if (!data.access_token) {
       this.logger.error(
-        "Failed to get Facebook app token",
-        "",
-        "FacebookOAuthProvider",
+        'Failed to get Facebook app token',
+        '',
+        'FacebookOAuthProvider',
       );
       throw new InternalServerErrorException(
-        "Failed to get Facebook app token",
+        'Failed to get Facebook app token',
       );
     }
 
@@ -114,7 +114,7 @@ export class FacebookOAuthProvider implements IOAuthProvider {
     appToken: string,
   ): Promise<void> {
     const debugData = await this.httpClient.get(
-      "https://graph.facebook.com/debug_token",
+      'https://graph.facebook.com/debug_token',
       {
         params: {
           input_token: userToken,
@@ -124,7 +124,7 @@ export class FacebookOAuthProvider implements IOAuthProvider {
     );
 
     if (!debugData.data?.is_valid) {
-      throw new UnauthorizedException("Invalid Facebook access token");
+      throw new UnauthorizedException('Invalid Facebook access token');
     }
   }
 

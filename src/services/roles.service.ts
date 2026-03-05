@@ -3,12 +3,12 @@ import {
   ConflictException,
   NotFoundException,
   InternalServerErrorException,
-} from "@nestjs/common";
-import { RoleRepository } from "@repos/role.repository";
-import { CreateRoleDto } from "@dto/role/create-role.dto";
-import { UpdateRoleDto } from "@dto/role/update-role.dto";
-import { Types } from "mongoose";
-import { LoggerService } from "@services/logger.service";
+} from '@nestjs/common';
+import { RoleRepository } from '@repos/role.repository';
+import { CreateRoleDto } from '@dto/role/create-role.dto';
+import { UpdateRoleDto } from '@dto/role/update-role.dto';
+import { Types } from 'mongoose';
+import { LoggerService } from '@services/logger.service';
 
 /**
  * Roles service handling role-based access control (RBAC) operations
@@ -32,7 +32,7 @@ export class RolesService {
   async create(dto: CreateRoleDto) {
     try {
       if (await this.roles.findByName(dto.name)) {
-        throw new ConflictException("Role already exists");
+        throw new ConflictException('Role already exists');
       }
       const permIds = (dto.permissions || []).map((p) => new Types.ObjectId(p));
       return this.roles.create({ name: dto.name, permissions: permIds });
@@ -41,14 +41,14 @@ export class RolesService {
         throw error;
       }
       if (error?.code === 11000) {
-        throw new ConflictException("Role already exists");
+        throw new ConflictException('Role already exists');
       }
       this.logger.error(
         `Role creation failed: ${error.message}`,
         error.stack,
-        "RolesService",
+        'RolesService',
       );
-      throw new InternalServerErrorException("Failed to create role");
+      throw new InternalServerErrorException('Failed to create role');
     }
   }
 
@@ -64,9 +64,9 @@ export class RolesService {
       this.logger.error(
         `Role list failed: ${error.message}`,
         error.stack,
-        "RolesService",
+        'RolesService',
       );
-      throw new InternalServerErrorException("Failed to retrieve roles");
+      throw new InternalServerErrorException('Failed to retrieve roles');
     }
   }
 
@@ -88,7 +88,7 @@ export class RolesService {
 
       const role = await this.roles.updateById(id, data);
       if (!role) {
-        throw new NotFoundException("Role not found");
+        throw new NotFoundException('Role not found');
       }
       return role;
     } catch (error) {
@@ -98,9 +98,9 @@ export class RolesService {
       this.logger.error(
         `Role update failed: ${error.message}`,
         error.stack,
-        "RolesService",
+        'RolesService',
       );
-      throw new InternalServerErrorException("Failed to update role");
+      throw new InternalServerErrorException('Failed to update role');
     }
   }
 
@@ -115,7 +115,7 @@ export class RolesService {
     try {
       const role = await this.roles.deleteById(id);
       if (!role) {
-        throw new NotFoundException("Role not found");
+        throw new NotFoundException('Role not found');
       }
       return { ok: true };
     } catch (error) {
@@ -125,9 +125,9 @@ export class RolesService {
       this.logger.error(
         `Role deletion failed: ${error.message}`,
         error.stack,
-        "RolesService",
+        'RolesService',
       );
-      throw new InternalServerErrorException("Failed to delete role");
+      throw new InternalServerErrorException('Failed to delete role');
     }
   }
 
@@ -150,7 +150,7 @@ export class RolesService {
         permissions: permIds,
       });
       if (!role) {
-        throw new NotFoundException("Role not found");
+        throw new NotFoundException('Role not found');
       }
       return role;
     } catch (error) {
@@ -160,9 +160,9 @@ export class RolesService {
       this.logger.error(
         `Set permissions failed: ${error.message}`,
         error.stack,
-        "RolesService",
+        'RolesService',
       );
-      throw new InternalServerErrorException("Failed to set permissions");
+      throw new InternalServerErrorException('Failed to set permissions');
     }
   }
 

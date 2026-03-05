@@ -1,8 +1,8 @@
-import { Injectable } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
-import type { Model, Types } from "mongoose";
-import { Role, RoleDocument } from "@entities/role.entity";
-import { IRoleRepository } from "./interfaces/role-repository.interface";
+import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import type { Model, Types } from 'mongoose';
+import { Role, RoleDocument } from '@entities/role.entity';
+import { IRoleRepository } from './interfaces/role-repository.interface';
 
 /**
  * Role repository implementation using Mongoose
@@ -26,7 +26,7 @@ export class RoleRepository implements IRoleRepository {
   }
 
   list() {
-    return this.roleModel.find().populate("permissions").lean();
+    return this.roleModel.find().populate('permissions').lean();
   }
 
   updateById(id: string | Types.ObjectId, data: Partial<Role>) {
@@ -40,7 +40,7 @@ export class RoleRepository implements IRoleRepository {
   findByIds(ids: string[]) {
     return this.roleModel
       .find({ _id: { $in: ids } })
-      .populate("permissions")
+      .populate('permissions')
       .lean()
       .exec();
   }

@@ -5,7 +5,7 @@
  * This ensures consistency across different OAuth implementations.
  */
 
-import type { OAuthProfile } from "../oauth.types";
+import type { OAuthProfile } from '../oauth.types';
 
 /**
  * Base interface for OAuth providers

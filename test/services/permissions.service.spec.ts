@@ -1,16 +1,16 @@
-import type { TestingModule } from "@nestjs/testing";
-import { Test } from "@nestjs/testing";
+import type { TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 import {
   ConflictException,
   NotFoundException,
   InternalServerErrorException,
-} from "@nestjs/common";
-import { Types } from "mongoose";
-import { PermissionsService } from "@services/permissions.service";
-import { PermissionRepository } from "@repos/permission.repository";
-import { LoggerService } from "@services/logger.service";
+} from '@nestjs/common';
+import { Types } from 'mongoose';
+import { PermissionsService } from '@services/permissions.service';
+import { PermissionRepository } from '@repos/permission.repository';
+import { LoggerService } from '@services/logger.service';
 
-describe("PermissionsService", () => {
+describe('PermissionsService', () => {
   let service: PermissionsService;
   let mockPermissionRepository: any;
   let mockLogger: any;
@@ -43,13 +43,13 @@ describe("PermissionsService", () => {
     service = module.get<PermissionsService>(PermissionsService);
   });
 
-  it("should be defined", () => {
+  it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
-  describe("create", () => {
-    it("should create a permission successfully", async () => {
-      const dto = { name: "users:read", description: "Read users" };
+  describe('create', () => {
+    it('should create a permission successfully', async () => {
+      const dto = { name: 'users:read', description: 'Read users' };
       const expectedPermission = {
         _id: new Types.ObjectId(),
         ...dto,
@@ -67,23 +67,23 @@ describe("PermissionsService", () => {
       expect(mockPermissionRepository.create).toHaveBeenCalledWith(dto);
     });
 
-    it("should throw ConflictException if permission already exists", async () => {
-      const dto = { name: "users:write" };
+    it('should throw ConflictException if permission already exists', async () => {
+      const dto = { name: 'users:write' };
       mockPermissionRepository.findByName.mockResolvedValue({
-        name: "users:write",
+        name: 'users:write',
       });
 
       await expect(service.create(dto)).rejects.toThrow(ConflictException);
       await expect(service.create(dto)).rejects.toThrow(
-        "Permission already exists",
+        'Permission already exists',
       );
     });
 
-    it("should handle duplicate key error (11000)", async () => {
-      const dto = { name: "users:write" };
+    it('should handle duplicate key error (11000)', async () => {
+      const dto = { name: 'users:write' };
       mockPermissionRepository.findByName.mockResolvedValue(null);
       mockPermissionRepository.create.mockImplementation(() => {
-        const error: any = new Error("Duplicate key");
+        const error: any = new Error('Duplicate key');
         error.code = 11000;
         throw error;
       });
@@ -91,11 +91,11 @@ describe("PermissionsService", () => {
       await expect(service.create(dto)).rejects.toThrow(ConflictException);
     });
 
-    it("should handle unexpected errors", async () => {
-      const dto = { name: "users:write" };
+    it('should handle unexpected errors', async () => {
+      const dto = { name: 'users:write' };
       mockPermissionRepository.findByName.mockResolvedValue(null);
       mockPermissionRepository.create.mockImplementation(() => {
-        throw new Error("DB error");
+        throw new Error('DB error');
       });
 
       await expect(service.create(dto)).rejects.toThrow(
@@ -103,18 +103,18 @@ describe("PermissionsService", () => {
       );
 
       expect(mockLogger.error).toHaveBeenCalledWith(
-        "Permission creation failed: DB error",
+        'Permission creation failed: DB error',
         expect.any(String),
-        "PermissionsService",
+        'PermissionsService',
       );
     });
   });
 
-  describe("list", () => {
-    it("should return list of permissions", async () => {
+  describe('list', () => {
+    it('should return list of permissions', async () => {
       const permissions = [
-        { _id: new Types.ObjectId(), name: "users:read" },
-        { _id: new Types.ObjectId(), name: "users:write" },
+        { _id: new Types.ObjectId(), name: 'users:read' },
+        { _id: new Types.ObjectId(), name: 'users:write' },
       ];
       mockPermissionRepository.list.mockResolvedValue(permissions);
 
@@ -124,9 +124,9 @@ describe("PermissionsService", () => {
       expect(mockPermissionRepository.list).toHaveBeenCalled();
     });
 
-    it("should handle list errors", async () => {
+    it('should handle list errors', async () => {
       mockPermissionRepository.list.mockImplementation(() => {
-        throw new Error("List failed");
+        throw new Error('List failed');
       });
 
       await expect(service.list()).rejects.toThrow(
@@ -134,19 +134,19 @@ describe("PermissionsService", () => {
       );
 
       expect(mockLogger.error).toHaveBeenCalledWith(
-        "Permission list failed: List failed",
+        'Permission list failed: List failed',
         expect.any(String),
-        "PermissionsService",
+        'PermissionsService',
       );
     });
   });
 
-  describe("update", () => {
-    it("should update a permission successfully", async () => {
+  describe('update', () => {
+    it('should update a permission successfully', async () => {
       const permId = new Types.ObjectId().toString();
       const dto = {
-        name: "users:manage",
-        description: "Full user management",
+        name: 'users:manage',
+        description: 'Full user management',
       };
       const updatedPermission = {
         _id: new Types.ObjectId(permId),
@@ -164,9 +164,9 @@ describe("PermissionsService", () => {
       );
     });
 
-    it("should update permission name only", async () => {
+    it('should update permission name only', async () => {
       const permId = new Types.ObjectId().toString();
-      const dto = { name: "users:manage" };
+      const dto = { name: 'users:manage' };
       const updatedPermission = {
         _id: new Types.ObjectId(permId),
         name: dto.name,
@@ -179,39 +179,39 @@ describe("PermissionsService", () => {
       expect(result).toEqual(updatedPermission);
     });
 
-    it("should throw NotFoundException if permission not found", async () => {
-      const dto = { name: "users:manage" };
+    it('should throw NotFoundException if permission not found', async () => {
+      const dto = { name: 'users:manage' };
       mockPermissionRepository.updateById.mockResolvedValue(null);
 
-      await expect(service.update("non-existent", dto)).rejects.toThrow(
+      await expect(service.update('non-existent', dto)).rejects.toThrow(
         NotFoundException,
       );
     });
 
-    it("should handle update errors", async () => {
-      const dto = { name: "users:manage" };
+    it('should handle update errors', async () => {
+      const dto = { name: 'users:manage' };
       mockPermissionRepository.updateById.mockImplementation(() => {
-        throw new Error("Update failed");
+        throw new Error('Update failed');
       });
 
-      await expect(service.update("perm-id", dto)).rejects.toThrow(
+      await expect(service.update('perm-id', dto)).rejects.toThrow(
         InternalServerErrorException,
       );
 
       expect(mockLogger.error).toHaveBeenCalledWith(
-        "Permission update failed: Update failed",
+        'Permission update failed: Update failed',
         expect.any(String),
-        "PermissionsService",
+        'PermissionsService',
       );
     });
   });
 
-  describe("delete", () => {
-    it("should delete a permission successfully", async () => {
+  describe('delete', () => {
+    it('should delete a permission successfully', async () => {
       const permId = new Types.ObjectId().toString();
       const deletedPermission = {
         _id: new Types.ObjectId(permId),
-        name: "users:read",
+        name: 'users:read',
       };
 
       mockPermissionRepository.deleteById.mockResolvedValue(deletedPermission);
@@ -222,27 +222,27 @@ describe("PermissionsService", () => {
       expect(mockPermissionRepository.deleteById).toHaveBeenCalledWith(permId);
     });
 
-    it("should throw NotFoundException if permission not found", async () => {
+    it('should throw NotFoundException if permission not found', async () => {
       mockPermissionRepository.deleteById.mockResolvedValue(null);
 
-      await expect(service.delete("non-existent")).rejects.toThrow(
+      await expect(service.delete('non-existent')).rejects.toThrow(
         NotFoundException,
       );
     });
 
-    it("should handle deletion errors", async () => {
+    it('should handle deletion errors', async () => {
       mockPermissionRepository.deleteById.mockImplementation(() => {
-        throw new Error("Deletion failed");
+        throw new Error('Deletion failed');
       });
 
-      await expect(service.delete("perm-id")).rejects.toThrow(
+      await expect(service.delete('perm-id')).rejects.toThrow(
         InternalServerErrorException,
       );
 
       expect(mockLogger.error).toHaveBeenCalledWith(
-        "Permission deletion failed: Deletion failed",
+        'Permission deletion failed: Deletion failed',
         expect.any(String),
-        "PermissionsService",
+        'PermissionsService',
       );
     });
   });

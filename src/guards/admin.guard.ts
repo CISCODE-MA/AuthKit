@@ -1,5 +1,5 @@
-import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
-import { AdminRoleService } from "@services/admin-role.service";
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { AdminRoleService } from '@services/admin-role.service';
 
 @Injectable()
 export class AdminGuard implements CanActivate {
@@ -13,7 +13,7 @@ export class AdminGuard implements CanActivate {
     const adminRoleId = await this.adminRole.loadAdminRoleId();
     if (roles.includes(adminRoleId)) return true;
 
-    res.status(403).json({ message: "Forbidden: admin required." });
+    res.status(403).json({ message: 'Forbidden: admin required.' });
     return false;
   }
 }

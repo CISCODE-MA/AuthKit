@@ -9,19 +9,19 @@
 
 ### 🟢 **OBBLIGATORIE** (per funzionare)
 
-| Tipo | Numero | Priorità | Tempo Setup |
-|------|--------|----------|-------------|
-| JWT Secrets | 4 secrets | 🔴 CRITICA | 1 min (auto-generati) |
-| MongoDB | 1 connection string | 🔴 CRITICA | 5 min |
-| SMTP (Email) | 1 account | 🟡 ALTA | 5 min |
+| Tipo         | Numero              | Priorità   | Tempo Setup           |
+| ------------ | ------------------- | ---------- | --------------------- |
+| JWT Secrets  | 4 secrets           | 🔴 CRITICA | 1 min (auto-generati) |
+| MongoDB      | 1 connection string | 🔴 CRITICA | 5 min                 |
+| SMTP (Email) | 1 account           | 🟡 ALTA    | 5 min                 |
 
 ### 🔵 **OPZIONALI** (per OAuth providers)
 
-| Provider | Credenziali | Priorità | Tempo Setup |
-|----------|-------------|----------|-------------|
-| Google OAuth | Client ID + Secret | 🟢 MEDIA | 10 min |
-| Microsoft OAuth | Client ID + Secret + Tenant ID | 🟢 MEDIA | 15 min |
-| Facebook OAuth | App ID + Secret | 🟢 BASSA | 10 min |
+| Provider        | Credenziali                    | Priorità | Tempo Setup |
+| --------------- | ------------------------------ | -------- | ----------- |
+| Google OAuth    | Client ID + Secret             | 🟢 MEDIA | 10 min      |
+| Microsoft OAuth | Client ID + Secret + Tenant ID | 🟢 MEDIA | 15 min      |
+| Facebook OAuth  | App ID + Secret                | 🟢 BASSA | 10 min      |
 
 ---
 
@@ -44,6 +44,7 @@ cd "c:\Users\RedaChanna\Desktop\Ciscode Web Site\modules\auth-kit"
 **❌ Alternativa Manuale (NON raccomandata):**
 
 Se vuoi generarli manualmente, devono essere:
+
 - Minimo 32 caratteri
 - Mix di lettere maiuscole, minuscole, numeri, simboli
 - Diversi tra loro
@@ -67,6 +68,7 @@ MONGO_URI=mongodb://127.0.0.1:27017/auth_kit_test
 ```
 
 **Avvia MongoDB con Docker:**
+
 ```powershell
 docker run -d -p 27017:27017 --name mongodb mongo:latest
 ```
@@ -93,6 +95,7 @@ MONGO_URI=mongodb+srv://auth_kit_user:YOUR_PASSWORD@cluster0.xxxxx.mongodb.net/a
 ```
 
 **📝 Forniscimi:**
+
 - [ ] Username MongoDB Atlas (se usi Atlas)
 - [ ] Password MongoDB Atlas (se usi Atlas)
 - [ ] Connection string completo (se usi Atlas)
@@ -120,10 +123,12 @@ FROM_EMAIL=no-reply@test.com
 ```
 
 **📝 Forniscimi (da Mailtrap dashboard):**
+
 - [ ] SMTP_USER (Username)
 - [ ] SMTP_PASS (Password)
 
 **Screenshot della dashboard:**
+
 ```
 Mailtrap.io → My Inbox → SMTP Settings → Show Credentials
 ```
@@ -172,12 +177,12 @@ FROM_EMAIL=tua.email@gmail.com
    - Create Credentials → OAuth client ID
    - Application type: **Web application**
    - Name: `Auth Kit Local`
-   
 5. **Configura Redirect URIs**:
+
    ```
    Authorized JavaScript origins:
    http://localhost:3000
-   
+
    Authorized redirect URIs:
    http://localhost:3000/api/auth/google/callback
    ```
@@ -195,6 +200,7 @@ GOOGLE_CALLBACK_URL=http://localhost:3000/api/auth/google/callback
 ```
 
 **📝 Forniscimi:**
+
 - [ ] GOOGLE_CLIENT_ID
 - [ ] GOOGLE_CLIENT_SECRET
 
@@ -216,6 +222,7 @@ GOOGLE_CALLBACK_URL=http://localhost:3000/api/auth/google/callback
      - URL: `http://localhost:3000/api/auth/microsoft/callback`
 
 3. **Copia Application (client) ID**:
+
    ```
    abc12345-6789-def0-1234-567890abcdef
    ```
@@ -224,6 +231,7 @@ GOOGLE_CALLBACK_URL=http://localhost:3000/api/auth/google/callback
    - Description: `Auth Kit Local`
    - Expires: 24 months
    - **⚠️ COPIA SUBITO IL VALUE** (non visibile dopo)
+
    ```
    ABC~xyz123_789.def456-ghi
    ```
@@ -252,6 +260,7 @@ MICROSOFT_TENANT_ID=common
 ```
 
 **📝 Forniscimi:**
+
 - [ ] MICROSOFT_CLIENT_ID (Application ID)
 - [ ] MICROSOFT_CLIENT_SECRET (Client secret VALUE)
 - [ ] MICROSOFT_TENANT_ID (usa `common` per tutti gli account)
@@ -299,6 +308,7 @@ FB_CALLBACK_URL=http://localhost:3000/api/auth/facebook/callback
 ```
 
 **📝 Forniscimi:**
+
 - [ ] FB_CLIENT_ID (App ID)
 - [ ] FB_CLIENT_SECRET (App Secret)
 
@@ -423,6 +433,7 @@ FB_CLIENT_SECRET: abc123xyz789
 3. ⚠️ SMTP (Mailtrap - 5 minuti)
 
 **Con questi 3 puoi testare:**
+
 - ✅ Register + Email verification
 - ✅ Login + Logout
 - ✅ Forgot/Reset password
@@ -444,16 +455,18 @@ FB_CLIENT_SECRET: abc123xyz789
 ### Cosa Fare Ora:
 
 1. **JWT Secrets**: Esegui script automatico
+
    ```powershell
    .\scripts\setup-env.ps1 -GenerateSecrets
    ```
 
 2. **MongoDB**: Avvia Docker
+
    ```powershell
    docker run -d -p 27017:27017 --name mongodb mongo:latest
    ```
 
-3. **Mailtrap**: 
+3. **Mailtrap**:
    - Registrati su https://mailtrap.io/
    - Copia SMTP credentials
    - Forniscimi username + password
@@ -474,6 +487,7 @@ FB_CLIENT_SECRET: abc123xyz789
 ## 📞 Supporto
 
 **Se hai problemi durante il setup:**
+
 - Fammi sapere in quale step sei bloccato
 - Posso guidarti passo-passo con screenshot
 - Possiamo saltare OAuth providers e testarli dopo
@@ -481,4 +495,3 @@ FB_CLIENT_SECRET: abc123xyz789
 ---
 
 **Pronto quando lo sei tu!** 🎉
-

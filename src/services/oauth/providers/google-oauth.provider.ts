@@ -6,12 +6,12 @@
  * - Authorization code exchange
  */
 
-import { Injectable } from "@nestjs/common";
-import { LoggerService } from "@services/logger.service";
-import { OAuthProfile } from "../oauth.types";
-import { IOAuthProvider } from "./oauth-provider.interface";
-import { OAuthHttpClient } from "../utils/oauth-http.client";
-import { OAuthErrorHandler } from "../utils/oauth-error.handler";
+import { Injectable } from '@nestjs/common';
+import { LoggerService } from '@services/logger.service';
+import { OAuthProfile } from '../oauth.types';
+import { IOAuthProvider } from './oauth-provider.interface';
+import { OAuthHttpClient } from '../utils/oauth-http.client';
+import { OAuthErrorHandler } from '../utils/oauth-error.handler';
 
 @Injectable()
 export class GoogleOAuthProvider implements IOAuthProvider {
@@ -33,13 +33,13 @@ export class GoogleOAuthProvider implements IOAuthProvider {
   async verifyAndExtractProfile(idToken: string): Promise<OAuthProfile> {
     try {
       const data = await this.httpClient.get(
-        "https://oauth2.googleapis.com/tokeninfo",
+        'https://oauth2.googleapis.com/tokeninfo',
         {
           params: { id_token: idToken },
         },
       );
 
-      this.errorHandler.validateRequiredField(data.email, "Email", "Google");
+      this.errorHandler.validateRequiredField(data.email, 'Email', 'Google');
 
       return {
         email: data.email,
@@ -49,8 +49,8 @@ export class GoogleOAuthProvider implements IOAuthProvider {
     } catch (error) {
       this.errorHandler.handleProviderError(
         error,
-        "Google",
-        "ID token verification",
+        'Google',
+        'ID token verification',
       );
     }
   }
@@ -68,25 +68,25 @@ export class GoogleOAuthProvider implements IOAuthProvider {
     try {
       // Exchange code for access token
       const tokenData = await this.httpClient.post(
-        "https://oauth2.googleapis.com/token",
+        'https://oauth2.googleapis.com/token',
         {
           code,
           client_id: process.env.GOOGLE_CLIENT_ID,
           client_secret: process.env.GOOGLE_CLIENT_SECRET,
-          redirect_uri: "postmessage",
-          grant_type: "authorization_code",
+          redirect_uri: 'postmessage',
+          grant_type: 'authorization_code',
         },
       );
 
       this.errorHandler.validateRequiredField(
         tokenData.access_token,
-        "Access token",
-        "Google",
+        'Access token',
+        'Google',
       );
 
       // Get user profile with access token
       const profileData = await this.httpClient.get(
-        "https://www.googleapis.com/oauth2/v2/userinfo",
+        'https://www.googleapis.com/oauth2/v2/userinfo',
         {
           headers: { Authorization: `Bearer ${tokenData.access_token}` },
         },
@@ -94,8 +94,8 @@ export class GoogleOAuthProvider implements IOAuthProvider {
 
       this.errorHandler.validateRequiredField(
         profileData.email,
-        "Email",
-        "Google",
+        'Email',
+        'Google',
       );
 
       return {
@@ -104,7 +104,7 @@ export class GoogleOAuthProvider implements IOAuthProvider {
         providerId: profileData.id,
       };
     } catch (error) {
-      this.errorHandler.handleProviderError(error, "Google", "code exchange");
+      this.errorHandler.handleProviderError(error, 'Google', 'code exchange');
     }
   }
 

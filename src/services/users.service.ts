@@ -3,14 +3,14 @@ import {
   ConflictException,
   NotFoundException,
   InternalServerErrorException,
-} from "@nestjs/common";
-import { UserRepository } from "@repos/user.repository";
-import { RoleRepository } from "@repos/role.repository";
-import { RegisterDto } from "@dto/auth/register.dto";
-import { Types } from "mongoose";
-import { generateUsernameFromName } from "@utils/helper";
-import { LoggerService } from "@services/logger.service";
-import { hashPassword } from "@utils/password.util";
+} from '@nestjs/common';
+import { UserRepository } from '@repos/user.repository';
+import { RoleRepository } from '@repos/role.repository';
+import { RegisterDto } from '@dto/auth/register.dto';
+import { Types } from 'mongoose';
+import { generateUsernameFromName } from '@utils/helper';
+import { LoggerService } from '@services/logger.service';
+import { hashPassword } from '@utils/password.util';
 
 /**
  * Users service handling user management operations
@@ -35,7 +35,7 @@ export class UsersService {
   async create(dto: RegisterDto) {
     try {
       // Generate username from fname-lname if not provided
-      if (!dto.username || dto.username.trim() === "") {
+      if (!dto.username || dto.username.trim() === '') {
         dto.username = generateUsernameFromName(
           dto.fullname.fname,
           dto.fullname.lname,
@@ -52,7 +52,7 @@ export class UsersService {
 
       if (existingEmail || existingUsername || existingPhone) {
         throw new ConflictException(
-          "An account with these credentials already exists",
+          'An account with these credentials already exists',
         );
       }
 
@@ -64,9 +64,9 @@ export class UsersService {
         this.logger.error(
           `Password hashing failed: ${error.message}`,
           error.stack,
-          "UsersService",
+          'UsersService',
         );
-        throw new InternalServerErrorException("User creation failed");
+        throw new InternalServerErrorException('User creation failed');
       }
 
       const user = await this.users.create({
@@ -95,16 +95,16 @@ export class UsersService {
 
       if (error?.code === 11000) {
         throw new ConflictException(
-          "An account with these credentials already exists",
+          'An account with these credentials already exists',
         );
       }
 
       this.logger.error(
         `User creation failed: ${error.message}`,
         error.stack,
-        "UsersService",
+        'UsersService',
       );
-      throw new InternalServerErrorException("User creation failed");
+      throw new InternalServerErrorException('User creation failed');
     }
   }
 
@@ -125,9 +125,9 @@ export class UsersService {
       this.logger.error(
         `User list failed: ${error.message}`,
         error.stack,
-        "UsersService",
+        'UsersService',
       );
-      throw new InternalServerErrorException("Failed to retrieve users");
+      throw new InternalServerErrorException('Failed to retrieve users');
     }
   }
 
@@ -147,7 +147,7 @@ export class UsersService {
     try {
       const user = await this.users.updateById(id, { isBanned: banned });
       if (!user) {
-        throw new NotFoundException("User not found");
+        throw new NotFoundException('User not found');
       }
       return { id: user._id, isBanned: user.isBanned };
     } catch (error) {
@@ -157,10 +157,10 @@ export class UsersService {
       this.logger.error(
         `Set ban status failed: ${error.message}`,
         error.stack,
-        "UsersService",
+        'UsersService',
       );
       throw new InternalServerErrorException(
-        "Failed to update user ban status",
+        'Failed to update user ban status',
       );
     }
   }
@@ -176,7 +176,7 @@ export class UsersService {
     try {
       const user = await this.users.deleteById(id);
       if (!user) {
-        throw new NotFoundException("User not found");
+        throw new NotFoundException('User not found');
       }
       return { ok: true };
     } catch (error) {
@@ -186,9 +186,9 @@ export class UsersService {
       this.logger.error(
         `User deletion failed: ${error.message}`,
         error.stack,
-        "UsersService",
+        'UsersService',
       );
-      throw new InternalServerErrorException("Failed to delete user");
+      throw new InternalServerErrorException('Failed to delete user');
     }
   }
 
@@ -208,13 +208,13 @@ export class UsersService {
     try {
       const existing = await this.rolesRepo.findByIds(roles);
       if (existing.length !== roles.length) {
-        throw new NotFoundException("One or more roles not found");
+        throw new NotFoundException('One or more roles not found');
       }
 
       const roleIds = roles.map((r) => new Types.ObjectId(r));
       const user = await this.users.updateById(id, { roles: roleIds });
       if (!user) {
-        throw new NotFoundException("User not found");
+        throw new NotFoundException('User not found');
       }
       return { id: user._id, roles: user.roles };
     } catch (error) {
@@ -224,9 +224,9 @@ export class UsersService {
       this.logger.error(
         `Update user roles failed: ${error.message}`,
         error.stack,
-        "UsersService",
+        'UsersService',
       );
-      throw new InternalServerErrorException("Failed to update user roles");
+      throw new InternalServerErrorException('Failed to update user roles');
     }
   }
 

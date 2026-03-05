@@ -5,10 +5,10 @@
  * for OAuth API calls.
  */
 
-import type { AxiosError, AxiosRequestConfig } from "axios";
-import axios from "axios";
-import { InternalServerErrorException } from "@nestjs/common";
-import type { LoggerService } from "@services/logger.service";
+import type { AxiosError, AxiosRequestConfig } from 'axios';
+import axios from 'axios';
+import { InternalServerErrorException } from '@nestjs/common';
+import type { LoggerService } from '@services/logger.service';
 
 export class OAuthHttpClient {
   private readonly config: AxiosRequestConfig = {
@@ -25,7 +25,7 @@ export class OAuthHttpClient {
       const response = await axios.get(url, { ...this.config, ...config });
       return response.data;
     } catch (error) {
-      this.handleHttpError(error as AxiosError, "GET", url);
+      this.handleHttpError(error as AxiosError, 'GET', url);
     }
   }
 
@@ -44,7 +44,7 @@ export class OAuthHttpClient {
       });
       return response.data;
     } catch (error) {
-      this.handleHttpError(error as AxiosError, "POST", url);
+      this.handleHttpError(error as AxiosError, 'POST', url);
     }
   }
 
@@ -56,19 +56,19 @@ export class OAuthHttpClient {
     method: string,
     url: string,
   ): never {
-    if (error.code === "ECONNABORTED") {
+    if (error.code === 'ECONNABORTED') {
       this.logger.error(
         `OAuth API timeout: ${method} ${url}`,
-        error.stack || "",
-        "OAuthHttpClient",
+        error.stack || '',
+        'OAuthHttpClient',
       );
-      throw new InternalServerErrorException("Authentication service timeout");
+      throw new InternalServerErrorException('Authentication service timeout');
     }
 
     this.logger.error(
       `OAuth HTTP error: ${method} ${url} - ${error.message}`,
-      error.stack || "",
-      "OAuthHttpClient",
+      error.stack || '',
+      'OAuthHttpClient',
     );
 
     throw error;

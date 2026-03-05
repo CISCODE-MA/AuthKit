@@ -5,13 +5,13 @@
  * Uses JWKS (JSON Web Key Set) for token signature validation.
  */
 
-import { Injectable } from "@nestjs/common";
-import jwt from "jsonwebtoken";
-import jwksClient from "jwks-rsa";
-import { LoggerService } from "@services/logger.service";
-import { OAuthProfile } from "../oauth.types";
-import { IOAuthProvider } from "./oauth-provider.interface";
-import { OAuthErrorHandler } from "../utils/oauth-error.handler";
+import { Injectable } from '@nestjs/common';
+import jwt from 'jsonwebtoken';
+import jwksClient from 'jwks-rsa';
+import { LoggerService } from '@services/logger.service';
+import { OAuthProfile } from '../oauth.types';
+import { IOAuthProvider } from './oauth-provider.interface';
+import { OAuthErrorHandler } from '../utils/oauth-error.handler';
 
 @Injectable()
 export class MicrosoftOAuthProvider implements IOAuthProvider {
@@ -21,7 +21,7 @@ export class MicrosoftOAuthProvider implements IOAuthProvider {
    * JWKS client for fetching Microsoft's public keys
    */
   private readonly jwksClient = jwksClient({
-    jwksUri: "https://login.microsoftonline.com/common/discovery/v2.0/keys",
+    jwksUri: 'https://login.microsoftonline.com/common/discovery/v2.0/keys',
     cache: true,
     rateLimit: true,
     jwksRequestsPerMinute: 5,
@@ -44,7 +44,7 @@ export class MicrosoftOAuthProvider implements IOAuthProvider {
 
       // Extract email (Microsoft uses 'preferred_username' or 'email')
       const email = payload.preferred_username || payload.email;
-      this.errorHandler.validateRequiredField(email, "Email", "Microsoft");
+      this.errorHandler.validateRequiredField(email, 'Email', 'Microsoft');
 
       return {
         email,
@@ -54,8 +54,8 @@ export class MicrosoftOAuthProvider implements IOAuthProvider {
     } catch (error) {
       this.errorHandler.handleProviderError(
         error,
-        "Microsoft",
-        "ID token verification",
+        'Microsoft',
+        'ID token verification',
       );
     }
   }
@@ -80,7 +80,7 @@ export class MicrosoftOAuthProvider implements IOAuthProvider {
             this.logger.error(
               `Failed to get Microsoft signing key: ${err.message}`,
               err.stack,
-              "MicrosoftOAuthProvider",
+              'MicrosoftOAuthProvider',
             );
             callback(err);
           });
@@ -91,7 +91,7 @@ export class MicrosoftOAuthProvider implements IOAuthProvider {
         idToken,
         getKey as any,
         {
-          algorithms: ["RS256"],
+          algorithms: ['RS256'],
           audience: process.env.MICROSOFT_CLIENT_ID,
         },
         (err, payload) => {
@@ -99,7 +99,7 @@ export class MicrosoftOAuthProvider implements IOAuthProvider {
             this.logger.error(
               `Microsoft token verification failed: ${err.message}`,
               err.stack,
-              "MicrosoftOAuthProvider",
+              'MicrosoftOAuthProvider',
             );
             reject(err);
           } else {

@@ -131,11 +131,11 @@ class AuthService {
   async register(dto: RegisterDto): Promise<{ message: string }> {
     // 1. Check duplicate email
     const existing = await this.users.findByEmail(dto.email.toLowerCase());
-    if (existing) throw new ConflictException("Email already registered");
+    if (existing) throw new ConflictException('Email already registered');
 
     // 2. Get default role
-    const role = await this.roles.findByName("user");
-    if (!role) throw new InternalServerErrorException("Default role not found");
+    const role = await this.roles.findByName('user');
+    if (!role) throw new InternalServerErrorException('Default role not found');
 
     // 3. Hash password
     const hashedPassword = await bcrypt.hash(dto.password, 12);
@@ -156,7 +156,7 @@ class AuthService {
     const emailToken = this.signEmailToken({ sub: user._id.toString() });
     await this.mail.sendVerificationEmail(user.email, emailToken);
 
-    return { message: "Registration successful. Please verify your email." };
+    return { message: 'Registration successful. Please verify your email.' };
   }
 
   async login(
@@ -166,23 +166,23 @@ class AuthService {
     const user = await this.users.findByEmailWithPassword(
       dto.email.toLowerCase(),
     );
-    if (!user) throw new UnauthorizedException("Invalid credentials");
+    if (!user) throw new UnauthorizedException('Invalid credentials');
 
     // 2. Validate password
     const valid = await bcrypt.compare(dto.password, user.password!);
-    if (!valid) throw new UnauthorizedException("Invalid credentials");
+    if (!valid) throw new UnauthorizedException('Invalid credentials');
 
     // 3. Check verification status
     if (!user.isVerified) {
       throw new ForbiddenException(
-        "Email not verified. Please check your inbox",
+        'Email not verified. Please check your inbox',
       );
     }
 
     // 4. Check banned status
     if (user.isBanned) {
       throw new ForbiddenException(
-        "Account has been banned. Please contact support",
+        'Account has been banned. Please contact support',
       );
     }
 
@@ -522,7 +522,7 @@ LINKEDIN_CALLBACK_URL=http://localhost:3000/api/auth/linkedin/callback
 **File**: [src/services/oauth.service.ts](src/services/oauth.service.ts)
 
 ```typescript
-import axios from "axios";
+import axios from 'axios';
 
 @Injectable()
 export class OAuthService {
@@ -531,9 +531,9 @@ export class OAuthService {
   async loginWithLinkedIn(accessToken: string) {
     try {
       // Get user info from LinkedIn
-      const userUrl = "https://api.linkedin.com/v2/me";
+      const userUrl = 'https://api.linkedin.com/v2/me';
       const emailUrl =
-        "https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))";
+        'https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))';
 
       const [userRes, emailRes] = await Promise.all([
         axios.get(userUrl, {
@@ -547,10 +547,10 @@ export class OAuthService {
       ]);
 
       const { localizedFirstName, localizedLastName } = userRes.data;
-      const email = emailRes.data.elements[0]?.["handle~"]?.emailAddress;
+      const email = emailRes.data.elements[0]?.['handle~']?.emailAddress;
 
       if (!email) {
-        throw new BadRequestException("Email not provided by LinkedIn");
+        throw new BadRequestException('Email not provided by LinkedIn');
       }
 
       const name = `${localizedFirstName} ${localizedLastName}`;
@@ -560,27 +560,27 @@ export class OAuthService {
       this.logger.error(
         `LinkedIn login failed: ${error.message}`,
         error.stack,
-        "OAuthService",
+        'OAuthService',
       );
-      throw new UnauthorizedException("Failed to authenticate with LinkedIn");
+      throw new UnauthorizedException('Failed to authenticate with LinkedIn');
     }
   }
 
   async loginWithLinkedInCode(code: string) {
     try {
       // Exchange code for access token
-      const tokenUrl = "https://www.linkedin.com/oauth/v2/accessToken";
+      const tokenUrl = 'https://www.linkedin.com/oauth/v2/accessToken';
       const tokenRes = await axios.post(
         tokenUrl,
         new URLSearchParams({
-          grant_type: "authorization_code",
+          grant_type: 'authorization_code',
           code,
           redirect_uri: process.env.LINKEDIN_CALLBACK_URL!,
           client_id: process.env.LINKEDIN_CLIENT_ID!,
           client_secret: process.env.LINKEDIN_CLIENT_SECRET!,
         }),
         {
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           timeout: 10000,
         },
       );
@@ -591,9 +591,9 @@ export class OAuthService {
       this.logger.error(
         `LinkedIn code exchange failed: ${error.message}`,
         error.stack,
-        "OAuthService",
+        'OAuthService',
       );
-      throw new UnauthorizedException("Failed to authenticate with LinkedIn");
+      throw new UnauthorizedException('Failed to authenticate with LinkedIn');
     }
   }
 }
@@ -646,7 +646,7 @@ async linkedInCallback(@Req() req: Request, @Res() res: Response) {
 **File**: [src/config/passport.config.ts](src/config/passport.config.ts)
 
 ```typescript
-import { Strategy as LinkedInStrategy } from "passport-linkedin-oauth2";
+import { Strategy as LinkedInStrategy } from 'passport-linkedin-oauth2';
 
 export function registerOAuthStrategies(oauth: OAuthService) {
   // ... existing strategies ...
@@ -659,7 +659,7 @@ export function registerOAuthStrategies(oauth: OAuthService) {
           clientID: process.env.LINKEDIN_CLIENT_ID,
           clientSecret: process.env.LINKEDIN_CLIENT_SECRET,
           callbackURL: process.env.LINKEDIN_CALLBACK_URL,
-          scope: ["r_emailaddress", "r_liteprofile"],
+          scope: ['r_emailaddress', 'r_liteprofile'],
         },
         (
           accessToken: string,
@@ -680,36 +680,36 @@ export function registerOAuthStrategies(oauth: OAuthService) {
 **File**: [src/services/oauth.service.spec.ts](src/services/oauth.service.spec.ts)
 
 ```typescript
-describe("loginWithLinkedIn", () => {
-  it("should authenticate user with valid LinkedIn token", async () => {
+describe('loginWithLinkedIn', () => {
+  it('should authenticate user with valid LinkedIn token', async () => {
     const mockLinkedInResponse = {
-      localizedFirstName: "John",
-      localizedLastName: "Doe",
+      localizedFirstName: 'John',
+      localizedLastName: 'Doe',
     };
 
     const mockEmailResponse = {
-      elements: [{ "handle~": { emailAddress: "john.doe@example.com" } }],
+      elements: [{ 'handle~': { emailAddress: 'john.doe@example.com' } }],
     };
 
     jest
-      .spyOn(axios, "get")
+      .spyOn(axios, 'get')
       .mockResolvedValueOnce({ data: mockLinkedInResponse })
       .mockResolvedValueOnce({ data: mockEmailResponse });
 
     userRepository.findByEmail.mockResolvedValue(null);
-    userRepository.create.mockResolvedValue({ _id: "user123" } as any);
-    roleRepository.findByName.mockResolvedValue({ _id: "role123" } as any);
+    userRepository.create.mockResolvedValue({ _id: 'user123' } as any);
+    roleRepository.findByName.mockResolvedValue({ _id: 'role123' } as any);
 
-    const result = await service.loginWithLinkedIn("valid_token");
+    const result = await service.loginWithLinkedIn('valid_token');
 
-    expect(result).toHaveProperty("accessToken");
-    expect(result).toHaveProperty("refreshToken");
+    expect(result).toHaveProperty('accessToken');
+    expect(result).toHaveProperty('refreshToken');
   });
 
-  it("should throw UnauthorizedException for invalid token", async () => {
-    jest.spyOn(axios, "get").mockRejectedValue(new Error("Invalid token"));
+  it('should throw UnauthorizedException for invalid token', async () => {
+    jest.spyOn(axios, 'get').mockRejectedValue(new Error('Invalid token'));
 
-    await expect(service.loginWithLinkedIn("invalid_token")).rejects.toThrow(
+    await expect(service.loginWithLinkedIn('invalid_token')).rejects.toThrow(
       UnauthorizedException,
     );
   });
@@ -725,14 +725,14 @@ describe("loginWithLinkedIn", () => {
 
 ```typescript
 // Mobile app: Exchange LinkedIn access token
-const tokens = await fetch("http://localhost:3000/api/auth/linkedin/token", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ accessToken: "linkedin_access_token" }),
+const tokens = await fetch('http://localhost:3000/api/auth/linkedin/token', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ accessToken: 'linkedin_access_token' }),
 });
 
 // Web app: Redirect to LinkedIn login
-window.location.href = "http://localhost:3000/api/auth/linkedin";
+window.location.href = 'http://localhost:3000/api/auth/linkedin';
 ```
 ````
 
@@ -756,7 +756,7 @@ window.location.href = "http://localhost:3000/api/auth/linkedin";
 ### Unit Tests
 
 ```typescript
-describe("OAuthService", () => {
+describe('OAuthService', () => {
   let service: OAuthService;
   let userRepository: jest.Mocked<UserRepository>;
   let authService: jest.Mocked<AuthService>;
@@ -765,54 +765,54 @@ describe("OAuthService", () => {
     // ... setup mocks ...
   });
 
-  describe("findOrCreateOAuthUser", () => {
-    it("should create new user if email does not exist", async () => {
+  describe('findOrCreateOAuthUser', () => {
+    it('should create new user if email does not exist', async () => {
       userRepository.findByEmail.mockResolvedValue(null);
-      userRepository.create.mockResolvedValue({ _id: "newuser123" } as any);
-      roleRepository.findByName.mockResolvedValue({ _id: "role123" } as any);
+      userRepository.create.mockResolvedValue({ _id: 'newuser123' } as any);
+      roleRepository.findByName.mockResolvedValue({ _id: 'role123' } as any);
 
-      const result = await service["findOrCreateOAuthUser"](
-        "new@example.com",
-        "New User",
+      const result = await service['findOrCreateOAuthUser'](
+        'new@example.com',
+        'New User',
       );
 
       expect(userRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          email: "new@example.com",
+          email: 'new@example.com',
           isVerified: true, // OAuth users are pre-verified
           password: undefined,
         }),
       );
-      expect(result).toHaveProperty("accessToken");
+      expect(result).toHaveProperty('accessToken');
     });
 
-    it("should return existing user if email exists", async () => {
+    it('should return existing user if email exists', async () => {
       const existingUser = {
-        _id: "user123",
-        email: "existing@example.com",
+        _id: 'user123',
+        email: 'existing@example.com',
         isBanned: false,
       };
       userRepository.findByEmail.mockResolvedValue(existingUser as any);
 
-      const result = await service["findOrCreateOAuthUser"](
-        "existing@example.com",
-        "Existing User",
+      const result = await service['findOrCreateOAuthUser'](
+        'existing@example.com',
+        'Existing User',
       );
 
       expect(userRepository.create).not.toHaveBeenCalled();
-      expect(result).toHaveProperty("accessToken");
+      expect(result).toHaveProperty('accessToken');
     });
 
-    it("should throw ForbiddenException for banned users", async () => {
+    it('should throw ForbiddenException for banned users', async () => {
       const bannedUser = {
-        _id: "user123",
-        email: "banned@example.com",
+        _id: 'user123',
+        email: 'banned@example.com',
         isBanned: true,
       };
       userRepository.findByEmail.mockResolvedValue(bannedUser as any);
 
       await expect(
-        service["findOrCreateOAuthUser"]("banned@example.com", "Banned User"),
+        service['findOrCreateOAuthUser']('banned@example.com', 'Banned User'),
       ).rejects.toThrow(ForbiddenException);
     });
   });
@@ -822,7 +822,7 @@ describe("OAuthService", () => {
 ### Integration Tests
 
 ```typescript
-describe("AuthController - OAuth", () => {
+describe('AuthController - OAuth', () => {
   let app: INestApplication;
 
   beforeAll(async () => {
@@ -838,25 +838,25 @@ describe("AuthController - OAuth", () => {
     await app.init();
   });
 
-  describe("POST /api/auth/google/token", () => {
-    it("should return JWT tokens for valid Google ID token", async () => {
+  describe('POST /api/auth/google/token', () => {
+    it('should return JWT tokens for valid Google ID token', async () => {
       mockOAuthService.loginWithGoogle.mockResolvedValue({
-        accessToken: "jwt_access_token",
-        refreshToken: "jwt_refresh_token",
+        accessToken: 'jwt_access_token',
+        refreshToken: 'jwt_refresh_token',
       });
 
       const response = await request(app.getHttpServer())
-        .post("/api/auth/google/token")
-        .send({ idToken: "valid_google_id_token" })
+        .post('/api/auth/google/token')
+        .send({ idToken: 'valid_google_id_token' })
         .expect(200);
 
-      expect(response.body).toHaveProperty("accessToken");
-      expect(response.body).toHaveProperty("refreshToken");
+      expect(response.body).toHaveProperty('accessToken');
+      expect(response.body).toHaveProperty('refreshToken');
     });
 
-    it("should return 400 for missing ID token", async () => {
+    it('should return 400 for missing ID token', async () => {
       await request(app.getHttpServer())
-        .post("/api/auth/google/token")
+        .post('/api/auth/google/token')
         .send({})
         .expect(400);
     });

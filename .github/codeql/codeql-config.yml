@@ -1,4 +1,4 @@
-name: "CodeQL Config for AuthKit"
+name: 'CodeQL Config for AuthKit'
 
 # Suppress false positives for Mongoose queries
 # Mongoose automatically sanitizes all query parameters

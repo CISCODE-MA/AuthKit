@@ -1,7 +1,7 @@
 /**
  * Logging severity levels
  */
-export type LogLevel = "log" | "error" | "warn" | "debug" | "verbose";
+export type LogLevel = 'log' | 'error' | 'warn' | 'debug' | 'verbose';
 
 /**
  * Logger service interface for consistent logging across the application

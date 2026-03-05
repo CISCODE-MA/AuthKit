@@ -28,9 +28,11 @@ Questo documento ti guida attraverso il **testing completo** di:
 ## 📁 File Importanti Creati
 
 ### 1. **TESTING_GUIDE.md (Backend)**
+
 📄 `modules/auth-kit/docs/TESTING_GUIDE.md`
 
 **Contiene:**
+
 - Setup iniziale con MongoDB
 - Test endpoints local auth (register, login, verify, etc.)
 - Configurazione OAuth providers (Google, Microsoft, Facebook)
@@ -39,9 +41,11 @@ Questo documento ti guida attraverso il **testing completo** di:
 - Troubleshooting
 
 ### 2. **TESTING_GUIDE.md (Frontend)**
+
 📄 `modules/auth-kit-ui/docs/TESTING_GUIDE.md`
 
 **Contiene:**
+
 - Setup hooks `useAuth()`
 - Test login/register/logout flows
 - OAuth integration (buttons, callbacks)
@@ -50,9 +54,11 @@ Questo documento ti guida attraverso il **testing completo** di:
 - Troubleshooting frontend-backend
 
 ### 3. **setup-env.ps1 (Script PowerShell)**
+
 📄 `modules/auth-kit/scripts/setup-env.ps1`
 
 **Funzioni:**
+
 - Valida file .env esistenti
 - Controlla sicurezza dei JWT secrets
 - Genera secrets sicuri automaticamente
@@ -135,6 +141,7 @@ npm run test:cov
 ```
 
 **Test manualmente con Postman:**
+
 1. Importa collection: `ciscode-auth-collection 1.json`
 2. Testa endpoints:
    - POST `/api/auth/register`
@@ -288,6 +295,7 @@ npm install @ciscode/ui-authentication-kit
 ### ✅ Backend (Auth Kit)
 
 #### Local Authentication
+
 - [ ] Register nuovo utente
 - [ ] Email verification (GET link + POST token)
 - [ ] Login con email/password
@@ -299,6 +307,7 @@ npm install @ciscode/ui-authentication-kit
 - [ ] Errori (401, 403, 409)
 
 #### OAuth Providers
+
 - [ ] Google web flow (redirect)
 - [ ] Google callback handling
 - [ ] Google mobile (ID token)
@@ -310,6 +319,7 @@ npm install @ciscode/ui-authentication-kit
 - [ ] Facebook mobile (access token)
 
 #### Tests Automatici
+
 - [ ] `npm test` passa (312 tests)
 - [ ] Coverage >= 90%
 - [ ] No ESLint warnings
@@ -319,6 +329,7 @@ npm install @ciscode/ui-authentication-kit
 ### ✅ Frontend (Auth Kit UI)
 
 #### Hooks (useAuth)
+
 - [ ] Login with email/password
 - [ ] Register new user
 - [ ] Logout
@@ -329,6 +340,7 @@ npm install @ciscode/ui-authentication-kit
 - [ ] Error handling
 
 #### OAuth Integration
+
 - [ ] OAuth buttons render
 - [ ] Google redirect e callback
 - [ ] Microsoft redirect e callback
@@ -337,6 +349,7 @@ npm install @ciscode/ui-authentication-kit
 - [ ] Redirect a dashboard dopo login
 
 #### UI Components
+
 - [ ] Material-UI login form
 - [ ] Tailwind CSS form (example)
 - [ ] Form validation
@@ -345,6 +358,7 @@ npm install @ciscode/ui-authentication-kit
 - [ ] Success redirects
 
 #### Tests Automatici
+
 - [ ] `npm test` passa
 - [ ] Coverage >= 80%
 - [ ] No TypeScript errors
@@ -354,24 +368,28 @@ npm install @ciscode/ui-authentication-kit
 ### ✅ Environment & Configuration
 
 #### Secrets
+
 - [ ] JWT secrets >= 32 caratteri
 - [ ] Secrets non contengono parole comuni
 - [ ] Backup .env creato
 - [ ] .env in .gitignore
 
 #### MongoDB
+
 - [ ] MongoDB in esecuzione
 - [ ] Connection string corretto
 - [ ] Database accessibile
 - [ ] Seed default roles eseguito
 
 #### SMTP (Email)
+
 - [ ] SMTP configurato (Mailtrap per test)
 - [ ] Email di verifica arrivano
 - [ ] Email reset password arrivano
 - [ ] Links nelle email funzionano
 
 #### OAuth Credentials
+
 - [ ] Google Client ID/Secret validi
 - [ ] Microsoft Client ID/Secret validi
 - [ ] Facebook App ID/Secret validi
@@ -382,6 +400,7 @@ npm install @ciscode/ui-authentication-kit
 ## 🚨 Troubleshooting Rapido
 
 ### ❌ MongoDB connection refused
+
 ```powershell
 # Start MongoDB
 docker start mongodb
@@ -390,12 +409,14 @@ mongod --dbpath="C:\data\db"
 ```
 
 ### ❌ JWT secret troppo corto/insicuro
+
 ```powershell
 # Rigenera secrets automaticamente
 .\scripts\setup-env.ps1 -GenerateSecrets
 ```
 
 ### ❌ Email non arrivano
+
 ```env
 # Usa Mailtrap per testing
 SMTP_HOST=sandbox.smtp.mailtrap.io
@@ -405,6 +426,7 @@ SMTP_PASS=your_mailtrap_password
 ```
 
 ### ❌ OAuth redirect mismatch
+
 ```
 # Verifica che gli URL siano IDENTICI:
 Backend .env: GOOGLE_CALLBACK_URL=http://localhost:3000/api/auth/google/callback
@@ -412,6 +434,7 @@ Google Console: http://localhost:3000/api/auth/google/callback
 ```
 
 ### ❌ CORS error (frontend → backend)
+
 ```typescript
 // Backend main.ts
 app.enableCors({
@@ -421,6 +444,7 @@ app.enableCors({
 ```
 
 ### ❌ Token expired (401)
+
 ```typescript
 // Frontend - Abilita auto-refresh
 const useAuth = createUseAuth({
@@ -439,23 +463,27 @@ const useAuth = createUseAuth({
 Dopo aver completato tutti i test:
 
 ### 1. **Documentazione**
+
 - [ ] Aggiorna README con esempi reali
 - [ ] Screenshot dei flows OAuth
 - [ ] Video tutorial (opzionale)
 
 ### 2. **Production Setup**
+
 - [ ] Genera secrets production (diversi da dev)
 - [ ] Configura secrets manager (AWS Secrets Manager, Azure Key Vault)
 - [ ] Setup OAuth credentials production
 - [ ] HTTPS obbligatorio
 
 ### 3. **Deploy**
+
 - [ ] Deploy backend in staging
 - [ ] Deploy frontend in staging
 - [ ] Test end-to-end staging
 - [ ] Production deploy
 
 ### 4. **Monitoring**
+
 - [ ] Setup logging (CloudWatch, Elasticsearch)
 - [ ] Alert per errori OAuth
 - [ ] Metrics (login success rate, OAuth usage)
@@ -465,6 +493,7 @@ Dopo aver completato tutti i test:
 ## 📚 Risorse
 
 ### Documentazione
+
 - **Backend Guide**: `modules/auth-kit/docs/TESTING_GUIDE.md`
 - **Frontend Guide**: `modules/auth-kit-ui/docs/TESTING_GUIDE.md`
 - **Backend README**: `modules/auth-kit/README.md`
@@ -472,6 +501,7 @@ Dopo aver completato tutti i test:
 - **Status Report**: `modules/auth-kit/docs/STATUS.md`
 
 ### Tools
+
 - **Postman Collection**: `modules/auth-kit/ciscode-auth-collection 1.json`
 - **Setup Script**: `modules/auth-kit/scripts/setup-env.ps1`
 - **MongoDB Compass**: https://www.mongodb.com/products/compass
@@ -479,6 +509,7 @@ Dopo aver completato tutti i test:
 - **JWT Debugger**: https://jwt.io/
 
 ### OAuth Setup
+
 - **Google Console**: https://console.cloud.google.com/
 - **Azure Portal**: https://portal.azure.com/
 - **Facebook Developers**: https://developers.facebook.com/
@@ -488,12 +519,14 @@ Dopo aver completato tutti i test:
 ## 📝 Note Finali
 
 ### Sicurezza
+
 - ⚠️ **MAI committare .env** nel git
 - ⚠️ **Cambiare tutti i secrets** in production
 - ⚠️ **HTTPS obbligatorio** in production
 - ⚠️ **Rate limiting** su login endpoints
 
 ### Best Practices
+
 - ✅ Usa `setup-env.ps1` per gestire secrets
 - ✅ Backup `.env` prima di modifiche
 - ✅ Testa ogni provider OAuth separatamente
@@ -501,6 +534,7 @@ Dopo aver completato tutti i test:
 - ✅ Usa Mailtrap per email testing
 
 ### Performance
+
 - Token refresh automatico (prima della scadenza)
 - Caching di JWKS keys (Microsoft)
 - Connection pooling MongoDB
@@ -523,10 +557,10 @@ Se incontri problemi:
 **Documento compilato da**: GitHub Copilot  
 **Data**: 4 Febbraio 2026  
 **Versioni**:
+
 - Auth Kit: v1.5.0 ✅ Production Ready
 - Auth Kit UI: v1.0.4 → v2.0.0 (in development)
 
 ---
 
 **Buon testing! 🚀**
-

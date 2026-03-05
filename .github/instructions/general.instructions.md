@@ -313,13 +313,13 @@ Configured in `tsconfig.json`:
 
 ```typescript
 // ✅ Correct
-import { UserRepository } from "@repos/user.repository";
-import { LoginDto } from "@dtos/auth/login.dto";
-import { AuthService } from "@services/auth.service";
+import { UserRepository } from '@repos/user.repository';
+import { LoginDto } from '@dtos/auth/login.dto';
+import { AuthService } from '@services/auth.service';
 
 // ❌ Wrong
-import { UserRepository } from "../../repositories/user.repository";
-import { LoginDto } from "../dtos/auth/login.dto";
+import { UserRepository } from '../../repositories/user.repository';
+import { LoginDto } from '../dtos/auth/login.dto';
 ```
 
 ---
@@ -331,10 +331,10 @@ import { LoginDto } from "../dtos/auth/login.dto";
 **✅ Correct Pattern:**
 
 ```typescript
-import { Injectable } from "@nestjs/common";
-import { UserRepository } from "@repos/user.repository";
-import { MailService } from "@services/mail.service";
-import { LoggerService } from "@services/logger.service";
+import { Injectable } from '@nestjs/common';
+import { UserRepository } from '@repos/user.repository';
+import { MailService } from '@services/mail.service';
+import { LoggerService } from '@services/logger.service';
 
 @Injectable()
 export class AuthService {
@@ -356,7 +356,7 @@ export class AuthService {
 
 ```typescript
 // DON'T import services directly or instantiate manually
-import { UserRepository } from "@repos/user.repository";
+import { UserRepository } from '@repos/user.repository';
 const userRepo = new UserRepository(); // ❌ Breaks DI container
 ```
 
@@ -411,10 +411,10 @@ async findUserById(id: string) {
 **✅ Correct Repository:**
 
 ```typescript
-import { Injectable } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
-import { Model, Types } from "mongoose";
-import { User, UserDocument } from "@models/user.model";
+import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, Types } from 'mongoose';
+import { User, UserDocument } from '@models/user.model';
 
 @Injectable()
 export class UserRepository {
@@ -440,9 +440,9 @@ export class UserRepository {
 
   async findByIdWithRolesAndPermissions(id: string | Types.ObjectId) {
     return this.userModel.findById(id).populate({
-      path: "roles",
-      populate: { path: "permissions", select: "name" },
-      select: "name permissions",
+      path: 'roles',
+      populate: { path: 'permissions', select: 'name' },
+      select: 'name permissions',
     });
   }
 }
@@ -492,7 +492,7 @@ if (
   decoded.iat * 1000 < user.passwordChangedAt.getTime()
 ) {
   throw new UnauthorizedException(
-    "Token expired due to password change. Please login again",
+    'Token expired due to password change. Please login again',
   );
 }
 ```
@@ -533,8 +533,8 @@ import {
   MinLength,
   ValidateNested,
   IsOptional,
-} from "class-validator";
-import { Type } from "class-transformer";
+} from 'class-validator';
+import { Type } from 'class-transformer';
 
 class FullNameDto {
   @IsString()
@@ -585,15 +585,15 @@ async comparePassword(plain: string, hashed: string): Promise<boolean> {
 **✅ Structured logging:**
 
 ```typescript
-this.logger.log("User registered successfully", "AuthService");
+this.logger.log('User registered successfully', 'AuthService');
 this.logger.warn(
-  "SMTP not configured - email functionality disabled",
-  "MailService",
+  'SMTP not configured - email functionality disabled',
+  'MailService',
 );
 this.logger.error(
   `Authentication failed: ${error.message}`,
   error.stack,
-  "AuthenticateGuard",
+  'AuthenticateGuard',
 );
 ```
 
@@ -605,9 +605,9 @@ this.logger.error(
 
 ```typescript
 // ❌ BAD
-@Controller("api/auth")
+@Controller('api/auth')
 export class AuthController {
-  @Post("login")
+  @Post('login')
   async login(@Body() dto: LoginDto) {
     const user = await this.users.findByEmail(dto.email);
     const valid = await bcrypt.compare(dto.password, user.password);
@@ -618,11 +618,11 @@ export class AuthController {
 }
 
 // ✅ GOOD - Delegate to service
-@Controller("api/auth")
+@Controller('api/auth')
 export class AuthController {
   constructor(private readonly auth: AuthService) {}
 
-  @Post("login")
+  @Post('login')
   async login(@Body() dto: LoginDto, @Res() res: Response) {
     const { accessToken, refreshToken } = await this.auth.login(dto);
     // Handle cookie setting and response formatting here only
@@ -659,11 +659,11 @@ export class AuthService {
 
 ```typescript
 // ❌ BAD
-const token = jwt.sign(payload, "my-secret-key", { expiresIn: "15m" });
+const token = jwt.sign(payload, 'my-secret-key', { expiresIn: '15m' });
 
 // ✅ GOOD
-const token = jwt.sign(payload, this.getEnv("JWT_SECRET"), {
-  expiresIn: this.resolveExpiry(process.env.JWT_ACCESS_TOKEN_EXPIRES_IN, "15m"),
+const token = jwt.sign(payload, this.getEnv('JWT_SECRET'), {
+  expiresIn: this.resolveExpiry(process.env.JWT_ACCESS_TOKEN_EXPIRES_IN, '15m'),
 });
 ```
 
@@ -699,16 +699,16 @@ try {
 // ✅ GOOD
 try {
   const user = await this.users.findById(id);
-  if (!user) throw new NotFoundException("User not found");
+  if (!user) throw new NotFoundException('User not found');
   return user;
 } catch (error) {
   if (error instanceof NotFoundException) throw error;
   this.logger.error(
     `Failed to find user: ${error.message}`,
     error.stack,
-    "AuthService",
+    'AuthService',
   );
-  throw new InternalServerErrorException("Failed to retrieve user");
+  throw new InternalServerErrorException('Failed to retrieve user');
 }
 ```
 
@@ -722,22 +722,22 @@ try {
 
 ```typescript
 // Module
-export { AuthKitModule } from "./auth-kit.module";
+export { AuthKitModule } from './auth-kit.module';
 
 // Guards (used by host apps)
-export { AuthenticateGuard } from "./middleware/authenticate.guard";
-export { AdminGuard } from "./middleware/admin.guard";
-export { hasRole } from "./middleware/role.guard";
+export { AuthenticateGuard } from './middleware/authenticate.guard';
+export { AdminGuard } from './middleware/admin.guard';
+export { hasRole } from './middleware/role.guard';
 
 // Decorators
-export { Admin } from "./middleware/admin.decorator";
+export { Admin } from './middleware/admin.decorator';
 
 // Services (if host apps need direct access)
-export { AuthService } from "./services/auth.service";
-export { UsersService } from "./services/users.service";
-export { RolesService } from "./services/roles.service";
-export { SeedService } from "./services/seed.service";
-export { AdminRoleService } from "./services/admin-role.service";
+export { AuthService } from './services/auth.service';
+export { UsersService } from './services/users.service';
+export { RolesService } from './services/roles.service';
+export { SeedService } from './services/seed.service';
+export { AdminRoleService } from './services/admin-role.service';
 ```
 
 ### What MUST NOT be exported:
@@ -746,16 +746,16 @@ export { AdminRoleService } from "./services/admin-role.service";
 
 ```typescript
 // ❌ NEVER export models/schemas
-export { User, UserSchema } from "./models/user.model"; // FORBIDDEN
+export { User, UserSchema } from './models/user.model'; // FORBIDDEN
 
 // ❌ NEVER export repositories directly (exported via module if needed)
-export { UserRepository } from "./repositories/user.repository"; // Consider carefully
+export { UserRepository } from './repositories/user.repository'; // Consider carefully
 
 // ❌ NEVER export DTOs (host apps don't need them - they use the API)
-export { LoginDto, RegisterDto } from "./dtos/auth/login.dto"; // FORBIDDEN
+export { LoginDto, RegisterDto } from './dtos/auth/login.dto'; // FORBIDDEN
 
 // ❌ NEVER export internal utilities
-export { generateUsernameFromName } from "./utils/helper"; // FORBIDDEN
+export { generateUsernameFromName } from './utils/helper'; // FORBIDDEN
 ```
 
 **Rationale:**
@@ -790,7 +790,7 @@ export class AuthKitModule { }
 
 ```typescript
 // In host app
-import { AuthService } from "@ciscode/authentication-kit";
+import { AuthService } from '@ciscode/authentication-kit';
 
 @Injectable()
 export class MyService {
@@ -840,13 +840,13 @@ if (user.passwordChangedAt && decoded.iat * 1000 < user.passwordChangedAt.getTim
 ### 3. Cookie Security
 
 ```typescript
-const isProd = process.env.NODE_ENV === "production";
+const isProd = process.env.NODE_ENV === 'production';
 
-res.cookie("refreshToken", refreshToken, {
+res.cookie('refreshToken', refreshToken, {
   httpOnly: true, // ✅ Prevent JS access
   secure: isProd, // ✅ HTTPS only in production
-  sameSite: isProd ? "none" : "lax", // ✅ CSRF protection
-  path: "/",
+  sameSite: isProd ? 'none' : 'lax', // ✅ CSRF protection
+  path: '/',
   maxAge: getMillisecondsFromExpiry(refreshTTL),
 });
 ```
@@ -897,11 +897,11 @@ password!: string;
 
 ```typescript
 // ✅ Generic error for login failures (prevent user enumeration)
-throw new UnauthorizedException("Invalid credentials");
+throw new UnauthorizedException('Invalid credentials');
 
 // ❌ DON'T reveal specific info
-throw new UnauthorizedException("User not found"); // Reveals email exists
-throw new UnauthorizedException("Wrong password"); // Reveals email exists
+throw new UnauthorizedException('User not found'); // Reveals email exists
+throw new UnauthorizedException('Wrong password'); // Reveals email exists
 ```
 
 ---

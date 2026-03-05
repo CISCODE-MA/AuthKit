@@ -35,11 +35,13 @@ Make sure MongoDB is running on `mongodb://127.0.0.1:27017`
 MailHog captures all outgoing emails for testing.
 
 **Windows (PowerShell):**
+
 ```powershell
 .\tools\start-mailhog.ps1
 ```
 
 **Linux/Mac:**
+
 ```bash
 chmod +x tools/mailhog
 ./tools/mailhog
@@ -62,6 +64,7 @@ Backend will be available at: http://localhost:3000
 ### 6. Test Email Features
 
 With MailHog running:
+
 1. Register a new user → email sent to MailHog
 2. Open http://localhost:8025 to see the verification email
 3. Copy the token from the email
@@ -95,6 +98,7 @@ node scripts/seed-admin.ts
 ```
 
 Default credentials:
+
 - **Email**: admin@example.com
 - **Password**: admin123
 
@@ -134,6 +138,7 @@ src/
 **Error**: `MongoServerError: connect ECONNREFUSED`
 
 **Solution**: Make sure MongoDB is running:
+
 ```bash
 # Check if MongoDB is running
 mongosh --eval "db.version()"
@@ -144,6 +149,7 @@ mongosh --eval "db.version()"
 **Error**: Port 1025 or 8025 already in use
 
 **Solution**: Kill existing MailHog process:
+
 ```powershell
 Get-Process -Name mailhog -ErrorAction SilentlyContinue | Stop-Process -Force
 ```
@@ -158,13 +164,13 @@ Get-Process -Name mailhog -ErrorAction SilentlyContinue | Stop-Process -Force
 
 Key variables in `.env`:
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `MONGO_URI` | `mongodb://127.0.0.1:27017/auth_kit_test` | MongoDB connection |
-| `SMTP_HOST` | `127.0.0.1` | MailHog SMTP host |
-| `SMTP_PORT` | `1025` | MailHog SMTP port |
-| `FRONTEND_URL` | `http://localhost:5173` | Frontend URL for email links |
-| `JWT_SECRET` | (test key) | JWT signing secret |
+| Variable       | Default                                   | Description                  |
+| -------------- | ----------------------------------------- | ---------------------------- |
+| `MONGO_URI`    | `mongodb://127.0.0.1:27017/auth_kit_test` | MongoDB connection           |
+| `SMTP_HOST`    | `127.0.0.1`                               | MailHog SMTP host            |
+| `SMTP_PORT`    | `1025`                                    | MailHog SMTP port            |
+| `FRONTEND_URL` | `http://localhost:5173`                   | Frontend URL for email links |
+| `JWT_SECRET`   | (test key)                                | JWT signing secret           |
 
 **⚠️ Security Note**: Default secrets are for development only. Use strong secrets in production.
 

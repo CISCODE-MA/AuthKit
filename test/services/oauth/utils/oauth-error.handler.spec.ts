@@ -1,14 +1,14 @@
-import type { TestingModule } from "@nestjs/testing";
-import { Test } from "@nestjs/testing";
+import type { TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 import {
   UnauthorizedException,
   BadRequestException,
   InternalServerErrorException,
-} from "@nestjs/common";
-import { OAuthErrorHandler } from "@services/oauth/utils/oauth-error.handler";
-import { LoggerService } from "@services/logger.service";
+} from '@nestjs/common';
+import { OAuthErrorHandler } from '@services/oauth/utils/oauth-error.handler';
+import { LoggerService } from '@services/logger.service';
 
-describe("OAuthErrorHandler", () => {
+describe('OAuthErrorHandler', () => {
   let handler: OAuthErrorHandler;
   let mockLogger: any;
 
@@ -29,110 +29,110 @@ describe("OAuthErrorHandler", () => {
     handler = new OAuthErrorHandler(logger);
   });
 
-  describe("handleProviderError", () => {
-    it("should rethrow UnauthorizedException", () => {
-      const error = new UnauthorizedException("Invalid token");
+  describe('handleProviderError', () => {
+    it('should rethrow UnauthorizedException', () => {
+      const error = new UnauthorizedException('Invalid token');
 
       expect(() =>
-        handler.handleProviderError(error, "Google", "token verification"),
+        handler.handleProviderError(error, 'Google', 'token verification'),
       ).toThrow(UnauthorizedException);
     });
 
-    it("should rethrow BadRequestException", () => {
-      const error = new BadRequestException("Missing email");
+    it('should rethrow BadRequestException', () => {
+      const error = new BadRequestException('Missing email');
 
       expect(() =>
-        handler.handleProviderError(error, "Microsoft", "profile fetch"),
+        handler.handleProviderError(error, 'Microsoft', 'profile fetch'),
       ).toThrow(BadRequestException);
     });
 
-    it("should rethrow InternalServerErrorException", () => {
-      const error = new InternalServerErrorException("Service unavailable");
+    it('should rethrow InternalServerErrorException', () => {
+      const error = new InternalServerErrorException('Service unavailable');
 
       expect(() =>
-        handler.handleProviderError(error, "Facebook", "token validation"),
+        handler.handleProviderError(error, 'Facebook', 'token validation'),
       ).toThrow(InternalServerErrorException);
     });
 
-    it("should wrap unknown errors as UnauthorizedException", () => {
-      const error = new Error("Network error");
+    it('should wrap unknown errors as UnauthorizedException', () => {
+      const error = new Error('Network error');
 
       expect(() =>
-        handler.handleProviderError(error, "Google", "authentication"),
+        handler.handleProviderError(error, 'Google', 'authentication'),
       ).toThrow(UnauthorizedException);
 
       expect(() =>
-        handler.handleProviderError(error, "Google", "authentication"),
-      ).toThrow("Google authentication failed");
+        handler.handleProviderError(error, 'Google', 'authentication'),
+      ).toThrow('Google authentication failed');
 
       expect(mockLogger.error).toHaveBeenCalledWith(
-        "Google authentication failed: Network error",
+        'Google authentication failed: Network error',
         expect.any(String),
-        "OAuthErrorHandler",
+        'OAuthErrorHandler',
       );
     });
 
-    it("should log error details", () => {
-      const error = new Error("Custom error");
+    it('should log error details', () => {
+      const error = new Error('Custom error');
 
       try {
-        handler.handleProviderError(error, "Microsoft", "login");
+        handler.handleProviderError(error, 'Microsoft', 'login');
       } catch (e) {
         // Expected
       }
 
       expect(mockLogger.error).toHaveBeenCalledWith(
-        "Microsoft login failed: Custom error",
+        'Microsoft login failed: Custom error',
         expect.any(String),
-        "OAuthErrorHandler",
+        'OAuthErrorHandler',
       );
     });
   });
 
-  describe("validateRequiredField", () => {
-    it("should not throw if field has value", () => {
+  describe('validateRequiredField', () => {
+    it('should not throw if field has value', () => {
       expect(() =>
-        handler.validateRequiredField("user@example.com", "Email", "Google"),
+        handler.validateRequiredField('user@example.com', 'Email', 'Google'),
       ).not.toThrow();
 
       expect(() =>
-        handler.validateRequiredField("John Doe", "Name", "Microsoft"),
+        handler.validateRequiredField('John Doe', 'Name', 'Microsoft'),
       ).not.toThrow();
     });
 
-    it("should throw BadRequestException if field is null", () => {
+    it('should throw BadRequestException if field is null', () => {
       expect(() =>
-        handler.validateRequiredField(null, "Email", "Google"),
+        handler.validateRequiredField(null, 'Email', 'Google'),
       ).toThrow(BadRequestException);
 
       expect(() =>
-        handler.validateRequiredField(null, "Email", "Google"),
-      ).toThrow("Email not provided by Google");
+        handler.validateRequiredField(null, 'Email', 'Google'),
+      ).toThrow('Email not provided by Google');
     });
 
-    it("should throw BadRequestException if field is undefined", () => {
+    it('should throw BadRequestException if field is undefined', () => {
       expect(() =>
-        handler.validateRequiredField(undefined, "Access token", "Facebook"),
+        handler.validateRequiredField(undefined, 'Access token', 'Facebook'),
       ).toThrow(BadRequestException);
 
       expect(() =>
-        handler.validateRequiredField(undefined, "Access token", "Facebook"),
-      ).toThrow("Access token not provided by Facebook");
+        handler.validateRequiredField(undefined, 'Access token', 'Facebook'),
+      ).toThrow('Access token not provided by Facebook');
     });
 
-    it("should throw BadRequestException if field is empty string", () => {
+    it('should throw BadRequestException if field is empty string', () => {
       expect(() =>
-        handler.validateRequiredField("", "Email", "Microsoft"),
+        handler.validateRequiredField('', 'Email', 'Microsoft'),
       ).toThrow(BadRequestException);
     });
 
-    it("should accept non-empty values", () => {
+    it('should accept non-empty values', () => {
       expect(() =>
-        handler.validateRequiredField("0", "ID", "Provider"),
+        handler.validateRequiredField('0', 'ID', 'Provider'),
       ).not.toThrow();
 
       expect(() =>
-        handler.validateRequiredField(false, "Flag", "Provider"),
+        handler.validateRequiredField(false, 'Flag', 'Provider'),
       ).toThrow(); // false is falsy
     });
   });

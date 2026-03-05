@@ -1,14 +1,14 @@
-import type { TestingModule } from "@nestjs/testing";
-import { Test } from "@nestjs/testing";
-import type { Response } from "express";
-import { PermissionsController } from "@controllers/permissions.controller";
-import { PermissionsService } from "@services/permissions.service";
-import type { CreatePermissionDto } from "@dto/permission/create-permission.dto";
-import type { UpdatePermissionDto } from "@dto/permission/update-permission.dto";
-import { AdminGuard } from "@guards/admin.guard";
-import { AuthenticateGuard } from "@guards/authenticate.guard";
+import type { TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
+import type { Response } from 'express';
+import { PermissionsController } from '@controllers/permissions.controller';
+import { PermissionsService } from '@services/permissions.service';
+import type { CreatePermissionDto } from '@dto/permission/create-permission.dto';
+import type { UpdatePermissionDto } from '@dto/permission/update-permission.dto';
+import { AdminGuard } from '@guards/admin.guard';
+import { AuthenticateGuard } from '@guards/authenticate.guard';
 
-describe("PermissionsController", () => {
+describe('PermissionsController', () => {
   let controller: PermissionsController;
   let mockService: jest.Mocked<PermissionsService>;
   let mockResponse: Partial<Response>;
@@ -43,13 +43,13 @@ describe("PermissionsController", () => {
     jest.clearAllMocks();
   });
 
-  describe("create", () => {
-    it("should create a permission and return 201", async () => {
+  describe('create', () => {
+    it('should create a permission and return 201', async () => {
       const dto: CreatePermissionDto = {
-        name: "read:users",
-        description: "Read users",
+        name: 'read:users',
+        description: 'Read users',
       };
-      const created = { _id: "perm-id", ...dto };
+      const created = { _id: 'perm-id', ...dto };
 
       mockService.create.mockResolvedValue(created as any);
 
@@ -61,11 +61,11 @@ describe("PermissionsController", () => {
     });
   });
 
-  describe("list", () => {
-    it("should return all permissions with 200", async () => {
+  describe('list', () => {
+    it('should return all permissions with 200', async () => {
       const permissions = [
-        { _id: "p1", name: "read:users", description: "Read" },
-        { _id: "p2", name: "write:users", description: "Write" },
+        { _id: 'p1', name: 'read:users', description: 'Read' },
+        { _id: 'p2', name: 'write:users', description: 'Write' },
       ];
 
       mockService.list.mockResolvedValue(permissions as any);
@@ -78,36 +78,36 @@ describe("PermissionsController", () => {
     });
   });
 
-  describe("update", () => {
-    it("should update a permission and return 200", async () => {
+  describe('update', () => {
+    it('should update a permission and return 200', async () => {
       const dto: UpdatePermissionDto = {
-        description: "Updated description",
+        description: 'Updated description',
       };
       const updated = {
-        _id: "perm-id",
-        name: "read:users",
-        description: "Updated description",
+        _id: 'perm-id',
+        name: 'read:users',
+        description: 'Updated description',
       };
 
       mockService.update.mockResolvedValue(updated as any);
 
-      await controller.update("perm-id", dto, mockResponse as Response);
+      await controller.update('perm-id', dto, mockResponse as Response);
 
-      expect(mockService.update).toHaveBeenCalledWith("perm-id", dto);
+      expect(mockService.update).toHaveBeenCalledWith('perm-id', dto);
       expect(mockResponse.status).toHaveBeenCalledWith(200);
       expect(mockResponse.json).toHaveBeenCalledWith(updated);
     });
   });
 
-  describe("delete", () => {
-    it("should delete a permission and return 200", async () => {
+  describe('delete', () => {
+    it('should delete a permission and return 200', async () => {
       const deleted = { ok: true };
 
       mockService.delete.mockResolvedValue(deleted as any);
 
-      await controller.delete("perm-id", mockResponse as Response);
+      await controller.delete('perm-id', mockResponse as Response);
 
-      expect(mockService.delete).toHaveBeenCalledWith("perm-id");
+      expect(mockService.delete).toHaveBeenCalledWith('perm-id');
       expect(mockResponse.status).toHaveBeenCalledWith(200);
       expect(mockResponse.json).toHaveBeenCalledWith(deleted);
     });

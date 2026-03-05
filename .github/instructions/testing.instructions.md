@@ -13,15 +13,15 @@
 
 ```typescript
 // ✅ GOOD - Testing behavior
-it("should reject login with invalid credentials", async () => {
+it('should reject login with invalid credentials', async () => {
   await expect(
-    authService.login({ email: "test@example.com", password: "wrong" }),
+    authService.login({ email: 'test@example.com', password: 'wrong' }),
   ).rejects.toThrow(UnauthorizedException);
 });
 
 // ❌ BAD - Testing implementation
-it("should call bcrypt.compare with user password", async () => {
-  const spy = jest.spyOn(bcrypt, "compare");
+it('should call bcrypt.compare with user password', async () => {
+  const spy = jest.spyOn(bcrypt, 'compare');
   await authService.login(dto);
   expect(spy).toHaveBeenCalledWith(dto.password, user.password);
 });
@@ -91,12 +91,12 @@ src/
 **Standard template:**
 
 ```typescript
-import { Test, TestingModule } from "@nestjs/testing";
-import { ServiceUnderTest } from "./service-under-test";
-import { DependencyOne } from "./dependency-one";
-import { DependencyTwo } from "./dependency-two";
+import { Test, TestingModule } from '@nestjs/testing';
+import { ServiceUnderTest } from './service-under-test';
+import { DependencyOne } from './dependency-one';
+import { DependencyTwo } from './dependency-two';
 
-describe("ServiceUnderTest", () => {
+describe('ServiceUnderTest', () => {
   let service: ServiceUnderTest;
   let dependencyOne: jest.Mocked<DependencyOne>;
   let dependencyTwo: jest.Mocked<DependencyTwo>;
@@ -129,8 +129,8 @@ describe("ServiceUnderTest", () => {
     jest.clearAllMocks();
   });
 
-  describe("methodName", () => {
-    it("should do expected behavior in normal case", async () => {
+  describe('methodName', () => {
+    it('should do expected behavior in normal case', async () => {
       // Arrange
       dependencyOne.methodOne.mockResolvedValue(expectedData);
 
@@ -142,9 +142,9 @@ describe("ServiceUnderTest", () => {
       expect(dependencyOne.methodOne).toHaveBeenCalledWith(expectedArgs);
     });
 
-    it("should handle error case appropriately", async () => {
+    it('should handle error case appropriately', async () => {
       // Arrange
-      dependencyOne.methodOne.mockRejectedValue(new Error("DB error"));
+      dependencyOne.methodOne.mockRejectedValue(new Error('DB error'));
 
       // Act & Assert
       await expect(service.methodName(input)).rejects.toThrow(
@@ -242,9 +242,9 @@ const mockLoggerService = {
 
 // Usually no assertions needed, but can verify error logging
 expect(mockLoggerService.error).toHaveBeenCalledWith(
-  expect.stringContaining("Authentication failed"),
+  expect.stringContaining('Authentication failed'),
   expect.any(String),
-  "AuthService",
+  'AuthService',
 );
 ```
 
@@ -268,38 +268,38 @@ const mockAuthService = {
 **bcrypt:**
 
 ```typescript
-import * as bcrypt from "bcryptjs";
+import * as bcrypt from 'bcryptjs';
 
-jest.mock("bcryptjs");
+jest.mock('bcryptjs');
 const mockedBcrypt = bcrypt as jest.Mocked<typeof bcrypt>;
 
 // In test
-mockedBcrypt.hash.mockResolvedValue("hashed_password" as never);
+mockedBcrypt.hash.mockResolvedValue('hashed_password' as never);
 mockedBcrypt.compare.mockResolvedValue(true as never);
 ```
 
 **jsonwebtoken:**
 
 ```typescript
-import * as jwt from "jsonwebtoken";
+import * as jwt from 'jsonwebtoken';
 
-jest.mock("jsonwebtoken");
+jest.mock('jsonwebtoken');
 const mockedJwt = jwt as jest.Mocked<typeof jwt>;
 
 // In test
-mockedJwt.sign.mockReturnValue("mock_token" as any);
-mockedJwt.verify.mockReturnValue({ sub: "user123", roles: [] } as any);
+mockedJwt.sign.mockReturnValue('mock_token' as any);
+mockedJwt.verify.mockReturnValue({ sub: 'user123', roles: [] } as any);
 ```
 
 **nodemailer:**
 
 ```typescript
 const mockTransporter = {
-  sendMail: jest.fn().mockResolvedValue({ messageId: "msg123" }),
+  sendMail: jest.fn().mockResolvedValue({ messageId: 'msg123' }),
   verify: jest.fn().mockResolvedValue(true),
 };
 
-jest.mock("nodemailer", () => ({
+jest.mock('nodemailer', () => ({
   createTransport: jest.fn(() => mockTransporter),
 }));
 ```
@@ -335,9 +335,9 @@ mockUserModel.findById.mockReturnValue({
 const mockExecutionContext = {
   switchToHttp: jest.fn().mockReturnValue({
     getRequest: jest.fn().mockReturnValue({
-      headers: { authorization: "Bearer mock_token" },
-      user: { sub: "user123", roles: ["role123"] },
-      cookies: { refreshToken: "refresh_token" },
+      headers: { authorization: 'Bearer mock_token' },
+      user: { sub: 'user123', roles: ['role123'] },
+      cookies: { refreshToken: 'refresh_token' },
     }),
     getResponse: jest.fn().mockReturnValue({
       status: jest.fn().mockReturnThis(),
@@ -356,12 +356,12 @@ beforeEach(() => {
   jest.resetModules();
   process.env = {
     ...originalEnv,
-    JWT_SECRET: "test_secret",
-    JWT_REFRESH_SECRET: "test_refresh_secret",
-    JWT_ACCESS_TOKEN_EXPIRES_IN: "15m",
-    JWT_REFRESH_TOKEN_EXPIRES_IN: "7d",
-    SMTP_HOST: "smtp.test.com",
-    SMTP_PORT: "587",
+    JWT_SECRET: 'test_secret',
+    JWT_REFRESH_SECRET: 'test_refresh_secret',
+    JWT_ACCESS_TOKEN_EXPIRES_IN: '15m',
+    JWT_REFRESH_TOKEN_EXPIRES_IN: '7d',
+    SMTP_HOST: 'smtp.test.com',
+    SMTP_PORT: '587',
   };
 });
 
@@ -406,7 +406,7 @@ afterEach(() => {
 **Example test:**
 
 ```typescript
-describe("AuthService", () => {
+describe('AuthService', () => {
   let service: AuthService;
   let userRepository: jest.Mocked<UserRepository>;
   let mailService: jest.Mocked<MailService>;
@@ -454,18 +454,18 @@ describe("AuthService", () => {
     loggerService = module.get(LoggerService);
 
     // Set up environment
-    process.env.JWT_SECRET = "test_secret";
-    process.env.JWT_REFRESH_SECRET = "test_refresh";
+    process.env.JWT_SECRET = 'test_secret';
+    process.env.JWT_REFRESH_SECRET = 'test_refresh';
   });
 
-  describe("login", () => {
-    const loginDto = { email: "test@example.com", password: "password123" };
+  describe('login', () => {
+    const loginDto = { email: 'test@example.com', password: 'password123' };
 
-    it("should return access and refresh tokens for valid credentials", async () => {
+    it('should return access and refresh tokens for valid credentials', async () => {
       const mockUser = {
-        _id: "user123",
-        email: "test@example.com",
-        password: await bcrypt.hash("password123", 12),
+        _id: 'user123',
+        email: 'test@example.com',
+        password: await bcrypt.hash('password123', 12),
         isVerified: true,
         isBanned: false,
         roles: [],
@@ -479,13 +479,13 @@ describe("AuthService", () => {
 
       const result = await service.login(loginDto);
 
-      expect(result).toHaveProperty("accessToken");
-      expect(result).toHaveProperty("refreshToken");
-      expect(typeof result.accessToken).toBe("string");
-      expect(typeof result.refreshToken).toBe("string");
+      expect(result).toHaveProperty('accessToken');
+      expect(result).toHaveProperty('refreshToken');
+      expect(typeof result.accessToken).toBe('string');
+      expect(typeof result.refreshToken).toBe('string');
     });
 
-    it("should throw UnauthorizedException for invalid email", async () => {
+    it('should throw UnauthorizedException for invalid email', async () => {
       userRepository.findByEmailWithPassword.mockResolvedValue(null);
 
       await expect(service.login(loginDto)).rejects.toThrow(
@@ -493,11 +493,11 @@ describe("AuthService", () => {
       );
     });
 
-    it("should throw ForbiddenException for unverified user", async () => {
+    it('should throw ForbiddenException for unverified user', async () => {
       const mockUser = {
-        _id: "user123",
-        email: "test@example.com",
-        password: await bcrypt.hash("password123", 12),
+        _id: 'user123',
+        email: 'test@example.com',
+        password: await bcrypt.hash('password123', 12),
         isVerified: false, // ← Unverified
         isBanned: false,
       };
@@ -507,11 +507,11 @@ describe("AuthService", () => {
       await expect(service.login(loginDto)).rejects.toThrow(ForbiddenException);
     });
 
-    it("should throw ForbiddenException for banned user", async () => {
+    it('should throw ForbiddenException for banned user', async () => {
       const mockUser = {
-        _id: "user123",
-        email: "test@example.com",
-        password: await bcrypt.hash("password123", 12),
+        _id: 'user123',
+        email: 'test@example.com',
+        password: await bcrypt.hash('password123', 12),
         isVerified: true,
         isBanned: true, // ← Banned
       };
@@ -546,26 +546,26 @@ describe("AuthService", () => {
 **✅ Test these scenarios:**
 
 ```typescript
-describe("AuthenticateGuard", () => {
+describe('AuthenticateGuard', () => {
   let guard: AuthenticateGuard;
   let userRepository: jest.Mocked<UserRepository>;
   let loggerService: jest.Mocked<LoggerService>;
 
   beforeEach(() => {
-    process.env.JWT_SECRET = "test_secret";
+    process.env.JWT_SECRET = 'test_secret';
   });
 
-  it("should allow access with valid token", async () => {
-    const mockUser = { _id: "user123", isVerified: true, isBanned: false };
+  it('should allow access with valid token', async () => {
+    const mockUser = { _id: 'user123', isVerified: true, isBanned: false };
     userRepository.findById.mockResolvedValue(mockUser as any);
 
-    const context = createMockContext("Bearer valid_token");
+    const context = createMockContext('Bearer valid_token');
     const canActivate = await guard.canActivate(context);
 
     expect(canActivate).toBe(true);
   });
 
-  it("should throw UnauthorizedException when Authorization header is missing", async () => {
+  it('should throw UnauthorizedException when Authorization header is missing', async () => {
     const context = createMockContext(undefined);
 
     await expect(guard.canActivate(context)).rejects.toThrow(
@@ -573,28 +573,28 @@ describe("AuthenticateGuard", () => {
     );
   });
 
-  it("should throw UnauthorizedException when token is invalid", async () => {
-    const context = createMockContext("Bearer invalid_token");
+  it('should throw UnauthorizedException when token is invalid', async () => {
+    const context = createMockContext('Bearer invalid_token');
 
     await expect(guard.canActivate(context)).rejects.toThrow(
       UnauthorizedException,
     );
   });
 
-  it("should throw ForbiddenException for unverified user", async () => {
-    const mockUser = { _id: "user123", isVerified: false, isBanned: false };
+  it('should throw ForbiddenException for unverified user', async () => {
+    const mockUser = { _id: 'user123', isVerified: false, isBanned: false };
     userRepository.findById.mockResolvedValue(mockUser as any);
 
-    const context = createMockContext("Bearer valid_token");
+    const context = createMockContext('Bearer valid_token');
 
     await expect(guard.canActivate(context)).rejects.toThrow(
       ForbiddenException,
     );
   });
 
-  it("should throw UnauthorizedException when token issued before password change", async () => {
+  it('should throw UnauthorizedException when token issued before password change', async () => {
     const mockUser = {
-      _id: "user123",
+      _id: 'user123',
       isVerified: true,
       isBanned: false,
       passwordChangedAt: new Date(),
@@ -603,8 +603,8 @@ describe("AuthenticateGuard", () => {
 
     // Create token with old iat
     const oldToken = jwt.sign(
-      { sub: "user123", iat: Math.floor(Date.now() / 1000) - 3600 },
-      "test_secret",
+      { sub: 'user123', iat: Math.floor(Date.now() / 1000) - 3600 },
+      'test_secret',
     );
 
     const context = createMockContext(`Bearer ${oldToken}`);
@@ -621,19 +621,19 @@ describe("AuthenticateGuard", () => {
 **✅ Test these scenarios:**
 
 ```typescript
-describe("hasRole", () => {
-  it("should allow access when user has required role", () => {
-    const RoleGuard = hasRole("admin_role_id");
+describe('hasRole', () => {
+  it('should allow access when user has required role', () => {
+    const RoleGuard = hasRole('admin_role_id');
     const guard = new RoleGuard();
 
-    const context = createMockContext(null, { roles: ["admin_role_id"] });
+    const context = createMockContext(null, { roles: ['admin_role_id'] });
     const canActivate = guard.canActivate(context);
 
     expect(canActivate).toBe(true);
   });
 
-  it("should deny access when user lacks required role", () => {
-    const RoleGuard = hasRole("admin_role_id");
+  it('should deny access when user lacks required role', () => {
+    const RoleGuard = hasRole('admin_role_id');
     const guard = new RoleGuard();
 
     const mockResponse = {
@@ -642,7 +642,7 @@ describe("hasRole", () => {
     };
     const context = createMockContext(
       null,
-      { roles: ["user_role_id"] },
+      { roles: ['user_role_id'] },
       mockResponse,
     );
 
@@ -661,7 +661,7 @@ describe("hasRole", () => {
 **✅ Test these methods:**
 
 ```typescript
-describe("UserRepository", () => {
+describe('UserRepository', () => {
   let repository: UserRepository;
   let mockUserModel: any;
 
@@ -691,8 +691,8 @@ describe("UserRepository", () => {
     repository = module.get<UserRepository>(UserRepository);
   });
 
-  it("should create a user", async () => {
-    const userData = { email: "test@example.com", password: "hashed" };
+  it('should create a user', async () => {
+    const userData = { email: 'test@example.com', password: 'hashed' };
     mockUserModel.create.mockResolvedValue(userData);
 
     const result = await repository.create(userData);
@@ -701,15 +701,15 @@ describe("UserRepository", () => {
     expect(mockUserModel.create).toHaveBeenCalledWith(userData);
   });
 
-  it("should find user by email", async () => {
-    const mockUser = { _id: "user123", email: "test@example.com" };
+  it('should find user by email', async () => {
+    const mockUser = { _id: 'user123', email: 'test@example.com' };
     mockUserModel.findOne.mockResolvedValue(mockUser);
 
-    const result = await repository.findByEmail("test@example.com");
+    const result = await repository.findByEmail('test@example.com');
 
     expect(result).toEqual(mockUser);
     expect(mockUserModel.findOne).toHaveBeenCalledWith({
-      email: "test@example.com",
+      email: 'test@example.com',
     });
   });
 });
@@ -720,7 +720,7 @@ describe("UserRepository", () => {
 **Test HTTP layer (integration tests preferred):**
 
 ```typescript
-describe("AuthController", () => {
+describe('AuthController', () => {
   let controller: AuthController;
   let authService: jest.Mocked<AuthService>;
 
@@ -744,12 +744,12 @@ describe("AuthController", () => {
     authService = module.get(AuthService);
   });
 
-  describe("POST /api/auth/login", () => {
-    it("should return access and refresh tokens", async () => {
-      const loginDto = { email: "test@example.com", password: "password123" };
+  describe('POST /api/auth/login', () => {
+    it('should return access and refresh tokens', async () => {
+      const loginDto = { email: 'test@example.com', password: 'password123' };
       const tokens = {
-        accessToken: "access_token",
-        refreshToken: "refresh_token",
+        accessToken: 'access_token',
+        refreshToken: 'refresh_token',
       };
 
       authService.login.mockResolvedValue(tokens);
@@ -764,7 +764,7 @@ describe("AuthController", () => {
 
       expect(authService.login).toHaveBeenCalledWith(loginDto);
       expect(mockResponse.cookie).toHaveBeenCalledWith(
-        "refreshToken",
+        'refreshToken',
         tokens.refreshToken,
         expect.objectContaining({ httpOnly: true }),
       );
@@ -780,37 +780,37 @@ describe("AuthController", () => {
 **Test validation rules:**
 
 ```typescript
-import { validate } from "class-validator";
-import { LoginDto } from "@dtos/auth/login.dto";
+import { validate } from 'class-validator';
+import { LoginDto } from '@dtos/auth/login.dto';
 
-describe("LoginDto", () => {
-  it("should pass validation with valid data", async () => {
+describe('LoginDto', () => {
+  it('should pass validation with valid data', async () => {
     const dto = new LoginDto();
-    dto.email = "test@example.com";
-    dto.password = "password123";
+    dto.email = 'test@example.com';
+    dto.password = 'password123';
 
     const errors = await validate(dto);
     expect(errors.length).toBe(0);
   });
 
-  it("should fail validation with invalid email", async () => {
+  it('should fail validation with invalid email', async () => {
     const dto = new LoginDto();
-    dto.email = "invalid-email";
-    dto.password = "password123";
+    dto.email = 'invalid-email';
+    dto.password = 'password123';
 
     const errors = await validate(dto);
     expect(errors.length).toBeGreaterThan(0);
-    expect(errors[0].property).toBe("email");
+    expect(errors[0].property).toBe('email');
   });
 
-  it("should fail validation when password is missing", async () => {
+  it('should fail validation when password is missing', async () => {
     const dto = new LoginDto();
-    dto.email = "test@example.com";
+    dto.email = 'test@example.com';
     // password not set
 
     const errors = await validate(dto);
     expect(errors.length).toBeGreaterThan(0);
-    expect(errors[0].property).toBe("password");
+    expect(errors[0].property).toBe('password');
   });
 });
 ```
@@ -833,8 +833,8 @@ describe("LoginDto", () => {
 **Example:**
 
 ```typescript
-describe("Error handling", () => {
-  it("should throw InternalServerErrorException when JWT_SECRET is missing", async () => {
+describe('Error handling', () => {
+  it('should throw InternalServerErrorException when JWT_SECRET is missing', async () => {
     delete process.env.JWT_SECRET;
 
     await expect(service.login(dto)).rejects.toThrow(
@@ -842,14 +842,14 @@ describe("Error handling", () => {
     );
 
     expect(loggerService.error).toHaveBeenCalledWith(
-      expect.stringContaining("JWT_SECRET"),
-      "AuthService",
+      expect.stringContaining('JWT_SECRET'),
+      'AuthService',
     );
   });
 
-  it("should throw InternalServerErrorException when mail service fails", async () => {
+  it('should throw InternalServerErrorException when mail service fails', async () => {
     mailService.sendVerificationEmail.mockRejectedValue(
-      new Error("SMTP error"),
+      new Error('SMTP error'),
     );
 
     await expect(service.register(dto)).rejects.toThrow(
@@ -889,11 +889,11 @@ describe("Error handling", () => {
 **Example:**
 
 ```typescript
-describe("Edge cases", () => {
-  it("should handle user with no roles", async () => {
+describe('Edge cases', () => {
+  it('should handle user with no roles', async () => {
     const mockUser = {
-      _id: "user123",
-      email: "test@example.com",
+      _id: 'user123',
+      email: 'test@example.com',
       isVerified: true,
       isBanned: false,
       roles: [], // ← No roles
@@ -903,19 +903,19 @@ describe("Edge cases", () => {
       mockUser as any,
     );
 
-    const tokens = await service.issueTokensForUser("user123");
+    const tokens = await service.issueTokensForUser('user123');
     const decoded = jwt.verify(tokens.accessToken, process.env.JWT_SECRET!);
 
-    expect(decoded).toHaveProperty("roles", []);
-    expect(decoded).toHaveProperty("permissions", []);
+    expect(decoded).toHaveProperty('roles', []);
+    expect(decoded).toHaveProperty('permissions', []);
   });
 
-  it("should normalize email to lowercase", async () => {
-    const dto = { email: "TEST@EXAMPLE.COM", password: "password123" };
-    roleRepository.findByName.mockResolvedValue({ _id: "role123" } as any);
+  it('should normalize email to lowercase', async () => {
+    const dto = { email: 'TEST@EXAMPLE.COM', password: 'password123' };
+    roleRepository.findByName.mockResolvedValue({ _id: 'role123' } as any);
     userRepository.create.mockResolvedValue({
-      _id: "user123",
-      email: "test@example.com",
+      _id: 'user123',
+      email: 'test@example.com',
     } as any);
 
     await service.register(dto as any);
@@ -972,16 +972,16 @@ npm run test:cov
 
 ```typescript
 // ❌ BAD
-it("should call userRepository.findByEmail", async () => {
+it('should call userRepository.findByEmail', async () => {
   await service.login(dto);
   expect(userRepository.findByEmail).toHaveBeenCalled();
 });
 
 // ✅ GOOD
-it("should return tokens for valid credentials", async () => {
+it('should return tokens for valid credentials', async () => {
   const result = await service.login(dto);
-  expect(result).toHaveProperty("accessToken");
-  expect(result).toHaveProperty("refreshToken");
+  expect(result).toHaveProperty('accessToken');
+  expect(result).toHaveProperty('refreshToken');
 });
 ```
 
@@ -991,24 +991,24 @@ it("should return tokens for valid credentials", async () => {
 // ❌ BAD - Tests depend on each other
 let user;
 
-it("should register user", async () => {
+it('should register user', async () => {
   user = await service.register(dto);
 });
 
-it("should login user", async () => {
+it('should login user', async () => {
   await service.login({ email: user.email, password: dto.password });
 });
 
 // ✅ GOOD - Each test is independent
-it("should register user", async () => {
+it('should register user', async () => {
   const user = await service.register(dto);
   expect(user).toBeDefined();
 });
 
-it("should login user", async () => {
+it('should login user', async () => {
   userRepository.findByEmailWithPassword.mockResolvedValue(mockUser);
   const result = await service.login(dto);
-  expect(result).toHaveProperty("accessToken");
+  expect(result).toHaveProperty('accessToken');
 });
 ```
 
@@ -1016,11 +1016,11 @@ it("should login user", async () => {
 
 ```typescript
 // ❌ BAD - Mocks persist between tests
-it("test 1", () => {
-  mockService.method.mockResolvedValue("value1");
+it('test 1', () => {
+  mockService.method.mockResolvedValue('value1');
 });
 
-it("test 2", () => {
+it('test 2', () => {
   // mockService.method still has value1 mock!
 });
 
@@ -1034,7 +1034,7 @@ afterEach(() => {
 
 ```typescript
 // ❌ BAD - Mocking too much loses test value
-jest.mock("@services/auth.service");
+jest.mock('@services/auth.service');
 
 // ✅ GOOD - Only mock external dependencies
 const mockUserRepository = { findById: jest.fn() };
@@ -1050,27 +1050,27 @@ const mockMailService = { sendEmail: jest.fn() };
 
 ```javascript
 module.exports = {
-  preset: "ts-jest",
-  testEnvironment: "node",
-  roots: ["<rootDir>/src"],
-  testMatch: ["**/*.spec.ts"],
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  roots: ['<rootDir>/src'],
+  testMatch: ['**/*.spec.ts'],
   moduleNameMapper: {
-    "^@models/(.*)$": "<rootDir>/src/models/$1",
-    "^@dtos/(.*)$": "<rootDir>/src/dtos/$1",
-    "^@repos/(.*)$": "<rootDir>/src/repositories/$1",
-    "^@services/(.*)$": "<rootDir>/src/services/$1",
-    "^@controllers/(.*)$": "<rootDir>/src/controllers/$1",
-    "^@config/(.*)$": "<rootDir>/src/config/$1",
-    "^@middleware/(.*)$": "<rootDir>/src/middleware/$1",
-    "^@filters/(.*)$": "<rootDir>/src/filters/$1",
-    "^@utils/(.*)$": "<rootDir>/src/utils/$1",
+    '^@models/(.*)$': '<rootDir>/src/models/$1',
+    '^@dtos/(.*)$': '<rootDir>/src/dtos/$1',
+    '^@repos/(.*)$': '<rootDir>/src/repositories/$1',
+    '^@services/(.*)$': '<rootDir>/src/services/$1',
+    '^@controllers/(.*)$': '<rootDir>/src/controllers/$1',
+    '^@config/(.*)$': '<rootDir>/src/config/$1',
+    '^@middleware/(.*)$': '<rootDir>/src/middleware/$1',
+    '^@filters/(.*)$': '<rootDir>/src/filters/$1',
+    '^@utils/(.*)$': '<rootDir>/src/utils/$1',
   },
   collectCoverageFrom: [
-    "src/**/*.ts",
-    "!src/**/*.spec.ts",
-    "!src/**/*.d.ts",
-    "!src/index.ts",
-    "!src/standalone.ts",
+    'src/**/*.ts',
+    '!src/**/*.spec.ts',
+    '!src/**/*.d.ts',
+    '!src/index.ts',
+    '!src/standalone.ts',
   ],
   coverageThreshold: {
     global: {
@@ -1080,7 +1080,7 @@ module.exports = {
       statements: 80,
     },
   },
-  coverageDirectory: "coverage",
+  coverageDirectory: 'coverage',
   verbose: true,
 };
 ```

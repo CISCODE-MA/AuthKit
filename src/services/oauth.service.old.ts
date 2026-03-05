@@ -3,19 +3,19 @@ import {
   UnauthorizedException,
   InternalServerErrorException,
   BadRequestException,
-} from "@nestjs/common";
-import axios, { AxiosError } from "axios";
-import jwt from "jsonwebtoken";
-import jwksClient from "jwks-rsa";
-import { UserRepository } from "@repos/user.repository";
-import { RoleRepository } from "@repos/role.repository";
-import { AuthService } from "@services/auth.service";
-import { LoggerService } from "@services/logger.service";
+} from '@nestjs/common';
+import axios, { AxiosError } from 'axios';
+import jwt from 'jsonwebtoken';
+import jwksClient from 'jwks-rsa';
+import { UserRepository } from '@repos/user.repository';
+import { RoleRepository } from '@repos/role.repository';
+import { AuthService } from '@services/auth.service';
+import { LoggerService } from '@services/logger.service';
 
 @Injectable()
 export class OAuthService {
   private msJwks = jwksClient({
-    jwksUri: "https://login.microsoftonline.com/common/discovery/v2.0/keys",
+    jwksUri: 'https://login.microsoftonline.com/common/discovery/v2.0/keys',
     cache: true,
     rateLimit: true,
     jwksRequestsPerMinute: 5,
@@ -34,13 +34,13 @@ export class OAuthService {
   ) {}
 
   private async getDefaultRoleId() {
-    const role = await this.roles.findByName("user");
+    const role = await this.roles.findByName('user');
     if (!role) {
       this.logger.error(
-        "Default user role not found - seed data missing",
-        "OAuthService",
+        'Default user role not found - seed data missing',
+        'OAuthService',
       );
-      throw new InternalServerErrorException("System configuration error");
+      throw new InternalServerErrorException('System configuration error');
     }
     return role._id;
   }
@@ -55,7 +55,7 @@ export class OAuthService {
             this.logger.error(
               `Failed to get Microsoft signing key: ${err.message}`,
               err.stack,
-              "OAuthService",
+              'OAuthService',
             );
             cb(err);
           });
@@ -64,15 +64,15 @@ export class OAuthService {
       jwt.verify(
         idToken,
         getKey as any,
-        { algorithms: ["RS256"], audience: process.env.MICROSOFT_CLIENT_ID },
+        { algorithms: ['RS256'], audience: process.env.MICROSOFT_CLIENT_ID },
         (err, payload) => {
           if (err) {
             this.logger.error(
               `Microsoft token verification failed: ${err.message}`,
               err.stack,
-              "OAuthService",
+              'OAuthService',
             );
-            reject(new UnauthorizedException("Invalid Microsoft token"));
+            reject(new UnauthorizedException('Invalid Microsoft token'));
           } else {
             resolve(payload);
           }
@@ -87,7 +87,7 @@ export class OAuthService {
       const email = ms.preferred_username || ms.email;
 
       if (!email) {
-        throw new BadRequestException("Email not provided by Microsoft");
+        throw new BadRequestException('Email not provided by Microsoft');
       }
 
       return this.findOrCreateOAuthUser(email, ms.name);
@@ -101,16 +101,16 @@ export class OAuthService {
       this.logger.error(
         `Microsoft login failed: ${error.message}`,
         error.stack,
-        "OAuthService",
+        'OAuthService',
       );
-      throw new UnauthorizedException("Microsoft authentication failed");
+      throw new UnauthorizedException('Microsoft authentication failed');
     }
   }
 
   async loginWithGoogleIdToken(idToken: string) {
     try {
       const verifyResp = await axios.get(
-        "https://oauth2.googleapis.com/tokeninfo",
+        'https://oauth2.googleapis.com/tokeninfo',
         {
           params: { id_token: idToken },
           ...this.axiosConfig,
@@ -119,7 +119,7 @@ export class OAuthService {
 
       const email = verifyResp.data?.email;
       if (!email) {
-        throw new BadRequestException("Email not provided by Google");
+        throw new BadRequestException('Email not provided by Google');
       }
 
       return this.findOrCreateOAuthUser(email, verifyResp.data?.name);
@@ -129,47 +129,47 @@ export class OAuthService {
       }
 
       const axiosError = error as AxiosError;
-      if (axiosError.code === "ECONNABORTED") {
+      if (axiosError.code === 'ECONNABORTED') {
         this.logger.error(
-          "Google API timeout",
+          'Google API timeout',
           axiosError.stack,
-          "OAuthService",
+          'OAuthService',
         );
         throw new InternalServerErrorException(
-          "Authentication service timeout",
+          'Authentication service timeout',
         );
       }
 
       this.logger.error(
         `Google ID token login failed: ${error.message}`,
         error.stack,
-        "OAuthService",
+        'OAuthService',
       );
-      throw new UnauthorizedException("Google authentication failed");
+      throw new UnauthorizedException('Google authentication failed');
     }
   }
 
   async loginWithGoogleCode(code: string) {
     try {
       const tokenResp = await axios.post(
-        "https://oauth2.googleapis.com/token",
+        'https://oauth2.googleapis.com/token',
         {
           code,
           client_id: process.env.GOOGLE_CLIENT_ID,
           client_secret: process.env.GOOGLE_CLIENT_SECRET,
-          redirect_uri: "postmessage",
-          grant_type: "authorization_code",
+          redirect_uri: 'postmessage',
+          grant_type: 'authorization_code',
         },
         this.axiosConfig,
       );
 
       const { access_token } = tokenResp.data || {};
       if (!access_token) {
-        throw new BadRequestException("Failed to exchange authorization code");
+        throw new BadRequestException('Failed to exchange authorization code');
       }
 
       const profileResp = await axios.get(
-        "https://www.googleapis.com/oauth2/v2/userinfo",
+        'https://www.googleapis.com/oauth2/v2/userinfo',
         {
           headers: { Authorization: `Bearer ${access_token}` },
           ...this.axiosConfig,
@@ -178,7 +178,7 @@ export class OAuthService {
 
       const email = profileResp.data?.email;
       if (!email) {
-        throw new BadRequestException("Email not provided by Google");
+        throw new BadRequestException('Email not provided by Google');
       }
 
       return this.findOrCreateOAuthUser(email, profileResp.data?.name);
@@ -188,35 +188,35 @@ export class OAuthService {
       }
 
       const axiosError = error as AxiosError;
-      if (axiosError.code === "ECONNABORTED") {
+      if (axiosError.code === 'ECONNABORTED') {
         this.logger.error(
-          "Google API timeout",
+          'Google API timeout',
           axiosError.stack,
-          "OAuthService",
+          'OAuthService',
         );
         throw new InternalServerErrorException(
-          "Authentication service timeout",
+          'Authentication service timeout',
         );
       }
 
       this.logger.error(
         `Google code exchange failed: ${error.message}`,
         error.stack,
-        "OAuthService",
+        'OAuthService',
       );
-      throw new UnauthorizedException("Google authentication failed");
+      throw new UnauthorizedException('Google authentication failed');
     }
   }
 
   async loginWithFacebook(accessToken: string) {
     try {
       const appTokenResp = await axios.get(
-        "https://graph.facebook.com/oauth/access_token",
+        'https://graph.facebook.com/oauth/access_token',
         {
           params: {
             client_id: process.env.FB_CLIENT_ID,
             client_secret: process.env.FB_CLIENT_SECRET,
-            grant_type: "client_credentials",
+            grant_type: 'client_credentials',
           },
           ...this.axiosConfig,
         },
@@ -225,27 +225,27 @@ export class OAuthService {
       const appAccessToken = appTokenResp.data?.access_token;
       if (!appAccessToken) {
         throw new InternalServerErrorException(
-          "Failed to get Facebook app token",
+          'Failed to get Facebook app token',
         );
       }
 
-      const debug = await axios.get("https://graph.facebook.com/debug_token", {
+      const debug = await axios.get('https://graph.facebook.com/debug_token', {
         params: { input_token: accessToken, access_token: appAccessToken },
         ...this.axiosConfig,
       });
 
       if (!debug.data?.data?.is_valid) {
-        throw new UnauthorizedException("Invalid Facebook access token");
+        throw new UnauthorizedException('Invalid Facebook access token');
       }
 
-      const me = await axios.get("https://graph.facebook.com/me", {
-        params: { access_token: accessToken, fields: "id,name,email" },
+      const me = await axios.get('https://graph.facebook.com/me', {
+        params: { access_token: accessToken, fields: 'id,name,email' },
         ...this.axiosConfig,
       });
 
       const email = me.data?.email;
       if (!email) {
-        throw new BadRequestException("Email not provided by Facebook");
+        throw new BadRequestException('Email not provided by Facebook');
       }
 
       return this.findOrCreateOAuthUser(email, me.data?.name);
@@ -259,23 +259,23 @@ export class OAuthService {
       }
 
       const axiosError = error as AxiosError;
-      if (axiosError.code === "ECONNABORTED") {
+      if (axiosError.code === 'ECONNABORTED') {
         this.logger.error(
-          "Facebook API timeout",
+          'Facebook API timeout',
           axiosError.stack,
-          "OAuthService",
+          'OAuthService',
         );
         throw new InternalServerErrorException(
-          "Authentication service timeout",
+          'Authentication service timeout',
         );
       }
 
       this.logger.error(
         `Facebook login failed: ${error.message}`,
         error.stack,
-        "OAuthService",
+        'OAuthService',
       );
-      throw new UnauthorizedException("Facebook authentication failed");
+      throw new UnauthorizedException('Facebook authentication failed');
     }
   }
 
@@ -284,14 +284,14 @@ export class OAuthService {
       let user = await this.users.findByEmail(email);
 
       if (!user) {
-        const [fname, ...rest] = (name || "User OAuth").split(" ");
-        const lname = rest.join(" ") || "OAuth";
+        const [fname, ...rest] = (name || 'User OAuth').split(' ');
+        const lname = rest.join(' ') || 'OAuth';
 
         const defaultRoleId = await this.getDefaultRoleId();
 
         user = await this.users.create({
           fullname: { fname, lname },
-          username: email.split("@")[0],
+          username: email.split('@')[0],
           email,
           roles: [defaultRoleId],
           isVerified: true,
@@ -318,7 +318,7 @@ export class OAuthService {
           this.logger.error(
             `OAuth user retry failed: ${retryError.message}`,
             retryError.stack,
-            "OAuthService",
+            'OAuthService',
           );
         }
       }
@@ -326,9 +326,9 @@ export class OAuthService {
       this.logger.error(
         `OAuth user creation/login failed: ${error.message}`,
         error.stack,
-        "OAuthService",
+        'OAuthService',
       );
-      throw new InternalServerErrorException("Authentication failed");
+      throw new InternalServerErrorException('Authentication failed');
     }
   }
 }

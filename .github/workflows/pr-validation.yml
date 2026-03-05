@@ -27,7 +27,7 @@ jobs:
         run: npm ci
 
       - name: Format (check)
-        run: npm run format
+        run: npm run format:write
 
       - name: Lint
         run: npm run lint

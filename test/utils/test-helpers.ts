@@ -7,25 +7,25 @@ import type { ExecutionContext } from '@nestjs/common';
  * @returns Mock ExecutionContext
  */
 export function createMockExecutionContext(
-    userRoles?: string[],
-    authHeader?: string,
+  userRoles?: string[],
+  authHeader?: string,
 ): ExecutionContext {
-    const response = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn().mockReturnThis(),
-    };
+  const response = {
+    status: jest.fn().mockReturnThis(),
+    json: jest.fn().mockReturnThis(),
+  };
 
-    const request: any = {
-        headers: authHeader ? { authorization: authHeader } : {},
-        user: userRoles ? { roles: userRoles } : undefined,
-    };
+  const request: any = {
+    headers: authHeader ? { authorization: authHeader } : {},
+    user: userRoles ? { roles: userRoles } : undefined,
+  };
 
-    return {
-        switchToHttp: () => ({
-            getRequest: () => request,
-            getResponse: () => response,
-        }),
-    } as ExecutionContext;
+  return {
+    switchToHttp: () => ({
+      getRequest: () => request,
+      getResponse: () => response,
+    }),
+  } as ExecutionContext;
 }
 
 /**
@@ -34,9 +34,9 @@ export function createMockExecutionContext(
  * @returns Mock ExecutionContext with user roles
  */
 export function createMockContextWithRoles(
-    userRoles: string[] = [],
+  userRoles: string[] = [],
 ): ExecutionContext {
-    return createMockExecutionContext(userRoles);
+  return createMockExecutionContext(userRoles);
 }
 
 /**
@@ -45,7 +45,7 @@ export function createMockContextWithRoles(
  * @returns Mock ExecutionContext with auth header
  */
 export function createMockContextWithAuth(
-    authHeader?: string,
+  authHeader?: string,
 ): ExecutionContext {
-    return createMockExecutionContext(undefined, authHeader);
+  return createMockExecutionContext(undefined, authHeader);
 }

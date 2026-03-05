@@ -12,6 +12,7 @@ import { MailService } from '@services/mail.service';
 import { LoggerService } from '@services/logger.service';
 
 // Test constants
+// NOSONAR - Mock password for testing only
 const TEST_HASHED_PASSWORD = '$2a$10$validHashedPassword';
 
 describe('RBAC Integration - Login & JWT with Roles/Permissions', () => {

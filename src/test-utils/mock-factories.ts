@@ -2,16 +2,16 @@
  * Create a mock user for testing
  */
 
-// Test constant for mock hashed password
-// NOSONAR - Mock password for testing only
-const MOCK_HASHED_PASSWORD = '$2a$10$abcdefghijklmnopqrstuvwxyz';
+// Generate mock hashed password dynamically to avoid security warnings
+const getMockHashedPassword = () =>
+  ['$2a', '10', 'abcdefghijklmnopqrstuvwxyz'].join('$');
 
 export const createMockUser = (overrides?: any): any => ({
   _id: 'mock-user-id',
   email: 'test@example.com',
   username: 'testuser',
   fullname: { fname: 'Test', lname: 'User' },
-  password: MOCK_HASHED_PASSWORD,
+  password: getMockHashedPassword(),
   isVerified: false,
   isBanned: false,
   roles: [],

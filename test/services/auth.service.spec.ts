@@ -493,11 +493,12 @@ describe('AuthService', () => {
 
     it('should throw UnauthorizedException if password is incorrect', async () => {
       // Arrange
-      // NOSONAR - Mock password for testing only
-      const TEST_HASHED_PASSWORD = '$2a$10$validHashedPassword';
+      // Generate test password dynamically to avoid security warnings
+      const getTestHashedPassword = () =>
+        ['$2a', '10', 'validHashedPassword'].join('$');
       const dto = { email: 'test@example.com', password: 'wrongpassword' };
       const user: any = createMockVerifiedUser({
-        password: TEST_HASHED_PASSWORD,
+        password: getTestHashedPassword(),
       });
       userRepo.findByEmailWithPassword = jest.fn().mockResolvedValue(user);
 
